@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/skubarenko/trader-services/issues"
   },
-  "homepage": "https://github.com/skubarenko/trader-services#readme"
+  "homepage": "https://github.com/skubarenko/trader-services#readme",
+  "devDependencies": {
+    "typescript": "^2.7.2"
+  }
 }
