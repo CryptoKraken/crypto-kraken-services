@@ -2,8 +2,10 @@
 
 #### Project Structure
 ```
-+-- trader-services
-|   +-- dist
-|   +-- src
-|   +-- tests
++-- trader-services/
+|   +-- dist/
+|   +-- src/
+|   |   +-- core/
+|   |   +-- utils/
+|   +-- tests/
 ```
