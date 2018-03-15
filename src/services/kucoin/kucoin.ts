@@ -14,7 +14,8 @@ export class KuCoinService implements ExchangeService {
     async createOrder(order: Order): Promise<Order & { id: string; }> {
         throw new Error("Method not implemented.");
     }
-    async deleteOrder(id: string): Promise<boolean> {        
+
+    async deleteOrder(id: string): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
 
