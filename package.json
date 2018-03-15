@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "build-watch": "./node_modules/.bin/tsc -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -r ts-node/register tests/**/*.spec.ts"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,11 @@
   },
   "homepage": "https://github.com/skubarenko/trader-services#readme",
   "devDependencies": {
-    "typescript": "^2.7.2"
+    "typescript": "^2.7.2",
+    "ts-node": "^5.0.1",
+    "mocha": "^5.0.4",
+    "chai": "^4.1.2",
+    "@types/mocha": "^2.2.48",
+    "@types/chai": "^4.1.2"
   }
 }
