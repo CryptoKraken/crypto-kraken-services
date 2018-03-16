@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - "node"
+
+env:
+  global:
+    - NODE_ENV=development
+
+install:
+  - npm install
+
+script:
+  - npm run build
+  - npm test
