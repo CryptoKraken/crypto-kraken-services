@@ -11,5 +11,5 @@ export interface Order {
 
 export interface OrderInfo {
     startAmount: number;
-    currentAmout: number;
+    currentAmount: number;
 }
