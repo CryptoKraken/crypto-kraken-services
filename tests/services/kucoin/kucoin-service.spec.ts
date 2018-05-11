@@ -1,7 +1,11 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
-import { KuCoinService, InternalConstants as KuCoinInternalConstants } from '../../../src/services/kucoin';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
+import { KuCoinService } from '../../../src/services/kucoin';
+import {
+    KUCOIN_RECENTLY_DEAL_ORDERS_URI,
+    KUCOIN_SERVER_PRODUCTION_URI
+} from '../../../src/services/kucoin/constants';
 import recentDealOrdersData from './data/recent-deal-orders.data';
 
 describe('KuCoin Exchange Service', () => {
@@ -15,8 +19,8 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = recentDealOrdersData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KuCoinInternalConstants.KUCOIN_DEFAULT_SERVER_PRODUCTION_URI)
-            .get(KuCoinInternalConstants.KUCOIN_DEFAULT_RECENTLY_DEAL_ORDERS_URI)
+        nock(KUCOIN_SERVER_PRODUCTION_URI)
+            .get(KUCOIN_RECENTLY_DEAL_ORDERS_URI)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
