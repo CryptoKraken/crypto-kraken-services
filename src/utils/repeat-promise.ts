@@ -16,7 +16,8 @@ export class RepeatPromise<T> implements Promise<T> {
                 this.callCounter++;
                 if (this.callCounter > this.tryCount)
                     reject(reason);
-                setTimeout(() => this.wrappedExecutor(resolve, reject), 0);
+                else
+                    setTimeout(() => this.wrappedExecutor(resolve, reject), 0);
             };
             this.executor(this.wrappedResolve, this.wrappedReject);
         });
