@@ -1,1 +1,1 @@
-export { KuCoinService } from './kucoin';
+export { KuCoinService } from './kucoin-service';
