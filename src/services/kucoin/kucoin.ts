@@ -3,8 +3,8 @@ import { ExchangeService, Order, OrderInfo, OrderBook, CurrencyPair, OrderType }
 import { RepeatPromise } from '../../utils';
 import { KuCoinResponseParser } from './kucoin-responce-parser';
 
-const KUCOIN_DEFAULT_SERVER_PRODUCTION_URI = 'https://api.kucoin.com';
-const KUCOIN_DEFAULT_RECENTLY_DEAL_ORDERS_URI = '/v1/open/deal-orders';
+export const KUCOIN_DEFAULT_SERVER_PRODUCTION_URI = 'https://api.kucoin.com';
+export const KUCOIN_DEFAULT_RECENTLY_DEAL_ORDERS_URI = '/v1/open/deal-orders';
 
 export class KuCoinService implements ExchangeService {
     private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();;
