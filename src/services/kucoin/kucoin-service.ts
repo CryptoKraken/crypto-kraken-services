@@ -1,7 +1,7 @@
 import * as request from 'request-promise-native';
 import { ExchangeService, Order, OrderInfo, OrderBook, CurrencyPair, OrderType } from '../../core';
 import { RepeatPromise } from '../../utils';
-import { KuCoinResponseParser } from './kucoin-responce-parser';
+import { KuCoinResponseParser } from './kucoin-response-parser';
 
 export const KUCOIN_DEFAULT_SERVER_PRODUCTION_URI = 'https://api.kucoin.com';
 export const KUCOIN_DEFAULT_RECENTLY_DEAL_ORDERS_URI = '/v1/open/deal-orders';

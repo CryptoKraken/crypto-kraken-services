@@ -1,9 +1,9 @@
 import { expect } from 'chai';
-import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-responce-parser';
+import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import recentDealOrdersData, { wrongData as wrongRecentDealOrdersData } from './data/recent-deal-orders.data';
 
-describe('KuCoin Responce Parser', () => {
+describe('KuCoin Response Parser', () => {
     let kuCoinResponseParser: KuCoinResponseParser;
 
     beforeEach(() => {
