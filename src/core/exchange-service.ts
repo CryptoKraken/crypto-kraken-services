@@ -4,7 +4,7 @@ import { OrderBook } from './order-book';
 
 export interface ExchangeService {
     // Orders
-    getOrderBook(pair: CurrencyPair): Promise<OrderBook>;
+    getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook>;
     getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]>;
 
     // Account orders
