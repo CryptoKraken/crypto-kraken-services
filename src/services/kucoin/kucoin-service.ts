@@ -34,7 +34,7 @@ export class KuCoinService implements ExchangeService {
             })
                 .then(value => resolve(this.kuCoinResponseParser.parseOrderBook(pair, value)))
                 .catch(reason => reject(reason));
-        });
+        }, this.requestTryCount);
     }
 
     async getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
@@ -49,7 +49,7 @@ export class KuCoinService implements ExchangeService {
             })
                 .then(value => resolve(this.kuCoinResponseParser.parseDealOrders(pair, value)))
                 .catch(reason => reject(reason));
-        });
+        }, this.requestTryCount);
     }
 
     async createOrder(order: Order): Promise<Order & { id: string; }> {
