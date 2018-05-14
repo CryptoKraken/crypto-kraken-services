@@ -23,7 +23,7 @@ type dealOrderResponseResult = [
 const Guards = {
     dataObjOwnerGuard: (dataOwner: any): dataOwner is { data: any } => dataOwner && dataOwner.data,
     dataArrayOwnerGuard: (dataOwner: any): dataOwner is { data: any[] } => Guards.dataObjOwnerGuard(dataOwner) && isArray(dataOwner.data),
-    orderBook: (orderBook: any): orderBook is orderBookResponseResult => {
+    orderBookGuard: (orderBook: any): orderBook is orderBookResponseResult => {
         return orderBook && orderBook['SELL'] && orderBook['BUY']
             && isArray(orderBook['SELL']) && isArray(orderBook['BUY'])
             && orderBook['SELL'].every((order: any) => Guards.orderGuard(order))
@@ -42,7 +42,7 @@ const Guards = {
 export class KuCoinResponseParser {
     parseOrderBook(currencyPair: CurrencyPair, responseResult: string): OrderBook {
         const obj = JSON.parse(responseResult);
-        if (!Guards.dataObjOwnerGuard(obj) || !Guards.orderBook(obj.data))
+        if (!Guards.dataObjOwnerGuard(obj) || !Guards.orderBookGuard(obj.data))
             throw new Error(`The result ${responseResult} isn't the order book type.`);
         const orderBookResponseResult = obj.data;
         return {
