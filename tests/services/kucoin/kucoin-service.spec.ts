@@ -46,6 +46,26 @@ describe('KuCoin Exchange Service', () => {
         expect(orders2[1].price).to.eql(currentCase.data[1][2]);
     });
 
+    it('should get recent deal orders despite the error connection', async () => {
+        const currentCase = recentDealOrdersData[0];
+        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+
+        nock(KUCOIN_SERVER_PRODUCTION_URI)
+            .get(KUCOIN_RECENTLY_DEAL_ORDERS_URI)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .replyWithError('Error');
+        nock(KUCOIN_SERVER_PRODUCTION_URI)
+            .get(KUCOIN_RECENTLY_DEAL_ORDERS_URI)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .reply(200, currentCase);
+
+        const orders = await kuCoinResponse.getRecentDealOrders(currencyPair);
+    });
+
     it('should get a full order book', async () => {
         const currentCase = fullOrderBookData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];

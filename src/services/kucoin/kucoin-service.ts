@@ -9,9 +9,11 @@ import {
 } from './constants';
 
 export class KuCoinService implements ExchangeService {
-    private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();;
+    private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();
+    private _requestTryCount: number;
 
-    constructor(public readonly serverUri: string = KUCOIN_SERVER_PRODUCTION_URI, public readonly requestTryCount: number = 3) {
+    constructor(public readonly serverUri: string = KUCOIN_SERVER_PRODUCTION_URI, requestTryCount: number = 3) {
+        this._requestTryCount = requestTryCount;
     }
 
     protected set kuCoinResponseParser(value: KuCoinResponseParser) {
@@ -20,6 +22,14 @@ export class KuCoinService implements ExchangeService {
 
     protected get kuCoinResponseParser() {
         return this._kuCoinResponseParser;
+    }
+
+    get requestTryCount() {
+        return this._requestTryCount;
+    }
+
+    set requestTryCount(value: number) {
+        this._requestTryCount = value;
     }
 
     async getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
