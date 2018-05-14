@@ -11,7 +11,7 @@ describe('KuCoin Response Parser', () => {
         kuCoinResponseParser = new KuCoinResponseParser();
     });
 
-    it('should correct parse deal orders', () => {
+    it('should parse deal orders correctly', () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
         const expectedOrders: Order[] = [
             {
@@ -44,7 +44,7 @@ describe('KuCoin Response Parser', () => {
             .to.throw(/result/);
     });
 
-    it('should correct parse a full order book', () => {
+    it('should parse a full order book correctly', () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
         const expectedOrderBook: OrderBook = {
             buyOrders: [
