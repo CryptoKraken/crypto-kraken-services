@@ -4,7 +4,8 @@ import { RepeatPromise } from '../../utils';
 import { KuCoinResponseParser } from './kucoin-response-parser';
 import {
     KUCOIN_SERVER_PRODUCTION_URI,
-    KUCOIN_RECENTLY_DEAL_ORDERS_URI
+    KUCOIN_RECENTLY_DEAL_ORDERS_URI,
+    KUCOIN_ORDER_BOOKS_URI
 } from './constants';
 
 export class KuCoinService implements ExchangeService {
@@ -21,8 +22,19 @@ export class KuCoinService implements ExchangeService {
         return this._kuCoinResponseParser;
     }
 
-    async getOrderBook(pair: CurrencyPair): Promise<OrderBook> {
-        throw new Error("Method not implemented.");
+    async getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
+        return new RepeatPromise<OrderBook>((resolve, reject) => {
+            request(KUCOIN_ORDER_BOOKS_URI, {
+                baseUrl: this.serverUri,
+                method: 'GET',
+                qs: {
+                    symbol: this.getSymbol(pair),
+                    limit: maxLimit
+                }
+            })
+                .then(value => resolve(this.kuCoinResponseParser.parseOrderBook(pair, value)))
+                .catch(reason => reject(reason));
+        });
     }
 
     async getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
@@ -35,7 +47,7 @@ export class KuCoinService implements ExchangeService {
                     limit: maxLimit
                 }
             })
-                .then(value => resolve(this.kuCoinResponseParser.parseOrders(pair, value)))
+                .then(value => resolve(this.kuCoinResponseParser.parseDealOrders(pair, value)))
                 .catch(reason => reject(reason));
         });
     }

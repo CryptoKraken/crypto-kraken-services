@@ -61,6 +61,7 @@ export const wrongData = {
                 0.5 * 10
             ],
             [
+                // Missing required element
                 2521129900010,
                 'SELL',
                 0.52,
@@ -87,7 +88,7 @@ export const wrongData = {
             ],
             [
                 2521129900010,
-                'SELL1',
+                'SELL1', // A wrong value, it should be either 'SELL' or 'BUY'
                 0.52,
                 345,
                 0.52 * 345
@@ -102,6 +103,7 @@ export const wrongData = {
         ]
     },
     2: {
+        // The field name is wrong. It should be named 'data'
         orders: [
             [
                 2483438000040,
