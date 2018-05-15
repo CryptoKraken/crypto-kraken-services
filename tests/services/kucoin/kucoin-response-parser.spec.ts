@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import { CurrencyPair } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
-import { orderBookCases, tradesCases, wrongOrderBookCases, wrongTradesCases } from './data';
+import { currencyBalancesCases, orderBookCases, tradesCases, wrongOrderBookCases, wrongTradesCases } from './data';
+import { wrongCurrencyBalancesBalances } from './data/currency-balances';
 
 describe('KuCoin Response Parser', () => {
     let kuCoinResponseParser: KuCoinResponseParser;
@@ -46,5 +47,45 @@ describe('KuCoin Response Parser', () => {
         expect(() => kuCoinResponseParser.parseOrderBook(
             JSON.stringify(wrongOrderBookCases.dataWithWrongOrderTypeName), currencyPair)
         ).to.throw(/isn't the order book type/);
+    });
+
+    it('should parse a currency balance correctly', () => {
+        const currencies = { BTC: 'BTC', AAA: 'AAA', BBB: 'BBB' };
+
+        expect(kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(currencyBalancesCases.default.data), currencies.BTC
+        )).to.eql(currencyBalancesCases.default.expected);
+
+        expect(kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(currencyBalancesCases.dataAndAnyOtherField.data), currencies.AAA
+        )).to.eql(currencyBalancesCases.dataAndAnyOtherField.expected);
+
+        expect(kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(currencyBalancesCases.zeroBalance.data), currencies.BBB
+        )).to.eql(currencyBalancesCases.zeroBalance.expected);
+
+        expect(() => kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(currencyBalancesCases.default.data), currencies.BBB
+        )).to.throw(/requested coin type does not correspond/);
+
+        expect(() => kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(wrongCurrencyBalancesBalances.balanceWithoutAllAmount), currencies.AAA
+        )).to.throw(/isn't the currency balance type/);
+
+        expect(() => kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(wrongCurrencyBalancesBalances.balanceWithoutCoinType), currencies.AAA
+        )).to.throw(/isn't the currency balance type/);
+
+        expect(() => kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(wrongCurrencyBalancesBalances.balanceWithoutFreezeAmount), currencies.AAA
+        )).to.throw(/isn't the currency balance type/);
+
+        expect(() => kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(wrongCurrencyBalancesBalances.balanceWithWrongAllAmountType), currencies.AAA
+        )).to.throw(/isn't the currency balance type/);
+
+        expect(() => kuCoinResponseParser.parseCurrencyBalance(
+            JSON.stringify(wrongCurrencyBalancesBalances.balanceWithWrongFreezeAmountType), currencies.AAA
+        )).to.throw(/isn't the currency balance type/);
     });
 });

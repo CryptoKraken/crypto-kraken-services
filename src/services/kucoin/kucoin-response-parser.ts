@@ -1,16 +1,22 @@
 import { isArray, isNumber, isString } from 'util';
-import { CurrencyPair, Order, OrderBook, OrderType } from '../../core';
+import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
+
+interface KucoinCurrencyBalance {
+    coinType: string;
+    balance: number;
+    freezeBalance: number;
+}
+
+interface KucoinOrderBook {
+    SELL: KucoinOrder[];
+    BUY: KucoinOrder[];
+}
 
 type KucoinOrder = [
     /*Price*/ number,
     /*Amount*/ number,
     /*Volume*/ number
 ];
-
-interface KucoinOrderBook {
-    SELL: KucoinOrder[];
-    BUY: KucoinOrder[];
-}
 
 type KucoinTrade = [
     /*Timestamp*/ number,
@@ -43,7 +49,11 @@ const Guards = {
             && isNumber(data[2]) && isNumber(data[3]) && isNumber(data[4]);
     },
 
-    isOrderType: (orderType: any): orderType is 'SELL' | 'BUY' => orderType === 'SELL' || orderType === 'BUY'
+    isOrderType: (orderType: any): orderType is 'SELL' | 'BUY' => orderType === 'SELL' || orderType === 'BUY',
+
+    isKucoinCurrencyBalance: (data: any): data is KucoinCurrencyBalance => {
+        return data && isString(data.coinType) && isNumber(data.balance) && isNumber(data.freezeBalance);
+    }
 };
 
 export class KuCoinResponseParser {
@@ -71,6 +81,20 @@ export class KuCoinResponseParser {
                         price: order[0]
                     };
                 }),
+        };
+    }
+
+    parseCurrencyBalance(responseResult: string, currency: string): CurrencyBalance {
+        const obj = JSON.parse(responseResult);
+        if (!Guards.isDataObjOwner(obj) || !Guards.isKucoinCurrencyBalance(obj.data))
+            throw new Error(`The result ${responseResult} isn't the currency balance type.`);
+        const kucoinCurrencyBalance = obj.data;
+        if (kucoinCurrencyBalance.coinType !== currency)
+            throw new Error('The requested coin type does not correspond the coin type of the response.');
+        return {
+            allAmount: kucoinCurrencyBalance.balance,
+            lockedAmount: kucoinCurrencyBalance.freezeBalance,
+            freeAmount: kucoinCurrencyBalance.balance - kucoinCurrencyBalance.freezeBalance
         };
     }
 

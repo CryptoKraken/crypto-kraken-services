@@ -1,18 +1,8 @@
 import { expect } from 'chai';
 import { KuCoinSignatureMaker } from '../../../src/services/kucoin/kucoin-signature-maker';
+import { exchangeCredentialsCases } from './data/exchange-credentials';
 
 describe('KuCoin Signature Maker', () => {
-    const apiInfos = {
-        0: {
-            // The value is from the KuCoin Documentation: https://kucoinapidocs.docs.apiary.io/#introduction/general
-            key: '59c5ecfe18497f5394ded813',
-            secret: 'fc9ta6sk-78dg-5zb6-u46c-erg84xk4p8bd'
-        },
-        1: {
-            key: '4339a0bd81bcfa23f87e20da',
-            secret: 'c732s1pr-qp9i-8uvl-xo5g-m2k4fd3iu5vf'
-        }
-    };
     let kuCoinSignatureMaker: KuCoinSignatureMaker;
 
     beforeEach(() => {
@@ -20,7 +10,7 @@ describe('KuCoin Signature Maker', () => {
     });
 
     it('should be sign correctly', () => {
-        const currentApiInfo = apiInfos[0];
+        const currentApiInfo = exchangeCredentialsCases[0];
         const endpoint = '/v1/account/balances';
         const nonce = 1506219855000;
         const queryString = '?limit=15';
@@ -43,29 +33,31 @@ describe('KuCoin Signature Maker', () => {
         /*
         * signatures[<secretIndex>][<endpointIndex>][<nonceIndex>]
         *
-        * secret0 - apiInfos[0].secret
+        * secret0 - exchangeCredentialsCases[0].secret
         * |           |    endpoints[0]     |    endpoints[1]     |
         * |            -------------------------------------------
         * | nonces[0] | signatures[0][0][0] | signatures[0][1][0] |
         * | nonces[1] | signatures[0][0][1] | signatures[0][1][1] |
         *
-        * secret1 - apiInfos[1].secret
+        * secret1 - exchangeCredentialsCases[1].secret
         * |           |    endpoints[0]     |    endpoints[1]     |
         * |            -------------------------------------------
         * | nonces[0] | signatures[1][0][0] | signatures[1][1][0] |
         * | nonces[1] | signatures[1][0][1] | signatures[1][1][1] |
         */
         const signaturesList: string[] = [];
-        const signatures = [apiInfos[0].secret, apiInfos[1].secret] // [secret0, secret1]
-            .map(secret => endpoints
-                .map(endpoint => nonces
-                    .map(nonce => {
-                        const signature = kuCoinSignatureMaker.sign(secret, endpoint, undefined, nonce);
-                        signaturesList.push(signature);
-                        return signature;
-                    })
-                )
-            );
+        const signatures = [
+            exchangeCredentialsCases[0].secret, // secret0
+            exchangeCredentialsCases[1].secret // secret1
+        ].map(secret => endpoints
+            .map(endpoint => nonces
+                .map(nonce => {
+                    const signature = kuCoinSignatureMaker.sign(secret, endpoint, undefined, nonce);
+                    signaturesList.push(signature);
+                    return signature;
+                })
+            )
+        );
 
         const expectedSignatures = [
             [ // secret0

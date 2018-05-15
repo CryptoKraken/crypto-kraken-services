@@ -5,10 +5,15 @@ import {
 } from '../../core';
 import { Identified, RepeatPromise } from '../../utils';
 import { KuCoinConstants } from './constants';
+import { KuCoinAuthRequestHeaders, KuCoinExchangeCredentials } from './kucoin-exchange-credentials';
+import { kuCoinNonceFactory } from './kucoin-nonce-factory';
 import { KuCoinResponseParser } from './kucoin-response-parser';
+import { KuCoinSignatureMaker } from './kucoin-signature-maker';
 
 export class KuCoinService implements RestExchangeService, AuthenticatedRestExchangeService {
+    private _kuCoinSignatureMaker: KuCoinSignatureMaker = new KuCoinSignatureMaker();
     private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();
+    private _kuCoinNonceFactory: () => Promise<number> | number = kuCoinNonceFactory;
     private _requestTryCount: number;
 
     constructor(readonly serverUri: string = KuCoinConstants.serverProductionUrl, requestTryCount: number = 3) {
@@ -21,6 +26,22 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
 
     protected get kuCoinResponseParser() {
         return this._kuCoinResponseParser;
+    }
+
+    get kuCoinSignatureMaker() {
+        return this._kuCoinSignatureMaker;
+    }
+
+    set kuCoinSignatureMaker(value: KuCoinSignatureMaker) {
+        this._kuCoinSignatureMaker = value;
+    }
+
+    get kuCoinNonceFactory() {
+        return this._kuCoinNonceFactory;
+    }
+
+    set kuCoinNonceFactory(value: () => Promise<number> | number) {
+        this._kuCoinNonceFactory = value;
     }
 
     get requestTryCount() {
@@ -75,8 +96,32 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         throw new Error('Method not implemented.');
     }
 
-    async getBalance(currency: string): Promise<CurrencyBalance> {
-        throw new Error('Method not implemented.');
+    async getBalance(currency: string, exchangeCredentials: KuCoinExchangeCredentials): Promise<CurrencyBalance> {
+        const apiEndpoint = KuCoinConstants.getBalanceOfCoinUri(currency);
+        const authHeaders = await this.getAuthHeaders(exchangeCredentials, apiEndpoint, undefined);
+
+        return new RepeatPromise<CurrencyBalance>((resolve, reject) => {
+            request.get(apiEndpoint, {
+                baseUrl: this.serverUri,
+                headers: authHeaders
+            })
+                .then(value => resolve(this.kuCoinResponseParser.parseCurrencyBalance(value, currency)))
+                .catch(reason => reject(reason));
+        });
+    }
+
+    protected async getAuthHeaders(
+        exchangeCredentials: KuCoinExchangeCredentials,
+        apiEndpoint: string,
+        queryString: string | undefined
+    ): Promise<KuCoinAuthRequestHeaders> {
+        const nonce = await this.kuCoinNonceFactory();
+        return {
+            'KC-API-KEY': exchangeCredentials.apiKey,
+            'KC-API-NONCE': nonce,
+            'KC-API-SIGNATURE': this.kuCoinSignatureMaker
+                .sign(exchangeCredentials.secret, apiEndpoint, queryString, nonce)
+        };
     }
 
     protected getSymbol(currencyPair: CurrencyPair) {

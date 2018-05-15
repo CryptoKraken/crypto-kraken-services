@@ -3,10 +3,22 @@ import * as nock from 'nock';
 import { CurrencyPair } from '../../../src/core';
 import { KuCoinService } from '../../../src/services/kucoin';
 import { KuCoinConstants } from '../../../src/services/kucoin/constants';
-import { orderBookCases, tradesCases } from './data';
+import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-exchange-credentials';
+import { currencyBalancesCases, exchangeCredentialsCases, orderBookCases, tradesCases } from './data';
 
 describe('KuCoin Exchange Service', () => {
     let kuCoinService: KuCoinService;
+
+    const isHeaderHasValueRegEx = /./;
+    const getNockAuthHeaders = (expectedAuthHeaderValues?: Partial<KuCoinAuthRequestHeaders>): {
+        [K in keyof KuCoinAuthRequestHeaders]: string | RegExp | ((headerValue: string) => boolean)
+    } => ({
+        'KC-API-KEY': (expectedAuthHeaderValues && expectedAuthHeaderValues['KC-API-KEY']) || isHeaderHasValueRegEx,
+        'KC-API-NONCE': (expectedAuthHeaderValues && expectedAuthHeaderValues['KC-API-NONCE']
+            && expectedAuthHeaderValues['KC-API-NONCE']!.toString()) || /\d+/,
+        'KC-API-SIGNATURE': (expectedAuthHeaderValues && expectedAuthHeaderValues['KC-API-SIGNATURE'])
+            || isHeaderHasValueRegEx
+    });
 
     beforeEach(() => {
         kuCoinService = new KuCoinService();
@@ -96,5 +108,64 @@ describe('KuCoin Exchange Service', () => {
 
         expect(orderBook)
             .to.eql(currentCase.expected);
+    });
+
+    it('should get a balance of coin', async () => {
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.getBalanceOfCoinUri('BTC'))
+            .reply(200, currencyBalancesCases.default.data);
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.getBalanceOfCoinUri('AAA'))
+            .reply(200, currencyBalancesCases.dataAndAnyOtherField.data);
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.getBalanceOfCoinUri('BBB'))
+            .reply(200, currencyBalancesCases.zeroBalance.data);
+
+        expect('BTC').to.eql(currencyBalancesCases.default.data.data.coinType);
+        expect(await kuCoinService.getBalance('BTC', exchangeCredentialsCases[0]))
+            .to.eql(currencyBalancesCases.default.expected);
+
+        expect('AAA').to.eql(currencyBalancesCases.dataAndAnyOtherField.data.data.coinType);
+        expect(await kuCoinService.getBalance('AAA', exchangeCredentialsCases[0]))
+            .to.eql(currencyBalancesCases.dataAndAnyOtherField.expected);
+
+        expect('BBB').to.eql(currencyBalancesCases.zeroBalance.data.data.coinType);
+        expect(await kuCoinService.getBalance('BBB', exchangeCredentialsCases[0]))
+            .to.eql(currencyBalancesCases.zeroBalance.expected);
+    });
+
+    it('should get a balance of coin despite the connection error', async () => {
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.getBalanceOfCoinUri('BTC'))
+            .replyWithError('An connection error from the test');
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.getBalanceOfCoinUri('BTC'))
+            .reply(200, currencyBalancesCases.default.data);
+
+        expect('BTC').to.eql(currencyBalancesCases.default.data.data.coinType);
+        expect(await kuCoinService.getBalance('BTC', exchangeCredentialsCases[0]))
+            .to.eql(currencyBalancesCases.default.expected);
+    });
+
+    it('should allow using a custom nonce generator', async () => {
+        let currentNonce = 0;
+        const currentExchangeCredentials = exchangeCredentialsCases[0];
+        const currentApiEndpoint = KuCoinConstants.getBalanceOfCoinUri('BTC');
+        const customNonceFactory = () => currentNonce += 2;
+        const expectedSignature = kuCoinService.kuCoinSignatureMaker
+            .sign(currentExchangeCredentials.secret, currentApiEndpoint, undefined, 2);
+        nock(KuCoinConstants.serverProductionUrl, {
+            reqheaders: getNockAuthHeaders({
+                'KC-API-NONCE': 2,
+                'KC-API-SIGNATURE': expectedSignature
+            })
+        })
+            .get(currentApiEndpoint)
+            .reply(200, currencyBalancesCases.default.data);
+
+        kuCoinService.kuCoinNonceFactory = customNonceFactory;
+        await kuCoinService.getBalance('BTC', currentExchangeCredentials);
+
+        expect(currentNonce).to.eql(2);
     });
 });
