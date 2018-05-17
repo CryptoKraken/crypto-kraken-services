@@ -1,4 +1,6 @@
-export const orderBookResponse = {
+import { OrderBook, OrderType } from "../../../../src/core";
+
+export const orderBookRawResponse = {
     ltc_btc: [
         {
             type: 'ask',
@@ -27,6 +29,36 @@ export const orderBookResponse = {
             amount: 0.01,
             tid: 200623731,
             timestamp: 1526172282
+        }
+    ]
+};
+export const orderBookParsed: OrderBook = {
+    sellOrders: [
+        {
+            amount: 0.06,
+            price: 0.01665,
+            orderType: OrderType.Sell,
+            pair: ['ltc', 'btc']
+        },
+        {
+            amount: 0.01,
+            price: 0.01461,
+            orderType: OrderType.Sell,
+            pair: ['ltc', 'btc']
+        }
+    ],
+    buyOrders: [
+        {
+            amount: 0.5,
+            price: 0.01673804,
+            orderType: OrderType.Buy,
+            pair: ['ltc', 'btc']
+        },
+        {
+            amount: 1.1,
+            price: 0.01599042,
+            orderType: OrderType.Buy,
+            pair: ['ltc', 'btc']
         }
     ]
 };
