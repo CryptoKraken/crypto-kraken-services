@@ -2,17 +2,13 @@ import * as request from 'request-promise-native';
 import { ExchangeService, Order, OrderInfo, OrderBook, CurrencyPair, OrderType } from '../../core';
 import { RepeatPromise } from '../../utils';
 import { KuCoinResponseParser } from './kucoin-response-parser';
-import {
-    KUCOIN_SERVER_PRODUCTION_URI,
-    KUCOIN_RECENTLY_DEAL_ORDERS_URI,
-    KUCOIN_ORDER_BOOKS_URI
-} from './constants';
+import { KuCoinConstants } from './constants';
 
 export class KuCoinService implements ExchangeService {
     private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();
     private _requestTryCount: number;
 
-    constructor(public readonly serverUri: string = KUCOIN_SERVER_PRODUCTION_URI, requestTryCount: number = 3) {
+    constructor(public readonly serverUri: string = KuCoinConstants.KuCoinServerProductionUrl, requestTryCount: number = 3) {
         this._requestTryCount = requestTryCount;
     }
 
@@ -34,7 +30,7 @@ export class KuCoinService implements ExchangeService {
 
     async getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
         return new RepeatPromise<OrderBook>((resolve, reject) => {
-            request(KUCOIN_ORDER_BOOKS_URI, {
+            request.get(KuCoinConstants.KuCoinOrderBooksUri, {
                 baseUrl: this.serverUri,
                 method: 'GET',
                 qs: {
@@ -49,7 +45,7 @@ export class KuCoinService implements ExchangeService {
 
     async getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
         return new RepeatPromise<Order[]>((resolve, reject) => {
-            request(KUCOIN_RECENTLY_DEAL_ORDERS_URI, {
+            request.get(KuCoinConstants.KuCoinRecentlyDealOrdersUri, {
                 baseUrl: this.serverUri,
                 method: 'GET',
                 qs: {

@@ -2,11 +2,7 @@ import { expect } from 'chai';
 import * as nock from 'nock';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinService } from '../../../src/services/kucoin';
-import {
-    KUCOIN_RECENTLY_DEAL_ORDERS_URI,
-    KUCOIN_SERVER_PRODUCTION_URI,
-    KUCOIN_ORDER_BOOKS_URI
-} from '../../../src/services/kucoin/constants';
+import { KuCoinConstants } from '../../../src/services/kucoin/constants';
 import recentDealOrdersData from './data/recent-deal-orders.data';
 import fullOrderBookData from './data/full-order-book.data';
 
@@ -21,8 +17,8 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = recentDealOrdersData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KUCOIN_SERVER_PRODUCTION_URI)
-            .get(KUCOIN_RECENTLY_DEAL_ORDERS_URI)
+        nock(KuCoinConstants.KuCoinServerProductionUrl)
+            .get(KuCoinConstants.KuCoinRecentlyDealOrdersUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
@@ -53,14 +49,14 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = recentDealOrdersData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KUCOIN_SERVER_PRODUCTION_URI)
-            .get(KUCOIN_RECENTLY_DEAL_ORDERS_URI)
+        nock(KuCoinConstants.KuCoinServerProductionUrl)
+            .get(KuCoinConstants.KuCoinRecentlyDealOrdersUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .replyWithError('An connection error from the test');
-        nock(KUCOIN_SERVER_PRODUCTION_URI)
-            .get(KUCOIN_RECENTLY_DEAL_ORDERS_URI)
+        nock(KuCoinConstants.KuCoinServerProductionUrl)
+            .get(KuCoinConstants.KuCoinRecentlyDealOrdersUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
@@ -79,8 +75,8 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = fullOrderBookData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KUCOIN_SERVER_PRODUCTION_URI)
-            .get(KUCOIN_ORDER_BOOKS_URI)
+        nock(KuCoinConstants.KuCoinServerProductionUrl)
+            .get(KuCoinConstants.KuCoinOrderBooksUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
@@ -122,14 +118,14 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = fullOrderBookData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KUCOIN_SERVER_PRODUCTION_URI)
-            .get(KUCOIN_ORDER_BOOKS_URI)
+        nock(KuCoinConstants.KuCoinServerProductionUrl)
+            .get(KuCoinConstants.KuCoinOrderBooksUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .replyWithError('An connection error from the test');
-        nock(KUCOIN_SERVER_PRODUCTION_URI)
-            .get(KUCOIN_ORDER_BOOKS_URI)
+        nock(KuCoinConstants.KuCoinServerProductionUrl)
+            .get(KuCoinConstants.KuCoinOrderBooksUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
