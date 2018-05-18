@@ -1,6 +1,7 @@
 import { CurrencyPair } from './currency-pair';
 import { Order, OrderInfo } from './order';
 import { OrderBook } from './order-book';
+import { ExchangeCredentials } from './exchange-credentials';
 
 export interface ExchangeService {
     // Orders
@@ -8,10 +9,10 @@ export interface ExchangeService {
     getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]>;
 
     // Account orders
-    createOrder(order: Order): Promise<Order & { id: string }>;
-    deleteOrder(id: string): Promise<boolean>;
-    getOrderInfo(id: string): Promise<OrderInfo>;
-    getActiveOrders(): Promise<Order & { id: string }[]>;
+    createOrder(order: Order, exchangeCredentials: ExchangeCredentials): Promise<Order & { id: string }>;
+    deleteOrder(id: string, exchangeCredentials: ExchangeCredentials): Promise<boolean>;
+    getOrderInfo(id: string, exchangeCredentials: ExchangeCredentials): Promise<OrderInfo>;
+    getActiveOrders(exchangeCredentials: ExchangeCredentials): Promise<Order & { id: string }[]>;
 
-    getBalance(currency: string): Promise<number>;
+    getBalance(currency: string, exchangeCredentials: ExchangeCredentials): Promise<number>;
 }
