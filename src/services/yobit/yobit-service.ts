@@ -1,7 +1,7 @@
 import { OrderBook, ExchangeService, Order, OrderInfo, CurrencyPair } from '../../core';
 import { RepeatPromise } from '../../utils';
 import * as request from 'request-promise-native';
-import { YOBIT_CONSTANTS } from './constants'
+import { YobitConstants } from './constants'
 import { YobitResponseParser } from './yobit-response-parser';
 
 export class YobitService implements ExchangeService {
@@ -13,7 +13,7 @@ export class YobitService implements ExchangeService {
     }
     getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
         return new RepeatPromise((resolve, reject) => {
-            const url = `${YOBIT_CONSTANTS.ROOT_API_URL}/${YOBIT_CONSTANTS.GET_ORDER_BOOK_METHOD_NAME}/${pair[0]}_${pair[1]}`;
+            const url = `${YobitConstants.ROOT_API_URL}/${YobitConstants.GET_ORDER_BOOK_METHOD_NAME}/${pair[0]}_${pair[1]}`;
             const queryStringParams = maxLimit ? { limit: maxLimit } : undefined;
             request.get(url, { qs: queryStringParams })
                 .then(value => resolve(this.responseParser.parseOrderBook(value, pair)))
