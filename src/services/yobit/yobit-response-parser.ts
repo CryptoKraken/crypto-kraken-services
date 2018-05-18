@@ -1,5 +1,6 @@
 import { OrderBook, Order, CurrencyPair, OrderType } from '../../core';
 import { isArray, isNumber } from 'util';
+import { YobitUtils } from './yobit-utils';
 
 interface YobitOrderContainer {
     type: YobitOrderType,
@@ -17,18 +18,18 @@ const Guards = {
 }
 
 export class YobitResponseParser {
-    parseOrderBook(data: string, currencyPair: CurrencyPair): OrderBook {
+    parseOrderBook(data: string, pair: CurrencyPair): OrderBook {
         const dataObject = JSON.parse(data);
         if (!dataObject)
             throw new Error('Data object is empty.');
         if (Guards.isErrorResponse(dataObject))
             throw new Error(dataObject.error);
-        const rawOrders = dataObject[`${currencyPair[0]}_${currencyPair[1]}`];
+        const rawOrders = dataObject[YobitUtils.getPairSymbol(pair)];
         if (!Guards.isOrdersArray(rawOrders))
-            throw new Error(`Data object does not have the ${currencyPair} property contained array of orders.`);
+            throw new Error(`Data object does not have the ${pair} property contained array of orders.`);
 
         const orders = rawOrders.map<Order>(o => ({
-            pair: currencyPair,
+            pair: pair,
             price: o.price,
             amount: o.amount,
             orderType: o.type === 'bid' ? OrderType.Buy : OrderType.Sell
