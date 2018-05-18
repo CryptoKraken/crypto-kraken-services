@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { RepeatPromise } from '../../src/utils';
-import { fail } from 'assert';
 
 describe('The RepeatPromise', () => {
     it('should repeat a body', async () => {
