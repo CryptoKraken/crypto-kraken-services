@@ -14,7 +14,6 @@ describe('The RepeatPromise', () => {
 
         expect(callCounter).to.equal(3);
         expect(value).to.equal(500);
-
     });
 
     it('should repeat a asynchronous body', async () => {

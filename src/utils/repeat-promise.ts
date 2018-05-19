@@ -1,5 +1,5 @@
 export class RepeatPromise<T> implements Promise<T> {
-    readonly [Symbol.toStringTag]: "Promise";
+    readonly [Symbol.toStringTag]: 'Promise';
     protected readonly wrappedExecutor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void;
     protected readonly promise: Promise<T>;
     protected wrappedResolve!: (value?: T | PromiseLike<T>) => void;
