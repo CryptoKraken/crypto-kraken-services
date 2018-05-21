@@ -1,5 +1,7 @@
-export const KuCoinConstants = {
-    KuCoinServerProductionUrl: 'https://api.kucoin.com',
-    KuCoinRecentlyDealOrdersUri: '/v1/open/deal-orders',
-    KuCoinOrderBooksUri: '/v1/open/orders'
-}
+const constants = {
+    serverProductionUrl: 'https://api.kucoin.com',
+    recentlyDealOrdersUri: '/v1/open/deal-orders',
+    orderBooksUri: '/v1/open/orders'
+};
+
+export const KuCoinConstants: Readonly<typeof constants> =  constants;

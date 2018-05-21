@@ -17,8 +17,8 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = recentDealOrdersData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KuCoinConstants.KuCoinServerProductionUrl)
-            .get(KuCoinConstants.KuCoinRecentlyDealOrdersUri)
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
@@ -49,14 +49,14 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = recentDealOrdersData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KuCoinConstants.KuCoinServerProductionUrl)
-            .get(KuCoinConstants.KuCoinRecentlyDealOrdersUri)
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.KuCoinServerProductionUrl)
-            .get(KuCoinConstants.KuCoinRecentlyDealOrdersUri)
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
@@ -75,8 +75,8 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = fullOrderBookData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KuCoinConstants.KuCoinServerProductionUrl)
-            .get(KuCoinConstants.KuCoinOrderBooksUri)
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.orderBooksUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
@@ -118,14 +118,14 @@ describe('KuCoin Exchange Service', () => {
         const currentCase = fullOrderBookData[0];
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        nock(KuCoinConstants.KuCoinServerProductionUrl)
-            .get(KuCoinConstants.KuCoinOrderBooksUri)
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.orderBooksUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.KuCoinServerProductionUrl)
-            .get(KuCoinConstants.KuCoinOrderBooksUri)
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.orderBooksUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })

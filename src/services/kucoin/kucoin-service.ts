@@ -8,7 +8,7 @@ export class KuCoinService implements ExchangeService {
     private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();
     private _requestTryCount: number;
 
-    constructor(public readonly serverUri: string = KuCoinConstants.KuCoinServerProductionUrl, requestTryCount: number = 3) {
+    constructor(public readonly serverUri: string = KuCoinConstants.serverProductionUrl, requestTryCount: number = 3) {
         this._requestTryCount = requestTryCount;
     }
 
@@ -30,7 +30,7 @@ export class KuCoinService implements ExchangeService {
 
     async getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
         return new RepeatPromise<OrderBook>((resolve, reject) => {
-            request.get(KuCoinConstants.KuCoinOrderBooksUri, {
+            request.get(KuCoinConstants.orderBooksUri, {
                 baseUrl: this.serverUri,
                 method: 'GET',
                 qs: {
@@ -45,7 +45,7 @@ export class KuCoinService implements ExchangeService {
 
     async getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
         return new RepeatPromise<Order[]>((resolve, reject) => {
-            request.get(KuCoinConstants.KuCoinRecentlyDealOrdersUri, {
+            request.get(KuCoinConstants.recentlyDealOrdersUri, {
                 baseUrl: this.serverUri,
                 method: 'GET',
                 qs: {
