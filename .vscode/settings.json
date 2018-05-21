@@ -2,5 +2,6 @@
     "cSpell.words": [
         "kucoin",
         "yobit"
-    ]
+    ],
+    "files.insertFinalNewline": true
 }
