@@ -32,7 +32,6 @@ export class KuCoinService implements ExchangeService {
         return new RepeatPromise<OrderBook>((resolve, reject) => {
             request.get(KuCoinConstants.orderBooksUri, {
                 baseUrl: this.serverUri,
-                method: 'GET',
                 qs: {
                     symbol: this.getSymbol(pair),
                     limit: maxLimit
@@ -47,7 +46,6 @@ export class KuCoinService implements ExchangeService {
         return new RepeatPromise<Order[]>((resolve, reject) => {
             request.get(KuCoinConstants.recentlyDealOrdersUri, {
                 baseUrl: this.serverUri,
-                method: 'GET',
                 qs: {
                     symbol: this.getSymbol(pair),
                     limit: maxLimit
