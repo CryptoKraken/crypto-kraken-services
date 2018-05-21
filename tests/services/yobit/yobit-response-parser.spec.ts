@@ -12,7 +12,7 @@ describe('YoBit Response Parser', () => {
 
     it('should parse an order book', () => {
         const result = parser.parseOrderBook(JSON.stringify(orderBookCases.default.data), ['ltc', 'btc']);
-        expect(result).to.be.eql(orderBookCases.default.expected);
+        expect(result).to.eql(orderBookCases.default.expected);
 
         expect(() => parser.parseOrderBook(JSON.stringify(yobitGeneralError), ['aaa', 'bbb']))
             .to.throw(/Yobit error text/);

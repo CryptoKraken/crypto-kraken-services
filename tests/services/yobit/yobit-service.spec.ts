@@ -19,7 +19,7 @@ describe('YoBit Exchange Service', () => {
             .reply(200, JSON.stringify(orderBookCases.default.data));
 
         const result = await exchangeService.getOrderBook(['ltc', 'btc']);
-        expect(result).to.be.eql(orderBookCases.default.expected);
+        expect(result).to.eql(orderBookCases.default.expected);
     });
 
     it('should get an order book with the second request (the first request causes an error)', async () => {
@@ -30,7 +30,7 @@ describe('YoBit Exchange Service', () => {
             .reply(200, JSON.stringify(orderBookCases.default.data));
 
         const result = await exchangeService.getOrderBook(['ltc', 'btc']);
-        expect(result).to.be.eql(orderBookCases.default.expected);
+        expect(result).to.eql(orderBookCases.default.expected);
     });
 
     it('should pass query parameters for getting an order book with applied maxLimit', async () => {
@@ -40,6 +40,6 @@ describe('YoBit Exchange Service', () => {
             .reply(200, JSON.stringify(orderBookCases.default.data));
 
         const result = await exchangeService.getOrderBook(['ltc', 'btc'], 4);
-        expect(result).to.be.eql(orderBookCases.default.expected);
+        expect(result).to.eql(orderBookCases.default.expected);
     });
 });
