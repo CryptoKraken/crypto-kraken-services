@@ -7,10 +7,10 @@ import recentDealOrdersData from './data/recent-deal-orders.data';
 import fullOrderBookData from './data/full-order-book.data';
 
 describe('KuCoin Exchange Service', () => {
-    let kuCoinResponse: KuCoinService;
+    let kuCoinService: KuCoinService;
 
     beforeEach(() => {
-        kuCoinResponse = new KuCoinService();
+        kuCoinService = new KuCoinService();
     });
 
     it('should get recent deal orders', async () => {
@@ -25,8 +25,8 @@ describe('KuCoin Exchange Service', () => {
             .twice()
             .reply(200, currentCase);
 
-        const orders1 = await kuCoinResponse.getRecentDealOrders(currencyPair);
-        const orders2 = await kuCoinResponse.getRecentDealOrders(currencyPair);
+        const orders1 = await kuCoinService.getRecentDealOrders(currencyPair);
+        const orders2 = await kuCoinService.getRecentDealOrders(currencyPair);
 
         expect(orders1.length)
             .to.eql(orders2.length)
@@ -62,7 +62,7 @@ describe('KuCoin Exchange Service', () => {
             })
             .reply(200, currentCase);
 
-        const orders = await kuCoinResponse.getRecentDealOrders(currencyPair);
+        const orders = await kuCoinService.getRecentDealOrders(currencyPair);
 
         expect(orders[1].amount).to.eql(currentCase.data[1][3]);
         expect(orders[1].pair).to.eql(currencyPair);
@@ -83,8 +83,8 @@ describe('KuCoin Exchange Service', () => {
             .twice()
             .reply(200, currentCase);
 
-        const orderBook1 = await kuCoinResponse.getOrderBook(currencyPair);
-        const orderBook2 = await kuCoinResponse.getOrderBook(currencyPair);
+        const orderBook1 = await kuCoinService.getOrderBook(currencyPair);
+        const orderBook2 = await kuCoinService.getOrderBook(currencyPair);
 
         expect(orderBook1.buyOrders.length)
             .to.eql(orderBook2.buyOrders.length)
@@ -131,7 +131,7 @@ describe('KuCoin Exchange Service', () => {
             })
             .reply(200, currentCase);
 
-        const orderBook = await kuCoinResponse.getOrderBook(currencyPair);
+        const orderBook = await kuCoinService.getOrderBook(currencyPair);
 
         expect(orderBook.buyOrders.length)
             .to.eql(currentCase.data.BUY.length);
