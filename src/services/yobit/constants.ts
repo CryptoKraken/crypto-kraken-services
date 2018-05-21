@@ -1,4 +1,7 @@
+import { CurrencyPair } from "../../core";
+import { YobitUtils } from "./yobit-utils";
+
 export const YobitConstants = {
-    ROOT_API_URL: 'https://yobit.net/api/3',
-    GET_ORDER_BOOK_METHOD_NAME: 'trades'
+    rootServerUrl: 'https://yobit.net/api/3',
+    getOrderBookUri: (pair: CurrencyPair) => `/trades/${YobitUtils.getPairSymbol(pair)}`
 }

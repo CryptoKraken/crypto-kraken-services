@@ -3,7 +3,6 @@ import { RepeatPromise } from '../../utils';
 import * as request from 'request-promise-native';
 import { YobitConstants } from './constants'
 import { YobitResponseParser } from './yobit-response-parser';
-import { YobitUtils } from './yobit-utils';
 
 export class YobitService implements ExchangeService {
     private responseParser: YobitResponseParser;
@@ -14,9 +13,10 @@ export class YobitService implements ExchangeService {
     }
     getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
         return new RepeatPromise((resolve, reject) => {
-            const url = `${YobitConstants.ROOT_API_URL}/${YobitConstants.GET_ORDER_BOOK_METHOD_NAME}/${YobitUtils.getPairSymbol(pair)}`;
-            const queryStringParams = maxLimit ? { limit: maxLimit } : undefined;
-            request.get(url, { qs: queryStringParams })
+            request.get(YobitConstants.getOrderBookUri(pair), {
+                baseUrl: YobitConstants.rootServerUrl,
+                qs: maxLimit ? { limit: maxLimit } : undefined
+            })
                 .then(value => resolve(this.responseParser.parseOrderBook(value, pair)))
                 .catch(reason => reject(reason));
         }, this.requestTryCount);
