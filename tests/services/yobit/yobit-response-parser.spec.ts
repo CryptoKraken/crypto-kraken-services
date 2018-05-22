@@ -1,7 +1,7 @@
-import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
-import { orderBookCases, yobitGeneralError } from './data';
 import { expect } from 'chai';
 import { OrderType } from '../../../src/core';
+import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
+import { orderBookCases, yobitGeneralError } from './data';
 
 describe('YoBit Response Parser', () => {
     let parser: YobitResponseParser;

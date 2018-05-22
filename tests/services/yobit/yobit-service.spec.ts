@@ -1,9 +1,9 @@
-import { YobitService } from '../../../src/services/yobit';
+import { expect } from 'chai';
 import * as nock from 'nock';
+import { CurrencyPair, OrderBook, OrderType } from '../../../src/core';
+import { YobitService } from '../../../src/services/yobit';
 import { YobitConstants } from '../../../src/services/yobit/constants';
 import { orderBookCases } from './data';
-import { expect } from 'chai';
-import { OrderType, OrderBook, CurrencyPair } from '../../../src/core';
 
 describe('YoBit Exchange Service', () => {
     const orderBookUrlPostfix = YobitConstants.getOrderBookUri(['ltc', 'btc']);
