@@ -28,8 +28,10 @@
     "tslint-test": "tslint -p ./tests/tsconfig.json"
   },
   "dependencies": {
+    "create-hmac": "^1.1.7",
     "request": "^2.85.0",
-    "request-promise-native": "^1.0.5"
+    "request-promise-native": "^1.0.5",
+    "safe-buffer": "^5.1.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
