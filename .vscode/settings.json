@@ -3,5 +3,6 @@
         "kucoin",
         "yobit"
     ],
-    "files.insertFinalNewline": true
+    "files.insertFinalNewline": true,
+    "files.eol": "\n"
 }
