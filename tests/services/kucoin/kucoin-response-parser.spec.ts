@@ -1,8 +1,8 @@
 import { expect } from 'chai';
+import { CurrencyPair, Order, OrderBook, OrderType } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
-import { CurrencyPair, Order, OrderType, OrderBook } from '../../../src/core';
-import recentDealOrdersData, { wrongData as wrongRecentDealOrdersData } from './data/recent-deal-orders.data';
 import fullOrderBookData, { wrongData as wrongFullOrderBookData } from './data/full-order-book.data';
+import recentDealOrdersData, { wrongData as wrongRecentDealOrdersData } from './data/recent-deal-orders.data';
 
 describe('KuCoin Response Parser', () => {
     let kuCoinResponseParser: KuCoinResponseParser;

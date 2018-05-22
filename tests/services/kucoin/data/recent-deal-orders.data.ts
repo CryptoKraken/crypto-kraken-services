@@ -1,3 +1,4 @@
+/* tslint:disable */
 export default {
     /** This case from the KuCoin documentation: https://kucoinapidocs.docs.apiary.io/#reference/0/market/recently-deal-orders(open) */
     0: {

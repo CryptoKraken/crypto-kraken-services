@@ -3,8 +3,8 @@ import * as nock from 'nock';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinService } from '../../../src/services/kucoin';
 import { KuCoinConstants } from '../../../src/services/kucoin/constants';
-import recentDealOrdersData from './data/recent-deal-orders.data';
 import fullOrderBookData from './data/full-order-book.data';
+import recentDealOrdersData from './data/recent-deal-orders.data';
 
 describe('KuCoin Exchange Service', () => {
     let kuCoinService: KuCoinService;

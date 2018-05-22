@@ -1,5 +1,5 @@
 import { isArray, isNumber, isString } from 'util';
-import { Order, OrderType, CurrencyPair, OrderBook } from '../../core';
+import { CurrencyPair, Order, OrderBook, OrderType } from '../../core';
 
 type OrderResponseResult = [
     /*Price*/ number,
@@ -7,10 +7,10 @@ type OrderResponseResult = [
     /*Volume*/ number
 ];
 
-type OrderBookResponseResult = {
-    'SELL': OrderResponseResult[],
-    'BUY': OrderResponseResult[]
-};
+interface OrderBookResponseResult {
+    SELL: OrderResponseResult[];
+    BUY: OrderResponseResult[];
+}
 
 type DealOrderResponseResult = [
     /*Timestamp*/ number,
@@ -22,12 +22,14 @@ type DealOrderResponseResult = [
 
 const Guards = {
     isDataObjOwner: (dataOwner: any): dataOwner is { data: any } => dataOwner && dataOwner.data,
-    isDataArrayOwner: (dataOwner: any): dataOwner is { data: any[] } => Guards.isDataObjOwner(dataOwner) && isArray(dataOwner.data),
+    isDataArrayOwner: (dataOwner: any): dataOwner is { data: any[] } => {
+        return Guards.isDataObjOwner(dataOwner) && isArray(dataOwner.data);
+    },
     isOrderBook: (orderBook: any): orderBook is OrderBookResponseResult => {
-        return orderBook && orderBook['SELL'] && orderBook['BUY']
-            && isArray(orderBook['SELL']) && isArray(orderBook['BUY'])
-            && orderBook['SELL'].every((order: any) => Guards.isOrder(order))
-            && orderBook['BUY'].every((order: any) => Guards.isOrder(order));
+        return orderBook && orderBook.SELL && orderBook.BUY
+            && isArray(orderBook.SELL) && isArray(orderBook.BUY)
+            && orderBook.SELL.every((order: any) => Guards.isOrder(order))
+            && orderBook.BUY.every((order: any) => Guards.isOrder(order));
     },
     isOrder: (order: any): order is OrderResponseResult => {
         return order && isNumber(order[0]) && isNumber(order[1]) && isNumber(order[2]);
@@ -46,25 +48,25 @@ export class KuCoinResponseParser {
             throw new Error(`The result ${responseResult} isn't the order book type.`);
         const orderBookResponseResult = obj.data;
         return {
-            buyOrders: orderBookResponseResult['BUY']
+            buyOrders: orderBookResponseResult.BUY
                 .map(order => {
                     return {
                         amount: order[1],
                         orderType: OrderType.Buy,
                         pair: currencyPair,
                         price: order[0]
-                    }
+                    };
                 }),
-            sellOrders: orderBookResponseResult['SELL']
+            sellOrders: orderBookResponseResult.SELL
                 .map(order => {
                     return {
                         amount: order[1],
                         orderType: OrderType.Sell,
                         pair: currencyPair,
                         price: order[0]
-                    }
+                    };
                 }),
-        }
+        };
     }
 
     parseDealOrders(responseResult: string, currencyPair: CurrencyPair): Order[] {
@@ -76,6 +78,7 @@ export class KuCoinResponseParser {
             if (!Guards.isDealOrder(orderObj))
                 throw new Error(`The element (${orderObj}) of the orders object isn't the deal order type.`);
             if (!Guards.isOrderType(orderObj[1]))
+                // tslint:disable-next-line:max-line-length
                 throw new Error(`The type of the order (${orderObj}) is incorrect. It should be 'SELL' or 'BUY' value.`);
 
             return {
@@ -84,7 +87,7 @@ export class KuCoinResponseParser {
                 pair: currencyPair,
                 price: orderObj[2]
             };
-        })
+        });
     }
 
 }

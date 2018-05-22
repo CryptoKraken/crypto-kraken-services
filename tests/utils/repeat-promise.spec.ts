@@ -39,12 +39,11 @@ describe('The RepeatPromise', () => {
                 setTimeout(() => {
                     callCounter++;
                     reject(`A custom reason: ${callCounter}`);
-                }, 2)
+                }, 2);
             }, 4);
 
             throw new Error('This test should throw an exception');
-        }
-        catch (error) {
+        } catch (error) {
             expect(error).to.eql('A custom reason: 5');
         }
     });
@@ -56,10 +55,9 @@ describe('The RepeatPromise', () => {
                 setTimeout(() => {
                     callCounter++;
                     reject(`A custom reason: ${callCounter}`);
-                }, 2)
+                }, 2);
             }, 4);
-        }
-        catch (error) {
+        } catch (error) {
             await new Promise((resolve, reject) => {
                 setTimeout(() => {
                     expect(callCounter).to.eql(5);
