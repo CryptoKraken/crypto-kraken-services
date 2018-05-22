@@ -1,14 +1,14 @@
 import * as request from 'request-promise-native';
-import { ExchangeService, Order, OrderInfo, OrderBook, CurrencyPair, OrderType } from '../../core';
+import { CurrencyPair, ExchangeService, Order, OrderBook, OrderInfo, OrderType } from '../../core';
 import { RepeatPromise } from '../../utils';
-import { KuCoinResponseParser } from './kucoin-response-parser';
 import { KuCoinConstants } from './constants';
+import { KuCoinResponseParser } from './kucoin-response-parser';
 
 export class KuCoinService implements ExchangeService {
     private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();
     private _requestTryCount: number;
 
-    constructor(public readonly serverUri: string = KuCoinConstants.serverProductionUrl, requestTryCount: number = 3) {
+    constructor(readonly serverUri: string = KuCoinConstants.serverProductionUrl, requestTryCount: number = 3) {
         this._requestTryCount = requestTryCount;
     }
 
@@ -57,23 +57,23 @@ export class KuCoinService implements ExchangeService {
     }
 
     async createOrder(order: Order): Promise<Order & { id: string; }> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 
     async deleteOrder(id: string): Promise<boolean> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 
     async getOrderInfo(id: string): Promise<OrderInfo> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 
-    async getActiveOrders(): Promise<Order & { id: string; }[]> {
-        throw new Error("Method not implemented.");
+    async getActiveOrders(): Promise<Array<Order & { id: string; }>> {
+        throw new Error('Method not implemented.');
     }
 
     async getBalance(currency: string): Promise<number> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 
     protected getSymbol(currencyPair: CurrencyPair) {

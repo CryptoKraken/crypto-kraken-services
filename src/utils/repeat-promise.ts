@@ -1,12 +1,16 @@
 export class RepeatPromise<T> implements Promise<T> {
     readonly [Symbol.toStringTag]: 'Promise';
-    protected readonly wrappedExecutor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void;
+    protected readonly wrappedExecutor:
+        (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void;
     protected readonly promise: Promise<T>;
     protected wrappedResolve!: (value?: T | PromiseLike<T>) => void;
     protected wrappedReject!: (reason?: any) => void;
     protected callCounter = 0;
 
-    constructor(protected executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void, protected tryCount: number = 1) {
+    constructor(
+        protected executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void,
+        protected tryCount: number = 1
+    ) {
         this.wrappedExecutor = (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => {
             this.executor(this.wrappedResolve, this.wrappedReject);
         };
@@ -23,11 +27,16 @@ export class RepeatPromise<T> implements Promise<T> {
         });
     }
 
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null | undefined, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined): Promise<TResult1 | TResult2> {
+    then<TResult1 = T, TResult2 = never>(
+        onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null | undefined,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined
+    ): Promise<TResult1 | TResult2> {
         return this.promise.then(onfulfilled, onrejected);
     }
 
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null | undefined): Promise<T | TResult> {
+    catch<TResult = never>(
+        onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null | undefined
+    ): Promise<T | TResult> {
         return this.promise.catch(onrejected);
     }
 }

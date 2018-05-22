@@ -1,4 +1,5 @@
-import { OrderBook, OrderType } from "../../../../src/core";
+/* tslint:disable */
+import { OrderBook, OrderType } from '../../../../src/core';
 
 export const orderBookCases = {
     default: {
