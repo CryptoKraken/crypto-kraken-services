@@ -37,7 +37,7 @@ export class KuCoinService implements ExchangeService {
                     limit: maxLimit
                 }
             })
-                .then(value => resolve(this.kuCoinResponseParser.parseOrderBook(pair, value)))
+                .then(value => resolve(this.kuCoinResponseParser.parseOrderBook(value, pair)))
                 .catch(reason => reject(reason));
         }, this.requestTryCount);
     }
@@ -51,7 +51,7 @@ export class KuCoinService implements ExchangeService {
                     limit: maxLimit
                 }
             })
-                .then(value => resolve(this.kuCoinResponseParser.parseDealOrders(pair, value)))
+                .then(value => resolve(this.kuCoinResponseParser.parseDealOrders(value, pair)))
                 .catch(reason => reject(reason));
         }, this.requestTryCount);
     }

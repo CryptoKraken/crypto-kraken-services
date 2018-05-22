@@ -34,13 +34,13 @@ describe('KuCoin Response Parser', () => {
             }
         ];
 
-        const orders = kuCoinResponseParser.parseDealOrders(currencyPair, JSON.stringify(recentDealOrdersData[1]));
+        const orders = kuCoinResponseParser.parseDealOrders(JSON.stringify(recentDealOrdersData[1]), currencyPair);
         expect(orders).to.eql(expectedOrders);
-        expect(() => kuCoinResponseParser.parseDealOrders(currencyPair, JSON.stringify(wrongRecentDealOrdersData[0])))
+        expect(() => kuCoinResponseParser.parseDealOrders(JSON.stringify(wrongRecentDealOrdersData[0]), currencyPair))
             .to.throw(/isn't the deal order type/);
-        expect(() => kuCoinResponseParser.parseDealOrders(currencyPair, JSON.stringify(wrongRecentDealOrdersData[1])))
+        expect(() => kuCoinResponseParser.parseDealOrders(JSON.stringify(wrongRecentDealOrdersData[1]), currencyPair))
             .to.throw(/SELL/);
-        expect(() => kuCoinResponseParser.parseDealOrders(currencyPair, JSON.stringify(wrongRecentDealOrdersData[2])))
+        expect(() => kuCoinResponseParser.parseDealOrders(JSON.stringify(wrongRecentDealOrdersData[2]), currencyPair))
             .to.throw(/result/);
     });
 
@@ -79,13 +79,13 @@ describe('KuCoin Response Parser', () => {
             ]
         };
 
-        const orderBook = kuCoinResponseParser.parseOrderBook(currencyPair, JSON.stringify(fullOrderBookData[1]));
+        const orderBook = kuCoinResponseParser.parseOrderBook(JSON.stringify(fullOrderBookData[1]), currencyPair);
         expect(orderBook).to.eql(expectedOrderBook);
-        expect(() => kuCoinResponseParser.parseOrderBook(currencyPair, JSON.stringify(wrongFullOrderBookData[0])))
+        expect(() => kuCoinResponseParser.parseOrderBook(JSON.stringify(wrongFullOrderBookData[0]), currencyPair))
             .to.throw(/isn't the order book type/);
-        expect(() => kuCoinResponseParser.parseOrderBook(currencyPair, JSON.stringify(wrongFullOrderBookData[1])))
+        expect(() => kuCoinResponseParser.parseOrderBook(JSON.stringify(wrongFullOrderBookData[1]), currencyPair))
             .to.throw(/isn't the order book type/);
-        expect(() => kuCoinResponseParser.parseOrderBook(currencyPair, JSON.stringify(wrongFullOrderBookData[2])))
+        expect(() => kuCoinResponseParser.parseOrderBook(JSON.stringify(wrongFullOrderBookData[2]), currencyPair))
             .to.throw(/isn't the order book type/);
     });
 });

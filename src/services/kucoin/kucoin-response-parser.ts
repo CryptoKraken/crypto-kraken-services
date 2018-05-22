@@ -40,7 +40,7 @@ const Guards = {
 };
 
 export class KuCoinResponseParser {
-    parseOrderBook(currencyPair: CurrencyPair, responseResult: string): OrderBook {
+    parseOrderBook(responseResult: string, currencyPair: CurrencyPair): OrderBook {
         const obj = JSON.parse(responseResult);
         if (!Guards.isDataObjOwner(obj) || !Guards.isOrderBook(obj.data))
             throw new Error(`The result ${responseResult} isn't the order book type.`);
@@ -67,7 +67,7 @@ export class KuCoinResponseParser {
         }
     }
 
-    parseDealOrders(currencyPair: CurrencyPair, responseResult: string): Order[] {
+    parseDealOrders(responseResult: string, currencyPair: CurrencyPair): Order[] {
         const obj = JSON.parse(responseResult);
         if (!Guards.isDataArrayOwner(obj))
             throw new Error(`The result ${responseResult} isn't the orders type.`);
