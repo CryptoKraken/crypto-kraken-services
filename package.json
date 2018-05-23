@@ -1,8 +1,19 @@
 {
-  "name": "trader-services",
-  "version": "0.0.1",
-  "description": "",
+  "name": "crypto-kraken-services",
+  "author": "CryptoKraken",
+  "homepage": "https://github.com/CryptoKraken/crypto-kraken-services#readme",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "",  
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CryptoKraken/crypto-kraken-services.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CryptoKraken/crypto-kraken-services/issues"
+  },
+  "keywords": [],
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "build-watch": "./node_modules/.bin/tsc -w",
@@ -11,17 +22,6 @@
     "tslint-src": "./node_modules/.bin/tslint -p ./tsconfig.json",
     "tslint-test": "./node_modules/.bin/tslint -p ./tests/tsconfig.json"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/skubarenko/trader-services.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/skubarenko/trader-services/issues"
-  },
-  "homepage": "https://github.com/skubarenko/trader-services#readme",
   "dependencies": {
     "request": "^2.85.0",
     "request-promise-native": "^1.0.5"
@@ -38,5 +38,9 @@
     "ts-node": "^5.0.1",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3"
+  },
+  "engines": {
+    "node": ">= 8.0.0",
+    "npm": ">= 5.0.0"
   }
 }
