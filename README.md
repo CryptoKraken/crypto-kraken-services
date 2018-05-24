@@ -8,7 +8,7 @@ The set of API for crypto exchanges.
 | Exchanges | Status           |
 |-----------|------------------|
 | KuCoin    | Work in progress |
-| YouBit    | Work in progress |
+| YoBit     | Work in progress |
 | Binance   | Planned          |
 
 #### Project Structure
