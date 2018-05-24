@@ -24,8 +24,8 @@ describe('KuCoin Exchange Service', () => {
             .twice()
             .reply(200, currentCase.data);
 
-        const orders1 = await kuCoinService.getRecentDealOrders(currencyPair);
-        const orders2 = await kuCoinService.getRecentDealOrders(currencyPair);
+        const orders1 = await kuCoinService.getTrades(currencyPair);
+        const orders2 = await kuCoinService.getTrades(currencyPair);
 
         expect(orders1)
             .to.eql(orders2)
@@ -49,7 +49,7 @@ describe('KuCoin Exchange Service', () => {
             })
             .reply(200, currentCase.data);
 
-        const orders = await kuCoinService.getRecentDealOrders(currencyPair);
+        const orders = await kuCoinService.getTrades(currencyPair);
 
         expect(orders)
             .to.eql(currentCase.expected);
