@@ -1,0 +1,20 @@
+{
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/types"
+    ],
+    "extension": [
+        ".ts"
+    ],
+    "reporter": [
+        "json",
+        "text"
+    ],
+    "require": [
+        "ts-node/register"
+    ],
+    "temp-directory": "./coverage/.nyc_output",
+    "all": true
+}
