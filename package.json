@@ -15,13 +15,13 @@
   },
   "keywords": [],
   "scripts": {
-    "build": "./node_modules/.bin/tsc",
-    "build-watch": "./node_modules/.bin/tsc -w",
+    "build": "tsc",
+    "build-watch": "tsc -w",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "code-coverage": "nyc npm test && rimraf coverage",
     "tslint": "npm run tslint-src & npm run tslint-test",
-    "tslint-src": "./node_modules/.bin/tslint -p ./tsconfig.json",
-    "tslint-test": "./node_modules/.bin/tslint -p ./tests/tsconfig.json"
+    "tslint-src": "tslint -p ./tsconfig.json",
+    "tslint-test": "tslint -p ./tests/tsconfig.json"
   },
   "dependencies": {
     "request": "^2.85.0",

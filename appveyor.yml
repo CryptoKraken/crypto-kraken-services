@@ -8,6 +8,10 @@ branches:
 
 environment:
   nodejs_version: "stable"
+  matrix:
+  - current_test_script: test
+  - current_test_script: tslint
+
 
 install:
   - npm install
@@ -16,5 +20,5 @@ install:
 build: off
 
 test_script:
-  - npm run build
-  - npm test
+  - ps: npm run build
+  - ps: npm run $env:current_test_script
