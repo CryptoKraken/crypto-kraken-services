@@ -18,7 +18,9 @@
     "build": "tsc",
     "build-watch": "tsc -w",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
-    "code-coverage": "nyc npm test && rimraf coverage",
+    "code-coverage": "nyc npm test",
+    "postcode-coverage": "rimraf coverage",
+    "codecov": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov",
     "tslint": "npm run tslint-src & npm run tslint-test",
     "tslint-src": "tslint -p ./tsconfig.json",
     "tslint-test": "tslint -p ./tests/tsconfig.json"
