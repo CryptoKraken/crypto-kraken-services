@@ -13,7 +13,7 @@
         "text"
     ],
     "require": [
-        "ts-node/register"
+        "./environment/plugins/remove-empty-module-init-ts-node"
     ],
     "temp-directory": "./coverage/.nyc_output",
     "all": true
