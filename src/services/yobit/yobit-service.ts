@@ -14,7 +14,14 @@ export class YobitService implements ExchangeService {
     }
 
     getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
-        throw new Error('Method not implemented.');
+        return new RepeatPromise((resolve, reject) => {
+            request.get(YobitConstants.getOrderBookUri(pair), {
+                baseUrl: YobitConstants.rootServerUrl,
+                qs: maxLimit ? { limit: maxLimit } : undefined
+            })
+                .then(value => resolve(this.responseParser.parseOrderBook(value, pair)))
+                .catch(reason => reject(reason));
+        }, this.requestTryCount);
     }
 
     getRecentDealOrders(pair: CurrencyPair, maxLimit?: number | undefined): Promise<Order[]> {

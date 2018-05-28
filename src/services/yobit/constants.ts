@@ -3,6 +3,7 @@ import { YobitUtils } from './yobit-utils';
 
 const constants = {
     rootServerUrl: 'https://yobit.net/api/3',
+    getOrderBookUri: (pair: CurrencyPair) => `/depth/${YobitUtils.getPairSymbol(pair)}`,
     getTradesUri: (pair: CurrencyPair) => `/trades/${YobitUtils.getPairSymbol(pair)}`
 };
 
