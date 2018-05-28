@@ -1,2 +1,2 @@
 export { yobitGeneralError } from './common';
-export { orderBookCases } from './order-book';
+export { tradesCases } from './trades';

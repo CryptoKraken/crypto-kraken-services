@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { OrderType } from '../../../src/core';
 import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
-import { orderBookCases, yobitGeneralError } from './data';
+import { tradesCases, yobitGeneralError } from './data';
 
 describe('YoBit Response Parser', () => {
     let parser: YobitResponseParser;
@@ -10,15 +10,15 @@ describe('YoBit Response Parser', () => {
         parser = new YobitResponseParser();
     });
 
-    it('should parse an order book', () => {
-        const result = parser.parseOrderBook(JSON.stringify(orderBookCases.default.data), ['ltc', 'btc']);
-        expect(result).to.eql(orderBookCases.default.expected);
+    it('should parse trades', () => {
+        const result = parser.parseTrades(JSON.stringify(tradesCases.default.data), ['ltc', 'btc']);
+        expect(result).to.eql(tradesCases.default.expected);
 
-        expect(() => parser.parseOrderBook(JSON.stringify(yobitGeneralError), ['aaa', 'bbb']))
+        expect(() => parser.parseTrades(JSON.stringify(yobitGeneralError), ['aaa', 'bbb']))
             .to.throw(/Yobit error text/);
-        expect(() => parser.parseOrderBook(JSON.stringify(''), ['aaa', 'bbb']))
+        expect(() => parser.parseTrades(JSON.stringify(''), ['aaa', 'bbb']))
             .to.throw(/Data object is empty/);
-        expect(() => parser.parseOrderBook(JSON.stringify({}), ['aaa', 'bbb']))
+        expect(() => parser.parseTrades(JSON.stringify({}), ['aaa', 'bbb']))
             .to.throw(/Data object does not have the .* property./);
     });
 });
