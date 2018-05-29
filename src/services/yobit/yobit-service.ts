@@ -24,7 +24,7 @@ export class YobitService implements ExchangeService {
         }, this.requestTryCount);
     }
 
-    getRecentDealOrders(pair: CurrencyPair, maxLimit?: number | undefined): Promise<Order[]> {
+    getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
         return new RepeatPromise((resolve, reject) => {
             request.get(YobitConstants.getTradesUri(pair), {
                 baseUrl: YobitConstants.rootServerUrl,

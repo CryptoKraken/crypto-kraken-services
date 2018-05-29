@@ -21,7 +21,7 @@ describe('YoBit Response Parser', () => {
         expect(() => parser.parseOrderBook(JSON.stringify({}), ['aaa', 'bbb']))
             .to.throw(/Data object does not have the .* property./);
 
-        const asksBidsErrorRegex = /Data object does not have the.*asks or bids.*property./;
+        const asksBidsErrorRegex = /Data object does not have the asks or bids property./;
         expect(() => parser.parseOrderBook(JSON.stringify({ aaa_bbb: {} }), ['aaa', 'bbb']))
             .to.throw(asksBidsErrorRegex);
         expect(() => parser.parseOrderBook(JSON.stringify({ aaa_bbb: { asks: [] } }), ['aaa', 'bbb']))
