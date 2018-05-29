@@ -1,5 +1,5 @@
 import * as request from 'request-promise-native';
-import { CurrencyPair, ExchangeService, Order, OrderBook, OrderInfo, OrderType } from '../../core';
+import { CurrencyBalance, CurrencyPair, ExchangeService, Order, OrderBook, OrderInfo, OrderType } from '../../core';
 import { RepeatPromise } from '../../utils';
 import { KuCoinConstants } from './constants';
 import { KuCoinResponseParser } from './kucoin-response-parser';
@@ -72,7 +72,7 @@ export class KuCoinService implements ExchangeService {
         throw new Error('Method not implemented.');
     }
 
-    async getBalance(currency: string): Promise<number> {
+    async getBalance(currency: string): Promise<CurrencyBalance> {
         throw new Error('Method not implemented.');
     }
 

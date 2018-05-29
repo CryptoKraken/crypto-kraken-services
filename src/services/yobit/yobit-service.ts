@@ -1,5 +1,5 @@
 import * as request from 'request-promise-native';
-import { CurrencyPair, ExchangeService, Order, OrderBook, OrderInfo } from '../../core';
+import { CurrencyBalance, CurrencyPair, ExchangeService, Order, OrderBook, OrderInfo } from '../../core';
 import { RepeatPromise } from '../../utils';
 import { YobitConstants } from './constants';
 import { YobitResponseParser } from './yobit-response-parser';
@@ -47,7 +47,7 @@ export class YobitService implements ExchangeService {
     getActiveOrders(): Promise<Array<Order & { id: string; }>> {
         throw new Error('Method not implemented.');
     }
-    getBalance(currency: string): Promise<number> {
+    getBalance(currency: string): Promise<CurrencyBalance> {
         throw new Error('Method not implemented.');
     }
 }

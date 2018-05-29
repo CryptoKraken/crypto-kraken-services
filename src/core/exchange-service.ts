@@ -1,3 +1,4 @@
+import { CurrencyBalance } from './currency-balance';
 import { CurrencyPair } from './currency-pair';
 import { ExchangeCredentials } from './exchange-credentials';
 import { Order, OrderInfo } from './order';
@@ -14,5 +15,5 @@ export interface ExchangeService {
     getOrderInfo(id: string, exchangeCredentials: ExchangeCredentials): Promise<OrderInfo>;
     getActiveOrders(exchangeCredentials: ExchangeCredentials): Promise<Array<Order & { id: string }>>;
 
-    getBalance(currency: string, exchangeCredentials: ExchangeCredentials): Promise<number>;
+    getBalance(currency: string, exchangeCredentials: ExchangeCredentials): Promise<CurrencyBalance>;
 }
