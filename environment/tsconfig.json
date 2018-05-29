@@ -3,12 +3,6 @@
     "target": "es2015",
     "module": "commonjs",
     "strict": true,
-    "outDir": "./dist/",
-    "rootDir": "./src/",
     "sourceMap": true
-  },
-  "exclude": [
-    "./tests/",
-    "./environment"
-  ]
+  }
 }

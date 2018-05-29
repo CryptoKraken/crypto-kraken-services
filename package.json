@@ -4,7 +4,7 @@
   "homepage": "https://github.com/CryptoKraken/crypto-kraken-services#readme",
   "version": "0.1.0",
   "license": "MIT",
-  "description": "",  
+  "description": "",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
@@ -17,10 +17,12 @@
   "scripts": {
     "build": "tsc",
     "build-watch": "tsc -w",
+    "build-plugins": "tsc -p ./environment/tsconfig.json",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
-    "code-coverage": "nyc npm test",
-    "postcode-coverage": "rimraf coverage",
-    "codecov": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov",
+    "coverage": "npm run coverage-without-clear",
+    "postcoverage": "rimraf coverage",
+    "coverage-without-clear": "npm run build-plugins && nyc mocha tests/**/*.spec.ts",
+    "codecov": "npm run coverage-without-clear && nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov",
     "tslint": "npm run tslint-src & npm run tslint-test",
     "tslint-src": "tslint -p ./tsconfig.json",
     "tslint-test": "tslint -p ./tests/tsconfig.json"
