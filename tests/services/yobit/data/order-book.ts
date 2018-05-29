@@ -4,62 +4,42 @@ import { OrderBook, OrderType } from '../../../../src/core';
 export const orderBookCases = {
     default: {
         data: {
-            ltc_btc: [
-                {
-                    type: 'ask',
-                    price: 0.01665,
-                    amount: 0.06,
-                    tid: 200623735,
-                    timestamp: 1526172281
-                },
-                {
-                    type: 'bid',
-                    price: 0.01673804,
-                    amount: 0.5,
-                    tid: 200623734,
-                    timestamp: 1526172256
-                },
-                {
-                    type: 'bid',
-                    price: 0.01599042,
-                    amount: 1.1,
-                    tid: 200623732,
-                    timestamp: 1526172121
-                },
-                {
-                    type: 'ask',
-                    price: 0.01461,
-                    amount: 0.01,
-                    tid: 200623731,
-                    timestamp: 1526172282
-                }
-            ]
+            ltc_btc: {
+                asks: [
+                    [0.01571419, 1.7514179],
+                    [0.01577619, 0.32323747]
+                ],
+                bids: [
+                    [0.01567506, 2.94061013],
+                    [0.01567505, 165.875],
+                ]
+            }
         },
         expected: <OrderBook>{
             sellOrders: [
                 {
-                    amount: 0.06,
-                    price: 0.01665,
+                    price: 0.01571419,
+                    amount: 1.7514179,
                     orderType: OrderType.Sell,
                     pair: ['ltc', 'btc']
                 },
                 {
-                    amount: 0.01,
-                    price: 0.01461,
+                    price: 0.01577619,
+                    amount: 0.32323747,
                     orderType: OrderType.Sell,
                     pair: ['ltc', 'btc']
                 }
             ],
             buyOrders: [
                 {
-                    amount: 0.5,
-                    price: 0.01673804,
+                    price: 0.01567506,
+                    amount: 2.94061013,
                     orderType: OrderType.Buy,
                     pair: ['ltc', 'btc']
                 },
                 {
-                    amount: 1.1,
-                    price: 0.01599042,
+                    price: 0.01567505,
+                    amount: 165.875,
                     orderType: OrderType.Buy,
                     pair: ['ltc', 'btc']
                 }
