@@ -30,6 +30,7 @@ describe('KuCoin Signature Maker', () => {
         const signature = kuCoinSignatureMaker.sign(currentApiInfo.secret, endpoint, undefined, nonce);
         const signatureWithQueryString = kuCoinSignatureMaker.sign(currentApiInfo.secret, endpoint, queryString, nonce);
 
+        expect(kuCoinSignatureMaker.sign(currentApiInfo.secret, endpoint, undefined)).to.not.be.empty;
         expect(signature).to.not.eql(signatureWithQueryString);
         expect(signature).to.eql(expectedSignature);
         expect(signatureWithQueryString).to.eql(expectedSignatureWithQueryString);
