@@ -47,14 +47,14 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
 
     async getTrades(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
         return new RepeatPromise<Order[]>((resolve, reject) => {
-            request.get(KuCoinConstants.recentlyDealOrdersUri, {
+            request.get(KuCoinConstants.tradesUri, {
                 baseUrl: this.serverUri,
                 qs: {
                     symbol: this.getSymbol(pair),
                     limit: maxLimit
                 }
             })
-                .then(value => resolve(this.kuCoinResponseParser.parseDealOrders(value, pair)))
+                .then(value => resolve(this.kuCoinResponseParser.parseTrades(value, pair)))
                 .catch(reason => reject(reason));
         }, this.requestTryCount);
     }

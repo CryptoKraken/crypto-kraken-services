@@ -13,18 +13,18 @@ describe('KuCoin Response Parser', () => {
     it('should parse trades correctly', () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        const orders = kuCoinResponseParser.parseDealOrders(
+        const orders = kuCoinResponseParser.parseTrades(
             JSON.stringify(tradesCases.mixedOrders.data), currencyPair
         );
 
         expect(orders).to.eql(tradesCases.mixedOrders.expected);
-        expect(() => kuCoinResponseParser.parseDealOrders(
+        expect(() => kuCoinResponseParser.parseTrades(
             JSON.stringify(wrongTradesCases.sellOrderWithMissingAmount), currencyPair)
-        ).to.throw(/isn't the deal order type/);
-        expect(() => kuCoinResponseParser.parseDealOrders(
+        ).to.throw(/isn't the trade type/);
+        expect(() => kuCoinResponseParser.parseTrades(
             JSON.stringify(wrongTradesCases.orderWithWrongOrderTypeName), currencyPair)
         ).to.throw(/SELL/);
-        expect(() => kuCoinResponseParser.parseDealOrders(
+        expect(() => kuCoinResponseParser.parseTrades(
             JSON.stringify(wrongTradesCases.wrongDataFieldName), currencyPair)
         ).to.throw(/result/);
     });
