@@ -2,6 +2,25 @@ import { expect } from 'chai';
 import { RepeatPromise } from '../../src/utils';
 
 describe('The RepeatPromise', () => {
+    it('should repeat a body once by default', async () => {
+        let repeatCounter = 0;
+        try {
+            await new RepeatPromise<number>((resolve, reject) => {
+                reject(`A custom reason: ${repeatCounter}`);
+                repeatCounter++;
+            });
+
+            throw new Error('This test should throw an exception');
+        } catch (error) {
+            expect(error).to.eql('A custom reason: 1');
+        }
+    });
+
+    it('should have the correct catch method', () => {
+        return new RepeatPromise<number>((resolve, reject) => reject(`A custom reason`))
+            .catch(error => expect(error).to.eql('A custom reason'));
+    });
+
     it('should repeat a body', async () => {
         let callCounter = 0;
         const value = await new RepeatPromise<number>((resolve, reject) => {
