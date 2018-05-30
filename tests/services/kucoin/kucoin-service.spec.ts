@@ -17,15 +17,15 @@ describe('KuCoin Exchange Service', () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
         nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .get(KuCoinConstants.tradesUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .twice()
             .reply(200, currentCase.data);
 
-        const orders1 = await kuCoinService.getRecentDealOrders(currencyPair);
-        const orders2 = await kuCoinService.getRecentDealOrders(currencyPair);
+        const orders1 = await kuCoinService.getTrades(currencyPair);
+        const orders2 = await kuCoinService.getTrades(currencyPair);
 
         expect(orders1)
             .to.eql(orders2)
@@ -37,19 +37,19 @@ describe('KuCoin Exchange Service', () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
         nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .get(KuCoinConstants.tradesUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .replyWithError('An connection error from the test');
         nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .get(KuCoinConstants.tradesUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .reply(200, currentCase.data);
 
-        const orders = await kuCoinService.getRecentDealOrders(currencyPair);
+        const orders = await kuCoinService.getTrades(currencyPair);
 
         expect(orders)
             .to.eql(currentCase.expected);

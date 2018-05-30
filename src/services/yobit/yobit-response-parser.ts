@@ -2,7 +2,7 @@ import { isArray, isNumber } from 'util';
 import { CurrencyPair, Order, OrderBook, OrderType } from '../../core';
 import { YobitUtils } from './yobit-utils';
 
-interface YobitTradesItem {
+interface YobitTrade {
     type: YobitOrderType;
     price: number;
     amount: number;
@@ -10,7 +10,7 @@ interface YobitTradesItem {
 
 type YobitOrderType = 'bid' | 'ask';
 
-type YobitOrderBookItem = [
+type YobitOrder = [
     /*price*/ number,
     /*amount*/ number
 ];
@@ -20,23 +20,23 @@ const Guards = {
         return data && data.hasOwnProperty('success') && data.success === 0 && data.error;
     },
 
-    isOrderType: (type: any): type is YobitOrderType => type === 'bid' || type === 'ask',
+    isOrderType: (data: any): data is YobitOrderType => data === 'bid' || data === 'ask',
 
-    isOrderBookItem: (item: any): item is YobitOrderBookItem => {
-        return item && isArray(item) && item.length === 2 && isNumber(item[0]) && isNumber(item[1]);
+    isYobitOrder: (data: any): data is YobitOrder => {
+        return data && isArray(data) && data.length === 2 && isNumber(data[0]) && isNumber(data[1]);
     },
 
-    isOrderBookItemArray: (data: any): data is YobitOrderBookItem[] => {
-        return data && isArray(data) && data.every(i => Guards.isOrderBookItem(i));
+    isYobitOrderArray: (data: any): data is YobitOrder[] => {
+        return data && isArray(data) && data.every(i => Guards.isYobitOrder(i));
     },
 
-    isTradesItem: (order: any): order is YobitTradesItem => {
-        return order.type && Guards.isOrderType(order.type) && order.price && isNumber(order.price)
-            && order.amount && isNumber(order.amount);
+    isYobitTrade: (data: any): data is YobitTrade => {
+        return data.type && Guards.isOrderType(data.type) && data.price && isNumber(data.price)
+            && data.amount && isNumber(data.amount);
     },
 
-    isTradesArray: (ordersArray: any): ordersArray is YobitTradesItem[] => {
-        return ordersArray && isArray(ordersArray) && ordersArray.every(o => Guards.isTradesItem(o));
+    isYobitTradeArray: (data: any): data is YobitTrade[] => {
+        return data && isArray(data) && data.every(o => Guards.isYobitTrade(o));
     }
 };
 
@@ -53,7 +53,7 @@ export class YobitResponseParser {
             throw new Error(`Data object does not have the ${pairSymbol} property.`);
         const rawSellOrders = orderBookContainer.asks;
         const rawBuyOrders = orderBookContainer.bids;
-        if (!Guards.isOrderBookItemArray(rawSellOrders) || !Guards.isOrderBookItemArray(rawBuyOrders))
+        if (!Guards.isYobitOrderArray(rawSellOrders) || !Guards.isYobitOrderArray(rawBuyOrders))
             throw new Error('Data object does not have the asks or bids property contained array of orders');
 
         return {
@@ -69,11 +69,11 @@ export class YobitResponseParser {
         if (Guards.isErrorResponse(dataObject))
             throw new Error(dataObject.error);
         const pairSymbol = YobitUtils.getPairSymbol(pair);
-        const rawTrades = dataObject[pairSymbol];
-        if (!Guards.isTradesArray(rawTrades))
+        const yobitTrades = dataObject[pairSymbol];
+        if (!Guards.isYobitTradeArray(yobitTrades))
             throw new Error(`Data object does not have the ${pairSymbol} property contained array of orders.`);
 
-        return rawTrades.map<Order>(o => ({
+        return yobitTrades.map<Order>(o => ({
             pair,
             price: o.price,
             amount: o.amount,
@@ -81,7 +81,7 @@ export class YobitResponseParser {
         }));
     }
 
-    private getOrders(items: YobitOrderBookItem[], pair: CurrencyPair, type: OrderType): Order[] {
+    private getOrders(items: YobitOrder[], pair: CurrencyPair, type: OrderType): Order[] {
         return items.map<Order>(o => ({
             price: o[0],
             amount: o[1],

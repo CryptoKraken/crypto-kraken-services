@@ -1,6 +1,6 @@
 const constants = {
     serverProductionUrl: 'https://api.kucoin.com',
-    recentlyDealOrdersUri: '/v1/open/deal-orders',
+    tradesUri: '/v1/open/deal-orders',
     orderBooksUri: '/v1/open/orders'
 };
 

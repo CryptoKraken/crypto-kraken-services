@@ -49,7 +49,7 @@ describe('YoBit Exchange Service', () => {
             .get(tradesUrlPostfix)
             .reply(200, JSON.stringify(tradesCases.default.data));
 
-        const result = await exchangeService.getRecentDealOrders(['ltc', 'btc']);
+        const result = await exchangeService.getTrades(['ltc', 'btc']);
         expect(result).to.eql(tradesCases.default.expected);
     });
 
@@ -60,7 +60,7 @@ describe('YoBit Exchange Service', () => {
             .get(tradesUrlPostfix)
             .reply(200, JSON.stringify(tradesCases.default.data));
 
-        const result = await exchangeService.getRecentDealOrders(['ltc', 'btc']);
+        const result = await exchangeService.getTrades(['ltc', 'btc']);
         expect(result).to.eql(tradesCases.default.expected);
     });
 
@@ -70,7 +70,7 @@ describe('YoBit Exchange Service', () => {
             .query({ limit: 4 })
             .reply(200, JSON.stringify(tradesCases.default.data));
 
-        const result = await exchangeService.getRecentDealOrders(['ltc', 'btc'], 4);
+        const result = await exchangeService.getTrades(['ltc', 'btc'], 4);
         expect(result).to.eql(tradesCases.default.expected);
     });
 });

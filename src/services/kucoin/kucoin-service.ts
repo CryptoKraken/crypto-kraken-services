@@ -1,10 +1,13 @@
 import * as request from 'request-promise-native';
-import { CurrencyBalance, CurrencyPair, ExchangeService, Order, OrderBook, OrderInfo, OrderType } from '../../core';
-import { RepeatPromise } from '../../utils';
+import {
+    AuthenticatedRestExchangeService, CurrencyBalance, CurrencyPair,
+    Order, OrderBook, OrderInfo, OrderType, RestExchangeService
+} from '../../core';
+import { Identified, isIdentified, RepeatPromise } from '../../utils';
 import { KuCoinConstants } from './constants';
 import { KuCoinResponseParser } from './kucoin-response-parser';
 
-export class KuCoinService implements ExchangeService {
+export class KuCoinService implements RestExchangeService, AuthenticatedRestExchangeService {
     private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();
     private _requestTryCount: number;
 
@@ -42,21 +45,21 @@ export class KuCoinService implements ExchangeService {
         }, this.requestTryCount);
     }
 
-    async getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
+    async getTrades(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
         return new RepeatPromise<Order[]>((resolve, reject) => {
-            request.get(KuCoinConstants.recentlyDealOrdersUri, {
+            request.get(KuCoinConstants.tradesUri, {
                 baseUrl: this.serverUri,
                 qs: {
                     symbol: this.getSymbol(pair),
                     limit: maxLimit
                 }
             })
-                .then(value => resolve(this.kuCoinResponseParser.parseDealOrders(value, pair)))
+                .then(value => resolve(this.kuCoinResponseParser.parseTrades(value, pair)))
                 .catch(reason => reject(reason));
         }, this.requestTryCount);
     }
 
-    async createOrder(order: Order): Promise<Order & { id: string; }> {
+    async createOrder(order: Order): Promise<Identified<Order>> {
         throw new Error('Method not implemented.');
     }
 
@@ -68,7 +71,7 @@ export class KuCoinService implements ExchangeService {
         throw new Error('Method not implemented.');
     }
 
-    async getActiveOrders(): Promise<Array<Order & { id: string; }>> {
+    async getActiveOrders(): Promise<Array<Identified<Order>>> {
         throw new Error('Method not implemented.');
     }
 

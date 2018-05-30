@@ -1,10 +1,13 @@
 import * as request from 'request-promise-native';
-import { CurrencyBalance, CurrencyPair, ExchangeService, Order, OrderBook, OrderInfo } from '../../core';
-import { RepeatPromise } from '../../utils';
+import {
+    AuthenticatedRestExchangeService, CurrencyBalance, CurrencyPair,
+    Order, OrderBook, OrderInfo, RestExchangeService
+} from '../../core';
+import { Identified, RepeatPromise } from '../../utils';
 import { YobitConstants } from './constants';
 import { YobitResponseParser } from './yobit-response-parser';
 
-export class YobitService implements ExchangeService {
+export class YobitService implements RestExchangeService, AuthenticatedRestExchangeService {
     private responseParser: YobitResponseParser;
 
     constructor(
@@ -24,7 +27,7 @@ export class YobitService implements ExchangeService {
         }, this.requestTryCount);
     }
 
-    getRecentDealOrders(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
+    getTrades(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
         return new RepeatPromise((resolve, reject) => {
             request.get(YobitConstants.getTradesUri(pair), {
                 baseUrl: YobitConstants.rootServerUrl,
@@ -35,7 +38,7 @@ export class YobitService implements ExchangeService {
         }, this.requestTryCount);
     }
 
-    createOrder(order: Order): Promise<Order & { id: string; }> {
+    createOrder(order: Order): Promise<Identified<Order>> {
         throw new Error('Method not implemented.');
     }
     deleteOrder(id: string): Promise<boolean> {
@@ -44,7 +47,7 @@ export class YobitService implements ExchangeService {
     getOrderInfo(id: string): Promise<OrderInfo> {
         throw new Error('Method not implemented.');
     }
-    getActiveOrders(): Promise<Array<Order & { id: string; }>> {
+    getActiveOrders(): Promise<Array<Identified<Order>>> {
         throw new Error('Method not implemented.');
     }
     getBalance(currency: string): Promise<CurrencyBalance> {
