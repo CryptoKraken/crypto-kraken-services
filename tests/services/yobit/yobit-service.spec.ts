@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
-import { CurrencyPair, OrderType } from '../../../src/core';
 import { YobitService } from '../../../src/services/yobit';
 import { YobitConstants } from '../../../src/services/yobit/constants';
 import { orderBookCases, tradesCases } from './data';

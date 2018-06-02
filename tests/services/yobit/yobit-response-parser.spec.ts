@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { OrderType } from '../../../src/core';
 import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
 import { orderBookCases, tradesCases, yobitGeneralError } from './data';
 

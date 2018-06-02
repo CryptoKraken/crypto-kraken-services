@@ -1,9 +1,9 @@
 import * as request from 'request-promise-native';
 import {
     AuthenticatedRestExchangeService, CurrencyBalance, CurrencyPair,
-    Order, OrderBook, OrderInfo, OrderType, RestExchangeService
+    Order, OrderBook, OrderInfo, RestExchangeService
 } from '../../core';
-import { Identified, isIdentified, RepeatPromise } from '../../utils';
+import { Identified, RepeatPromise } from '../../utils';
 import { KuCoinConstants } from './constants';
 import { KuCoinResponseParser } from './kucoin-response-parser';
 
