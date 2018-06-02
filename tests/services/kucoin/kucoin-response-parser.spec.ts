@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { CurrencyPair, Order, OrderBook, OrderType } from '../../../src/core';
+import { CurrencyPair } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
 import { orderBookCases, tradesCases, wrongOrderBookCases, wrongTradesCases } from './data';
 

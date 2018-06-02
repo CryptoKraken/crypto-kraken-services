@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
-import { CurrencyPair, Order, OrderType } from '../../../src/core';
+import { CurrencyPair } from '../../../src/core';
 import { KuCoinService } from '../../../src/services/kucoin';
 import { KuCoinConstants } from '../../../src/services/kucoin/constants';
 import { orderBookCases, tradesCases } from './data';
