@@ -9,6 +9,7 @@ import { KuCoinAuthRequestHeaders, KuCoinExchangeCredentials } from './kucoin-ex
 import { kuCoinNonceFactory } from './kucoin-nonce-factory';
 import { KuCoinResponseParser } from './kucoin-response-parser';
 import { KuCoinSignatureMaker } from './kucoin-signature-maker';
+import { KuCoinUtils } from './kucoin-utils';
 
 export class KuCoinService implements RestExchangeService, AuthenticatedRestExchangeService {
     private _kuCoinSignatureMaker: KuCoinSignatureMaker = new KuCoinSignatureMaker();
@@ -81,7 +82,23 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
     }
 
     async createOrder(order: Order, exchangeCredentials: KuCoinExchangeCredentials): Promise<Identified<Order>> {
-        throw new Error('Method not implemented.');
+        const symbol = this.getSymbol(order.pair);
+        const authHeaders = await this.getAuthHeaders(exchangeCredentials, KuCoinConstants.createOrderUri, symbol);
+
+        return new RepeatPromise<Identified<Order>>((resolve, reject) => {
+            request.get(KuCoinConstants.createOrderUri, {
+                baseUrl: this.serverUri,
+                qs: {
+                    symbol,
+                    type: KuCoinUtils.getKuCoinOrderType(order.orderType),
+                    price: order.price,
+                    amount: order.amount
+                },
+                headers: authHeaders
+            })
+                .then(value => resolve(this.kuCoinResponseParser.parseCreatedOrder(value, order)))
+                .catch(reason => reject(reason));
+        }, this.requestTryCount);
     }
 
     async deleteOrder(id: string): Promise<boolean> {

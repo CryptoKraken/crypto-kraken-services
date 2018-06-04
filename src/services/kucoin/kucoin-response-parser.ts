@@ -1,6 +1,9 @@
 import { isArray, isNumber, isString } from 'util';
 import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
-import { KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderType, KuCoinTrade } from './kucoin-types';
+import { Identified } from '../../utils';
+import {
+    KuCoinCreatedOrder, KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderType, KuCoinTrade
+} from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
 
 const Guards = {
@@ -22,11 +25,13 @@ const Guards = {
     },
 
     isKuCoinTrade: (data: any): data is KuCoinTrade => {
-        return data && isNumber(data[0]) && isString(data[1]) && Guards.isOrderType(data[1])
+        return data && isNumber(data[0]) && isString(data[1]) && Guards.isKuCoinOrderType(data[1])
             && isNumber(data[2]) && isNumber(data[3]) && isNumber(data[4]);
     },
 
-    isOrderType: (orderType: any): orderType is KuCoinOrderType => {
+    isKuCoinCreatedOrder: (data: any): data is KuCoinCreatedOrder => data && isString(data.orderOid),
+
+    isKuCoinOrderType: (orderType: any): orderType is KuCoinOrderType => {
         return orderType === KuCoinOrderType.SELL || orderType === KuCoinOrderType.BUY;
     },
 
@@ -95,4 +100,14 @@ export class KuCoinResponseParser {
         });
     }
 
+    parseCreatedOrder(responseResult: string, order: Order): Identified<Order> {
+        const obj = JSON.parse(responseResult);
+        if (!Guards.isDataObjOwner(obj) || !Guards.isKuCoinCreatedOrder(obj.data))
+            throw new Error(`The result ${responseResult} isn't the order type.`);
+
+        return {
+            id: obj.data.orderOid,
+            ...order
+        };
+    }
 }

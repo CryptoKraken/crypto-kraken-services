@@ -149,22 +149,6 @@ describe('KuCoin Exchange Service', () => {
 
     it('should create an order', async () => {
         const currentExchangeCredentials = exchangeCredentialsCases[0];
-        nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.createOrderUri)
-            .query({
-                symbol: `AAA-BBB`,
-                type: 'BUY'
-            })
-            .reply(200, createOrderCases.default.data);
-
-        nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.createOrderUri)
-            .query({
-                symbol: `AAA-CCC`,
-                type: 'SELL'
-            })
-            .reply(200, createOrderCases.dataAndAnyOtherField.data);
-
         const order1: Order = {
             pair: ['AAA', 'BBB'],
             orderType: OrderType.Buy,
@@ -178,29 +162,34 @@ describe('KuCoin Exchange Service', () => {
             amount: 345
         };
 
-        const createdOrder1 = await kuCoinService.createOrder(order1, currentExchangeCredentials);
-        expect(createdOrder1).to.eql(order1);
-
-        const createdOrder2 = await kuCoinService.createOrder(order2, currentExchangeCredentials);
-        expect(createdOrder2).to.eql(order2);
-    });
-
-    it('should create an order despite the connection error', async () => {
-        nock(KuCoinConstants.serverProductionUrl)
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
             .get(KuCoinConstants.createOrderUri)
             .query({
                 symbol: `AAA-BBB`,
-                type: 'BUY'
-            })
-            .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.createOrderUri)
-            .query({
-                symbol: `AAA-BBB`,
-                type: 'BUY'
+                type: 'BUY',
+                price: order1.price,
+                amount: order1.amount
             })
             .reply(200, createOrderCases.default.data);
 
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.createOrderUri)
+            .query({
+                symbol: `AAA-CCC`,
+                type: 'SELL',
+                price: order2.price,
+                amount: order2.amount
+            })
+            .reply(200, createOrderCases.dataAndAnyOtherField.data);
+
+        const createdOrder1 = await kuCoinService.createOrder(order1, currentExchangeCredentials);
+        expect(createdOrder1).to.eql(createOrderCases.default.expected);
+
+        const createdOrder2 = await kuCoinService.createOrder(order2, currentExchangeCredentials);
+        expect(createdOrder2).to.eql(createOrderCases.dataAndAnyOtherField.expected);
+    });
+
+    it('should create an order despite the connection error', async () => {
         const order: Order = {
             pair: ['AAA', 'BBB'],
             orderType: OrderType.Buy,
@@ -208,7 +197,27 @@ describe('KuCoin Exchange Service', () => {
             amount: 10
         };
 
-        expect(await kuCoinService.createOrder(order, exchangeCredentialsCases[0])).to.eql(order);
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.createOrderUri)
+            .query({
+                symbol: `AAA-BBB`,
+                type: 'BUY',
+                price: order.price,
+                amount: order.amount
+            })
+            .replyWithError('An connection error from the test');
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.createOrderUri)
+            .query({
+                symbol: `AAA-BBB`,
+                type: 'BUY',
+                price: order.price,
+                amount: order.amount
+            })
+            .reply(200, createOrderCases.default.data);
+
+        expect(await kuCoinService.createOrder(order, exchangeCredentialsCases[0]))
+            .to.eql(createOrderCases.default.expected);
     });
 
     it('should allow using a custom nonce generator', async () => {

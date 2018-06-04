@@ -23,6 +23,10 @@ export type KuCoinTrade = [
     /*Volume*/ number
 ];
 
+export interface KuCoinCreatedOrder {
+    orderOid: string;
+}
+
 export enum KuCoinOrderType {
     SELL = 'SELL',
     BUY = 'BUY'

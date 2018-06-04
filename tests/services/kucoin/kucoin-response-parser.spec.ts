@@ -1,7 +1,11 @@
 import { expect } from 'chai';
-import { CurrencyPair } from '../../../src/core';
+import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
-import { currencyBalancesCases, orderBookCases, tradesCases, wrongOrderBookCases, wrongTradesCases } from './data';
+import {
+    createOrderCases, currencyBalancesCases, orderBookCases,
+    tradesCases, wrongCreateOrderCases, wrongOrderBookCases,
+    wrongTradesCases
+} from './data';
 import { wrongCurrencyBalancesBalances } from './data/currency-balances';
 
 describe('KuCoin Response Parser', () => {
@@ -47,6 +51,23 @@ describe('KuCoin Response Parser', () => {
         expect(() => kuCoinResponseParser.parseOrderBook(
             JSON.stringify(wrongOrderBookCases.dataWithWrongOrderTypeName), currencyPair)
         ).to.throw(/isn't the order book type/);
+    });
+
+    it('should parse a created order correctly', () => {
+        const order: Order = {
+            pair: ['AAA', 'CCC'],
+            orderType: OrderType.Sell,
+            price: 0.845,
+            amount: 345
+        };
+
+        const createdOrder = kuCoinResponseParser.parseCreatedOrder(
+            JSON.stringify(createOrderCases.dataAndAnyOtherField.data), order
+        );
+        expect(createdOrder).to.eql(createOrderCases.dataAndAnyOtherField.expected);
+        expect(() => kuCoinResponseParser.parseCreatedOrder(
+            JSON.stringify(wrongCreateOrderCases.dataWithoutOid), order)
+        ).to.throw(/isn't the order type/);
     });
 
     it('should parse a currency balance correctly', () => {
