@@ -80,7 +80,7 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         }, this.requestTryCount);
     }
 
-    async createOrder(order: Order): Promise<Identified<Order>> {
+    async createOrder(order: Order, exchangeCredentials: KuCoinExchangeCredentials): Promise<Identified<Order>> {
         throw new Error('Method not implemented.');
     }
 
