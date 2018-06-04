@@ -1,30 +1,7 @@
 import { isArray, isNumber, isString } from 'util';
 import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
-
-interface KucoinCurrencyBalance {
-    coinType: string;
-    balance: number;
-    freezeBalance: number;
-}
-
-interface KucoinOrderBook {
-    SELL: KucoinOrder[];
-    BUY: KucoinOrder[];
-}
-
-type KucoinOrder = [
-    /*Price*/ number,
-    /*Amount*/ number,
-    /*Volume*/ number
-];
-
-type KucoinTrade = [
-    /*Timestamp*/ number,
-    /*Order Type*/ string,
-    /*Price*/ number,
-    /*Amount*/ number,
-    /*Volume*/ number
-];
+import { KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderType, KuCoinTrade } from './kucoin-types';
+import { KuCoinUtils } from './kucoin-utils';
 
 const Guards = {
     isDataObjOwner: (data: any): data is { data: any } => data && data.data,
@@ -33,25 +10,27 @@ const Guards = {
         return Guards.isDataObjOwner(data) && isArray(data.data);
     },
 
-    isKucoinOrderBook: (data: any): data is KucoinOrderBook => {
+    isKuCoinOrderBook: (data: any): data is KuCoinOrderBook => {
         return data && data.SELL && data.BUY
             && isArray(data.SELL) && isArray(data.BUY)
-            && data.SELL.every((order: any) => Guards.isKucoinOrder(order))
-            && data.BUY.every((order: any) => Guards.isKucoinOrder(order));
+            && data.SELL.every((order: any) => Guards.isKuCoinOrder(order))
+            && data.BUY.every((order: any) => Guards.isKuCoinOrder(order));
     },
 
-    isKucoinOrder: (data: any): data is KucoinOrder => {
+    isKuCoinOrder: (data: any): data is KuCoinOrder => {
         return data && isNumber(data[0]) && isNumber(data[1]) && isNumber(data[2]);
     },
 
-    isKucoinTrade: (data: any): data is KucoinTrade => {
+    isKuCoinTrade: (data: any): data is KuCoinTrade => {
         return data && isNumber(data[0]) && isString(data[1]) && Guards.isOrderType(data[1])
             && isNumber(data[2]) && isNumber(data[3]) && isNumber(data[4]);
     },
 
-    isOrderType: (orderType: any): orderType is 'SELL' | 'BUY' => orderType === 'SELL' || orderType === 'BUY',
+    isOrderType: (orderType: any): orderType is KuCoinOrderType => {
+        return orderType === KuCoinOrderType.SELL || orderType === KuCoinOrderType.BUY;
+    },
 
-    isKucoinCurrencyBalance: (data: any): data is KucoinCurrencyBalance => {
+    isKuCoinCurrencyBalance: (data: any): data is KuCoinCurrencyBalance => {
         return data && isString(data.coinType) && isNumber(data.balance) && isNumber(data.freezeBalance);
     }
 };
@@ -59,7 +38,7 @@ const Guards = {
 export class KuCoinResponseParser {
     parseOrderBook(responseResult: string, currencyPair: CurrencyPair): OrderBook {
         const obj = JSON.parse(responseResult);
-        if (!Guards.isDataObjOwner(obj) || !Guards.isKucoinOrderBook(obj.data))
+        if (!Guards.isDataObjOwner(obj) || !Guards.isKuCoinOrderBook(obj.data))
             throw new Error(`The result ${responseResult} isn't the order book type.`);
         const kucoinOrderBook = obj.data;
         return {
@@ -86,7 +65,7 @@ export class KuCoinResponseParser {
 
     parseCurrencyBalance(responseResult: string, currency: string): CurrencyBalance {
         const obj = JSON.parse(responseResult);
-        if (!Guards.isDataObjOwner(obj) || !Guards.isKucoinCurrencyBalance(obj.data))
+        if (!Guards.isDataObjOwner(obj) || !Guards.isKuCoinCurrencyBalance(obj.data))
             throw new Error(`The result ${responseResult} isn't the currency balance type.`);
         const kucoinCurrencyBalance = obj.data;
         if (kucoinCurrencyBalance.coinType !== currency)
@@ -104,12 +83,12 @@ export class KuCoinResponseParser {
             throw new Error(`The result ${responseResult} isn't the orders type.`);
 
         return obj.data.map<Order>(orderObj => {
-            if (!Guards.isKucoinTrade(orderObj))
+            if (!Guards.isKuCoinTrade(orderObj))
                 throw new Error(`The element (${orderObj}) of the orders object isn't the trade type.`);
 
             return {
                 amount: orderObj[3],
-                orderType: orderObj[1] === 'SELL' ? OrderType.Sell : OrderType.Buy,
+                orderType: KuCoinUtils.getOrderType(orderObj[1]),
                 pair: currencyPair,
                 price: orderObj[2]
             };
