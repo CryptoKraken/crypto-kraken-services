@@ -6,7 +6,7 @@ export const deleteOrderCases = {
             "code": "OK",
             "data": null
         },
-        expected: true
+        expected: undefined
     }
 };
 

@@ -73,13 +73,13 @@ describe('KuCoin Response Parser', () => {
     });
 
     it('should parse a deleted order correctly', () => {
-        const isSuccess = kuCoinResponseParser.parseDeletedOrder(
+        kuCoinResponseParser.parseDeletedOrder(
             JSON.stringify(deleteOrderCases.default.data)
         );
-        expect(isSuccess).to.eql(true);
+
         expect(() => kuCoinResponseParser.parseDeletedOrder(
             JSON.stringify(wrongDeleteOrderCases.dataWithBody))
-        ).to.throw(/isn't the response data of the deleted order/);
+        ).to.throw(/isn't a successful response result/);
     });
 
     it('should parse a currency balance correctly', () => {
