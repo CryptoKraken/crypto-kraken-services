@@ -110,4 +110,8 @@ export class KuCoinResponseParser {
             ...order
         };
     }
+
+    parseDeletedOrder(responseResult: string): boolean {
+        throw new Error('Method not implemented.');
+    }
 }
