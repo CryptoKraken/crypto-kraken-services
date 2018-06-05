@@ -12,9 +12,9 @@ export interface RestExchangeService {
 
 export interface AuthenticatedRestExchangeService {
     createOrder(order: Order, exchangeCredentials: ExchangeCredentials): Promise<Identified<Order>>;
-    deleteOrder(id: string, exchangeCredentials: ExchangeCredentials): Promise<boolean>;
+    deleteOrder(identifiedOrder: Identified<Order>, exchangeCredentials: ExchangeCredentials): Promise<boolean>;
     getActiveOrders(exchangeCredentials: ExchangeCredentials): Promise<Array<Identified<Order>>>;
-    getOrderInfo(id: string, exchangeCredentials: ExchangeCredentials): Promise<OrderInfo>;
+    getOrderInfo(identifiedOrder: Identified<Order>, exchangeCredentials: ExchangeCredentials): Promise<OrderInfo>;
 
     getBalance(currency: string, exchangeCredentials: ExchangeCredentials): Promise<CurrencyBalance>;
 }

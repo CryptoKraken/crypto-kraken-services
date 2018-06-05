@@ -101,11 +101,17 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         }, this.requestTryCount);
     }
 
-    async deleteOrder(id: string): Promise<boolean> {
+    async deleteOrder(
+        identifiedOrder: Identified<Order>,
+        exchangeCredentials: KuCoinExchangeCredentials
+    ): Promise<boolean> {
         throw new Error('Method not implemented.');
     }
 
-    async getOrderInfo(id: string): Promise<OrderInfo> {
+    async getOrderInfo(
+        identifiedOrder: Identified<Order>,
+        exchangeCredentials: KuCoinExchangeCredentials
+    ): Promise<OrderInfo> {
         throw new Error('Method not implemented.');
     }
 
