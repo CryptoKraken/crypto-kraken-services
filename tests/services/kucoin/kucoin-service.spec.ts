@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
-import { CurrencyPair } from '../../../src/core';
+import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinService } from '../../../src/services/kucoin';
 import { KuCoinConstants } from '../../../src/services/kucoin/constants';
 import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-exchange-credentials';
-import { currencyBalancesCases, exchangeCredentialsCases, orderBookCases, tradesCases } from './data';
+import { createOrderCases, currencyBalancesCases, exchangeCredentialsCases, orderBookCases, tradesCases } from './data';
 
 describe('KuCoin Exchange Service', () => {
     let kuCoinService: KuCoinService;
@@ -145,6 +145,79 @@ describe('KuCoin Exchange Service', () => {
         expect('BTC').to.eql(currencyBalancesCases.default.data.data.coinType);
         expect(await kuCoinService.getBalance('BTC', exchangeCredentialsCases[0]))
             .to.eql(currencyBalancesCases.default.expected);
+    });
+
+    it('should create an order', async () => {
+        const currentExchangeCredentials = exchangeCredentialsCases[0];
+        const order1: Order = {
+            pair: ['AAA', 'BBB'],
+            orderType: OrderType.Buy,
+            price: 0.5,
+            amount: 10
+        };
+        const order2: Order = {
+            pair: ['AAA', 'CCC'],
+            orderType: OrderType.Sell,
+            price: 0.845,
+            amount: 345
+        };
+
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.createOrderUri)
+            .query({
+                symbol: `AAA-BBB`,
+                type: 'BUY',
+                price: order1.price,
+                amount: order1.amount
+            })
+            .reply(200, createOrderCases.default.data);
+
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.createOrderUri)
+            .query({
+                symbol: `AAA-CCC`,
+                type: 'SELL',
+                price: order2.price,
+                amount: order2.amount
+            })
+            .reply(200, createOrderCases.dataAndAnyOtherField.data);
+
+        const createdOrder1 = await kuCoinService.createOrder(order1, currentExchangeCredentials);
+        expect(createdOrder1).to.eql(createOrderCases.default.expected);
+
+        const createdOrder2 = await kuCoinService.createOrder(order2, currentExchangeCredentials);
+        expect(createdOrder2).to.eql(createOrderCases.dataAndAnyOtherField.expected);
+    });
+
+    it('should create an order despite the connection error', async () => {
+        const order: Order = {
+            pair: ['AAA', 'BBB'],
+            orderType: OrderType.Buy,
+            price: 0.5,
+            amount: 10
+        };
+
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.createOrderUri)
+            .query({
+                symbol: `AAA-BBB`,
+                type: 'BUY',
+                price: order.price,
+                amount: order.amount
+            })
+            .replyWithError('An connection error from the test');
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.createOrderUri)
+            .query({
+                symbol: `AAA-BBB`,
+                type: 'BUY',
+                price: order.price,
+                amount: order.amount
+            })
+            .reply(200, createOrderCases.default.data);
+
+        expect(await kuCoinService.createOrder(order, exchangeCredentialsCases[0]))
+            .to.eql(createOrderCases.default.expected);
     });
 
     it('should allow using a custom nonce generator', async () => {
