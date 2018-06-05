@@ -2,7 +2,8 @@
     "cSpell.words": [
         "binance",
         "kucoin",
-        "yobit"
+        "yobit",
+        "reqheaders"
     ],
     "files.insertFinalNewline": true,
     "files.eol": "\n",
