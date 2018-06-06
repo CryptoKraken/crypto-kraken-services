@@ -78,6 +78,9 @@ describe('KuCoin Response Parser', () => {
         );
 
         expect(() => kuCoinResponseParser.parseDeletedOrder(
+            JSON.stringify(deleteOrderCases.error.data)
+        )).to.throw(deleteOrderCases.error.data.msg);
+        expect(() => kuCoinResponseParser.parseDeletedOrder(
             JSON.stringify(wrongDeleteOrderCases.dataWithBody))
         ).to.throw(/isn't a successful response result/);
     });
