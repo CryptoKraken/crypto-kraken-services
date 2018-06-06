@@ -41,10 +41,10 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
     createOrder(order: Order): Promise<Identified<Order>> {
         throw new Error('Method not implemented.');
     }
-    deleteOrder(id: string): Promise<boolean> {
+    deleteOrder(identifiedOrder: Identified<Order>): Promise<void> {
         throw new Error('Method not implemented.');
     }
-    getOrderInfo(id: string): Promise<OrderInfo> {
+    getOrderInfo(identifiedOrder: Identified<Order>): Promise<OrderInfo> {
         throw new Error('Method not implemented.');
     }
     getActiveOrders(): Promise<Array<Identified<Order>>> {
