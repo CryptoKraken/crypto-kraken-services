@@ -104,7 +104,7 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
     async deleteOrder(
         identifiedOrder: Identified<Order>,
         exchangeCredentials: KuCoinExchangeCredentials
-    ): Promise<boolean> {
+    ): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
