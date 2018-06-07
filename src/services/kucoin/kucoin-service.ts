@@ -105,7 +105,22 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         identifiedOrder: Identified<Order>,
         exchangeCredentials: KuCoinExchangeCredentials
     ): Promise<void> {
-        throw new Error('Method not implemented.');
+        const symbol = this.getSymbol(identifiedOrder.pair);
+        const authHeaders = await this.getAuthHeaders(exchangeCredentials, KuCoinConstants.deleteOrderUri, symbol);
+
+        return new RepeatPromise<void>((resolve, reject) => {
+            request.post(KuCoinConstants.deleteOrderUri, {
+                baseUrl: this.serverUri,
+                qs: {
+                    symbol,
+                    orderOid: identifiedOrder.id,
+                    type: KuCoinUtils.getKuCoinOrderType(identifiedOrder.orderType)
+                },
+                headers: authHeaders
+            })
+                .then(value => resolve(this.kuCoinResponseParser.parseDeletedOrder(value)))
+                .catch(reason => reject(reason));
+        }, this.requestTryCount);
     }
 
     async getOrderInfo(

@@ -1,4 +1,4 @@
-import { isArray, isNumber, isString } from 'util';
+import { isArray, isBoolean, isNumber, isString } from 'util';
 import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
 import { Identified } from '../../utils';
 import {
@@ -6,7 +6,26 @@ import {
 } from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
 
+interface KuCoinResponseResult {
+    success: boolean;
+    code: string;
+    [nameField: string]: any;
+}
+
+interface KuCoinErrorResponseResult extends KuCoinResponseResult {
+    success: false;
+    msg: string;
+}
+
 const Guards = {
+    isKuCoinResponseResult: (data: any): data is KuCoinResponseResult => {
+        return data && isBoolean(data.success) && isString(data.code);
+    },
+
+    isKuCoinErrorResponseResult: (data: KuCoinResponseResult): data is KuCoinErrorResponseResult => {
+        return !data.success && data.code !== 'OK';
+    },
+
     isDataObjOwner: (data: any): data is { data: any } => data && data.data,
 
     isDataArrayOwner: (data: any): data is { data: any[] } => {
@@ -31,8 +50,8 @@ const Guards = {
 
     isKuCoinCreatedOrder: (data: any): data is KuCoinCreatedOrder => data && isString(data.orderOid),
 
-    isKuCoinOrderType: (orderType: any): orderType is KuCoinOrderType => {
-        return orderType === KuCoinOrderType.SELL || orderType === KuCoinOrderType.BUY;
+    isKuCoinOrderType: (data: any): data is KuCoinOrderType => {
+        return data === KuCoinOrderType.SELL || data === KuCoinOrderType.BUY;
     },
 
     isKuCoinCurrencyBalance: (data: any): data is KuCoinCurrencyBalance => {
@@ -109,5 +128,13 @@ export class KuCoinResponseParser {
             id: obj.data.orderOid,
             ...order
         };
+    }
+
+    parseDeletedOrder(responseResult: string): void {
+        const obj = JSON.parse(responseResult);
+        if (!Guards.isKuCoinResponseResult(obj))
+            throw new Error(`The result ${responseResult} isn't a successful response result.`);
+        if (Guards.isKuCoinErrorResponseResult(obj))
+            throw new Error(obj.msg);
     }
 }

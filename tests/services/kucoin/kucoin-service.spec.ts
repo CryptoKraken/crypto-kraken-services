@@ -4,7 +4,11 @@ import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinService } from '../../../src/services/kucoin';
 import { KuCoinConstants } from '../../../src/services/kucoin/constants';
 import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-exchange-credentials';
-import { createOrderCases, currencyBalancesCases, exchangeCredentialsCases, orderBookCases, tradesCases } from './data';
+import {
+    createOrderCases, currencyBalancesCases,
+    deleteOrderCases, exchangeCredentialsCases,
+    orderBookCases, tradesCases
+} from './data';
 
 describe('KuCoin Exchange Service', () => {
     let kuCoinService: KuCoinService;
@@ -218,6 +222,54 @@ describe('KuCoin Exchange Service', () => {
 
         expect(await kuCoinService.createOrder(order, exchangeCredentialsCases[0]))
             .to.eql(createOrderCases.default.expected);
+    });
+
+    it('should delete an order correctly', async () => {
+        const order1 = createOrderCases.default.expected;
+        const order2 = createOrderCases.dataAndAnyOtherField.expected;
+
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .post(KuCoinConstants.deleteOrderUri)
+            .query({
+                orderOid: order1.id,
+                symbol: 'AAA-BBB',
+                type: 'BUY'
+            })
+            .reply(200, deleteOrderCases.default.data);
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .post(KuCoinConstants.deleteOrderUri)
+            .query({
+                orderOid: order2.id,
+                symbol: 'AAA-CCC',
+                type: 'SELL'
+            })
+            .reply(200, deleteOrderCases.default.data);
+
+        await kuCoinService.deleteOrder(order1, exchangeCredentialsCases[0]);
+        await kuCoinService.deleteOrder(order2, exchangeCredentialsCases[0]);
+    });
+
+    it('should delete an order correctly despite the connection error', async () => {
+        const order = createOrderCases.default.expected;
+
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .post(KuCoinConstants.deleteOrderUri)
+            .query({
+                orderOid: order.id,
+                symbol: 'AAA-BBB',
+                type: 'BUY'
+            })
+            .replyWithError('An connection error from the test');
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .post(KuCoinConstants.deleteOrderUri)
+            .query({
+                orderOid: order.id,
+                symbol: 'AAA-BBB',
+                type: 'BUY'
+            })
+            .reply(200, deleteOrderCases.default.data);
+
+        await kuCoinService.deleteOrder(order, exchangeCredentialsCases[0]);
     });
 
     it('should allow using a custom nonce generator', async () => {

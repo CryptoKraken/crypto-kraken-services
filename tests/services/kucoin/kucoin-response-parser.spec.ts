@@ -2,8 +2,10 @@ import { expect } from 'chai';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
 import {
-    createOrderCases, currencyBalancesCases, orderBookCases,
-    tradesCases, wrongCreateOrderCases, wrongOrderBookCases,
+    createOrderCases, currencyBalancesCases, deleteOrderCases,
+    orderBookCases, tradesCases, wrongCreateOrderCases,
+    wrongDeleteOrderCases,
+    wrongOrderBookCases,
     wrongTradesCases
 } from './data';
 import { wrongCurrencyBalancesBalances } from './data/currency-balances';
@@ -68,6 +70,19 @@ describe('KuCoin Response Parser', () => {
         expect(() => kuCoinResponseParser.parseCreatedOrder(
             JSON.stringify(wrongCreateOrderCases.dataWithoutOid), order)
         ).to.throw(/isn't the order type/);
+    });
+
+    it('should parse a deleted order correctly', () => {
+        kuCoinResponseParser.parseDeletedOrder(
+            JSON.stringify(deleteOrderCases.default.data)
+        );
+
+        expect(() => kuCoinResponseParser.parseDeletedOrder(
+            JSON.stringify(deleteOrderCases.error.data)
+        )).to.throw(deleteOrderCases.error.data.msg);
+        expect(() => kuCoinResponseParser.parseDeletedOrder(
+            JSON.stringify(wrongDeleteOrderCases.dataWithBody))
+        ).to.throw(/isn't a successful response result/);
     });
 
     it('should parse a currency balance correctly', () => {
