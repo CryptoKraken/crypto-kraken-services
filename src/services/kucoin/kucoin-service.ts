@@ -86,7 +86,7 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         const authHeaders = await this.getAuthHeaders(exchangeCredentials, KuCoinConstants.createOrderUri, symbol);
 
         return new RepeatPromise<Identified<Order>>((resolve, reject) => {
-            request.get(KuCoinConstants.createOrderUri, {
+            request.post(KuCoinConstants.createOrderUri, {
                 baseUrl: this.serverUri,
                 qs: {
                     symbol,
