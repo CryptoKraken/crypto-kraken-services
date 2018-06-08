@@ -5,6 +5,7 @@ import {
     activeOrderCases, createOrderCases, currencyBalancesCases,
     deleteOrderCases, orderBookCases, tradesCases,
     wrongActiveOrderCases,
+    wrongCommonCases,
     wrongCreateOrderCases,
     wrongDeleteOrderCases,
     wrongOrderBookCases,
@@ -94,16 +95,19 @@ describe('KuCoin Response Parser', () => {
         expect(kuCoinResponseParser.parseActiveOrders(
             JSON.stringify(activeOrderCases.buyAndSellOrders.data), ['AAA', 'CCC']
         )).to.eql(activeOrderCases.buyAndSellOrders.expected);
-
         expect(() => kuCoinResponseParser.parseActiveOrders(
             JSON.stringify(activeOrderCases.error.data), ['AAA', 'BBB']
         )).to.throw(activeOrderCases.error.data.msg);
+
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(wrongCommonCases.responseWithoutData), ['AAA', 'BBB']
+        )).to.throw(/hasn't got the 'data' field/);
         expect(() => kuCoinResponseParser.parseActiveOrders(
             JSON.stringify(wrongActiveOrderCases.dataWithMissingOrderTypes), ['AAA', 'BBB']
-        )).to.throw();
+        )).to.throw(/doesn't contain active orders/);
         expect(() => kuCoinResponseParser.parseActiveOrders(
             JSON.stringify(wrongActiveOrderCases.dataWithOneWrongOrder), ['AAA', 'BBB']
-        )).to.throw();
+        )).to.throw(/doesn't contain active orders/);
     });
 
     it('should parse a currency balance correctly', () => {
