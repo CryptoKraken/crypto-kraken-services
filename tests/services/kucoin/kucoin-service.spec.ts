@@ -167,7 +167,7 @@ describe('KuCoin Exchange Service', () => {
         };
 
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.createOrderUri)
+            .post(KuCoinConstants.createOrderUri)
             .query({
                 symbol: `AAA-BBB`,
                 type: 'BUY',
@@ -177,7 +177,7 @@ describe('KuCoin Exchange Service', () => {
             .reply(200, createOrderCases.default.data);
 
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.createOrderUri)
+            .post(KuCoinConstants.createOrderUri)
             .query({
                 symbol: `AAA-CCC`,
                 type: 'SELL',
@@ -202,7 +202,7 @@ describe('KuCoin Exchange Service', () => {
         };
 
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.createOrderUri)
+            .post(KuCoinConstants.createOrderUri)
             .query({
                 symbol: `AAA-BBB`,
                 type: 'BUY',
@@ -211,7 +211,7 @@ describe('KuCoin Exchange Service', () => {
             })
             .replyWithError('An connection error from the test');
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.createOrderUri)
+            .post(KuCoinConstants.createOrderUri)
             .query({
                 symbol: `AAA-BBB`,
                 type: 'BUY',
