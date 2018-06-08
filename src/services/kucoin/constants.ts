@@ -4,6 +4,7 @@ const constants = {
     orderBooksUri: '/v1/open/orders',
     createOrderUri: '/v1/order',
     deleteOrderUri: '/v1/cancel-order',
+    getActiveOrdersUri: '/v1/order/active',
     getBalanceOfCoinUri: (coin: string) => `/v1/account/${coin}/balance`,
 };
 
