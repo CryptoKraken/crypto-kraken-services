@@ -84,25 +84,25 @@ describe('KuCoin Response Parser', () => {
         )).to.throw(deleteOrderCases.error.data.msg);
         expect(() => kuCoinResponseParser.parseDeletedOrder(
             JSON.stringify(wrongDeleteOrderCases.dataWithBody))
-        ).to.throw(/isn't a successful response result/);
+        ).to.throw(/isn't a KuCoin response result/);
     });
 
     it('should parse active orders correctly', () => {
         expect(kuCoinResponseParser.parseActiveOrders(
-            JSON.stringify(activeOrderCases.default.data)
+            JSON.stringify(activeOrderCases.default.data), ['AAA', 'BBB']
         )).to.eql(activeOrderCases.default.expected);
         expect(kuCoinResponseParser.parseActiveOrders(
-            JSON.stringify(activeOrderCases.buyAndSellOrders.data)
+            JSON.stringify(activeOrderCases.buyAndSellOrders.data), ['AAA', 'CCC']
         )).to.eql(activeOrderCases.buyAndSellOrders.expected);
 
         expect(() => kuCoinResponseParser.parseActiveOrders(
-            JSON.stringify(activeOrderCases.default.data)
+            JSON.stringify(activeOrderCases.error.data), ['AAA', 'BBB']
         )).to.throw(activeOrderCases.error.data.msg);
         expect(() => kuCoinResponseParser.parseActiveOrders(
-            JSON.stringify(wrongActiveOrderCases.dataWithMissingOrderTypes.data)
+            JSON.stringify(wrongActiveOrderCases.dataWithMissingOrderTypes), ['AAA', 'BBB']
         )).to.throw();
         expect(() => kuCoinResponseParser.parseActiveOrders(
-            JSON.stringify(wrongActiveOrderCases.dataWithOneWrongOrder.data)
+            JSON.stringify(wrongActiveOrderCases.dataWithOneWrongOrder), ['AAA', 'BBB']
         )).to.throw();
     });
 

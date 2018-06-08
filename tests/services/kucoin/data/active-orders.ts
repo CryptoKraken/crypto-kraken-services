@@ -70,8 +70,10 @@ export const activeOrderCases = {
         }
     },
     buyAndSellOrders: {
-        field1: 'otherData',
         data: {
+            success: true,
+            code: 'OK',
+            field1: 'otherData',
             data: {
                 SELL: [
                     [
@@ -146,6 +148,8 @@ export const activeOrderCases = {
 
 export const wrongActiveOrderCases = {
     dataWithMissingOrderTypes: {
+        success: true,
+        code: 'OK',
         field1: 'otherData',
         data: [
             [1499563692100,
@@ -166,6 +170,8 @@ export const wrongActiveOrderCases = {
         ]
     },
     dataWithOneWrongOrder: {
+        success: true,
+        code: 'OK',
         field1: 'otherData',
         data: {
             SELL: [
