@@ -137,4 +137,8 @@ export class KuCoinResponseParser {
         if (Guards.isKuCoinErrorResponseResult(obj))
             throw new Error(obj.msg);
     }
+
+    parseActiveOrders(responseResult: string): Array<Identified<Order>> {
+        return [];
+    }
 }

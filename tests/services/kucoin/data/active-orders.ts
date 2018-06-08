@@ -62,6 +62,13 @@ export const activeOrderCases = {
             },
         ] as Array<Identified<Order>>
     },
+    error: {
+        data: {
+            success: false,
+            code: 'ERROR',
+            msg: 'Some error'
+        }
+    },
     buyAndSellOrders: {
         field1: 'otherData',
         data: {

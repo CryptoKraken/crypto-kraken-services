@@ -2,8 +2,10 @@ import { expect } from 'chai';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
 import {
-    createOrderCases, currencyBalancesCases, deleteOrderCases,
-    orderBookCases, tradesCases, wrongCreateOrderCases,
+    activeOrderCases, createOrderCases, currencyBalancesCases,
+    deleteOrderCases, orderBookCases, tradesCases,
+    wrongActiveOrderCases,
+    wrongCreateOrderCases,
     wrongDeleteOrderCases,
     wrongOrderBookCases,
     wrongTradesCases
@@ -83,6 +85,25 @@ describe('KuCoin Response Parser', () => {
         expect(() => kuCoinResponseParser.parseDeletedOrder(
             JSON.stringify(wrongDeleteOrderCases.dataWithBody))
         ).to.throw(/isn't a successful response result/);
+    });
+
+    it('should parse active orders correctly', () => {
+        expect(kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(activeOrderCases.default.data)
+        )).to.eql(activeOrderCases.default.expected);
+        expect(kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(activeOrderCases.buyAndSellOrders.data)
+        )).to.eql(activeOrderCases.buyAndSellOrders.expected);
+
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(activeOrderCases.default.data)
+        )).to.throw(activeOrderCases.error.data.msg);
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(wrongActiveOrderCases.dataWithMissingOrderTypes.data)
+        )).to.throw();
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(wrongActiveOrderCases.dataWithOneWrongOrder.data)
+        )).to.throw();
     });
 
     it('should parse a currency balance correctly', () => {
