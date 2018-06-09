@@ -2,7 +2,8 @@ import { isArray, isBoolean, isNumber, isString } from 'util';
 import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
 import { Identified } from '../../utils';
 import {
-    KuCoinCreatedOrder, KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderType, KuCoinTrade
+    KuCoinActiveOrder, KuCoinActiveOrders, KuCoinCreatedOrder,
+    KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderType, KuCoinTrade
 } from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
 
@@ -12,9 +13,9 @@ interface KuCoinResponseResult {
     [nameField: string]: any;
 }
 
-interface KuCoinErrorResponseResult extends KuCoinResponseResult {
-    success: false;
-    msg: string;
+interface KuCoinSuccessResponseResult extends KuCoinResponseResult {
+    success: true;
+    code: 'OK';
 }
 
 const Guards = {
@@ -22,8 +23,8 @@ const Guards = {
         return data && isBoolean(data.success) && isString(data.code);
     },
 
-    isKuCoinErrorResponseResult: (data: KuCoinResponseResult): data is KuCoinErrorResponseResult => {
-        return !data.success && data.code !== 'OK';
+    isKuCoinSuccessResponseResult: (data: KuCoinResponseResult): data is KuCoinSuccessResponseResult => {
+        return data && data.success && data.code === 'OK';
     },
 
     isDataObjOwner: (data: any): data is { data: any } => data && data.data,
@@ -39,8 +40,21 @@ const Guards = {
             && data.BUY.every((order: any) => Guards.isKuCoinOrder(order));
     },
 
+    isKuCoinActiveOrders: (data: any): data is KuCoinActiveOrders => {
+        return data && data.SELL && data.BUY
+            && isArray(data.SELL) && isArray(data.BUY)
+            && data.SELL.every((activeOrder: any) => Guards.isKuCoinActiveOrder(activeOrder))
+            && data.BUY.every((activeOrder: any) => Guards.isKuCoinActiveOrder(activeOrder));
+    },
+
     isKuCoinOrder: (data: any): data is KuCoinOrder => {
         return data && isNumber(data[0]) && isNumber(data[1]) && isNumber(data[2]);
+    },
+
+    isKuCoinActiveOrder: (data: any): data is KuCoinActiveOrder => {
+        return data && isNumber(data[0]) && Guards.isKuCoinOrderType(data[1])
+            && isNumber(data[2]) && isNumber(data[3])
+            && isNumber(data[4]) && isString(data[5]);
     },
 
     isKuCoinTrade: (data: any): data is KuCoinTrade => {
@@ -131,10 +145,53 @@ export class KuCoinResponseParser {
     }
 
     parseDeletedOrder(responseResult: string): void {
+        this.parseResponseResult(responseResult);
+    }
+
+    parseActiveOrders(responseResult: string, currencyPair: CurrencyPair): Array<Identified<Order>> {
+        const response = this.parseResponseDataObj(responseResult);
+        if (!Guards.isKuCoinActiveOrders(response.data))
+            throw new Error(`The result '${responseResult}' doesn't contain active orders`);
+
+        return response.data.SELL
+            .map<Identified<Order>>(kuCoinActiveOrder => ({
+                id: kuCoinActiveOrder[5],
+                amount: kuCoinActiveOrder[3],
+                orderType: OrderType.Sell,
+                pair: currencyPair,
+                price: kuCoinActiveOrder[2]
+            }))
+            .concat(response.data.BUY
+                .map<Identified<Order>>(kuCoinActiveOrder => ({
+                    id: kuCoinActiveOrder[5],
+                    amount: kuCoinActiveOrder[3],
+                    orderType: OrderType.Buy,
+                    pair: currencyPair,
+                    price: kuCoinActiveOrder[2]
+                }))
+            );
+    }
+
+    protected parseResponseDataObj(responseResult: string): KuCoinSuccessResponseResult & { data: any } {
+        const response = this.parseResponseResult(responseResult);
+        if (!Guards.isDataObjOwner(response))
+            throw new Error(`The response result '${responseResult}' hasn't got the 'data' field`);
+        return response;
+    }
+
+    protected parseResponseDataArray(responseResult: string): KuCoinSuccessResponseResult & { data: any[] } {
+        const response = this.parseResponseResult(responseResult);
+        if (!Guards.isDataArrayOwner(response))
+            throw new Error(`The response result '${responseResult}' hasn't got the 'data' field`);
+        return response;
+    }
+
+    protected parseResponseResult(responseResult: string): KuCoinSuccessResponseResult {
         const obj = JSON.parse(responseResult);
         if (!Guards.isKuCoinResponseResult(obj))
-            throw new Error(`The result ${responseResult} isn't a successful response result.`);
-        if (Guards.isKuCoinErrorResponseResult(obj))
+            throw new Error(`The result ${responseResult} isn't a KuCoin response result.`);
+        if (!Guards.isKuCoinSuccessResponseResult(obj))
             throw new Error(obj.msg);
+        return obj;
     }
 }

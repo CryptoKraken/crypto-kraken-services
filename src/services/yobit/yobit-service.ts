@@ -47,7 +47,7 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
     getOrderInfo(identifiedOrder: Identified<Order>): Promise<OrderInfo> {
         throw new Error('Method not implemented.');
     }
-    getActiveOrders(): Promise<Array<Identified<Order>>> {
+    getActiveOrders(pair: CurrencyPair): Promise<Array<Identified<Order>>> {
         throw new Error('Method not implemented.');
     }
     getBalance(currency: string): Promise<CurrencyBalance> {

@@ -22,6 +22,8 @@ export const createOrderCases = {
     },
     dataAndAnyOtherField: {
         data: {
+            success: true,
+            code: 'OK',
             field1: 'otherData',
             data: {
                 orderOid: "11c0fc0243351701298a5636"
@@ -39,6 +41,8 @@ export const createOrderCases = {
 
 export const wrongCreateOrderCases = {
     dataWithoutOid: {
+        success: true,
+        code: 'OK',
         field1: 'otherData',
         data: {            
         }

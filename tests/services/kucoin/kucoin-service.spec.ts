@@ -5,9 +5,9 @@ import { KuCoinService } from '../../../src/services/kucoin';
 import { KuCoinConstants } from '../../../src/services/kucoin/constants';
 import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-exchange-credentials';
 import {
-    createOrderCases, currencyBalancesCases,
-    deleteOrderCases, exchangeCredentialsCases,
-    orderBookCases, tradesCases
+    activeOrderCases, createOrderCases,
+    currencyBalancesCases, deleteOrderCases,
+    exchangeCredentialsCases, orderBookCases, tradesCases
 } from './data';
 
 describe('KuCoin Exchange Service', () => {
@@ -270,6 +270,28 @@ describe('KuCoin Exchange Service', () => {
             .reply(200, deleteOrderCases.default.data);
 
         await kuCoinService.deleteOrder(order, exchangeCredentialsCases[0]);
+    });
+
+    it('should get active orders correctly', async () => {
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.getActiveOrdersUri)
+            .query({
+                symbol: 'AAA-BBB'
+            })
+            .reply(200, activeOrderCases.default.data);
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.getActiveOrdersUri)
+            .query({
+                symbol: 'AAA-CCC'
+            })
+            .reply(200, activeOrderCases.buyAndSellOrders.data);
+
+        expect(
+            await kuCoinService.getActiveOrders(['AAA', 'BBB'], exchangeCredentialsCases[0])
+        ).to.eql(activeOrderCases.default.expected);
+        expect(
+            await kuCoinService.getActiveOrders(['AAA', 'CCC'], exchangeCredentialsCases[0])
+        ).to.eql(activeOrderCases.buyAndSellOrders.expected);
     });
 
     it('should allow using a custom nonce generator', async () => {

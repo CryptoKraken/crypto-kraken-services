@@ -130,8 +130,22 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         throw new Error('Method not implemented.');
     }
 
-    async getActiveOrders(): Promise<Array<Identified<Order>>> {
-        throw new Error('Method not implemented.');
+    async getActiveOrders(
+        pair: CurrencyPair,
+        exchangeCredentials: KuCoinExchangeCredentials
+    ): Promise<Array<Identified<Order>>> {
+        const symbol = this.getSymbol(pair);
+        const authHeaders = await this.getAuthHeaders(
+            exchangeCredentials, KuCoinConstants.getActiveOrdersUri, symbol
+        );
+        const responseResult = await request.get(KuCoinConstants.getActiveOrdersUri, {
+            baseUrl: this.serverUri,
+            headers: authHeaders,
+            qs: {
+                symbol
+            }
+        });
+        return this.kuCoinResponseParser.parseActiveOrders(responseResult, pair);
     }
 
     async getBalance(currency: string, exchangeCredentials: KuCoinExchangeCredentials): Promise<CurrencyBalance> {

@@ -2,8 +2,11 @@ import { expect } from 'chai';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
 import {
-    createOrderCases, currencyBalancesCases, deleteOrderCases,
-    orderBookCases, tradesCases, wrongCreateOrderCases,
+    activeOrderCases, createOrderCases, currencyBalancesCases,
+    deleteOrderCases, orderBookCases, tradesCases,
+    wrongActiveOrderCases,
+    wrongCommonCases,
+    wrongCreateOrderCases,
     wrongDeleteOrderCases,
     wrongOrderBookCases,
     wrongTradesCases
@@ -82,7 +85,29 @@ describe('KuCoin Response Parser', () => {
         )).to.throw(deleteOrderCases.error.data.msg);
         expect(() => kuCoinResponseParser.parseDeletedOrder(
             JSON.stringify(wrongDeleteOrderCases.dataWithBody))
-        ).to.throw(/isn't a successful response result/);
+        ).to.throw(/isn't a KuCoin response result/);
+    });
+
+    it('should parse active orders correctly', () => {
+        expect(kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(activeOrderCases.default.data), ['AAA', 'BBB']
+        )).to.eql(activeOrderCases.default.expected);
+        expect(kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(activeOrderCases.buyAndSellOrders.data), ['AAA', 'CCC']
+        )).to.eql(activeOrderCases.buyAndSellOrders.expected);
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(activeOrderCases.error.data), ['AAA', 'BBB']
+        )).to.throw(activeOrderCases.error.data.msg);
+
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(wrongCommonCases.responseWithoutData), ['AAA', 'BBB']
+        )).to.throw(/hasn't got the 'data' field/);
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(wrongActiveOrderCases.dataWithMissingOrderTypes), ['AAA', 'BBB']
+        )).to.throw(/doesn't contain active orders/);
+        expect(() => kuCoinResponseParser.parseActiveOrders(
+            JSON.stringify(wrongActiveOrderCases.dataWithOneWrongOrder), ['AAA', 'BBB']
+        )).to.throw(/doesn't contain active orders/);
     });
 
     it('should parse a currency balance correctly', () => {
