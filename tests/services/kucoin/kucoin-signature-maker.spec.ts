@@ -9,24 +9,26 @@ describe('KuCoin Signature Maker', () => {
         kuCoinSignatureMaker = new KuCoinSignatureMaker();
     });
 
-    it('should be sign correctly', () => {
-        const currentApiInfo = exchangeCredentialsCases[0];
+    it('should sign correctly', () => {
+        const currentCredentials = exchangeCredentialsCases[0];
         const endpoint = '/v1/account/balances';
         const nonce = 1506219855000;
         const queryString = '?limit=15';
         const expectedSignature = '6e5cb82abea3ca77e974af3069bdad91d3a34a09314594d56edb749d7e139adf';
         const expectedSignatureWithQueryString = 'c987bc627ef051f2f09a9c1a386f9aad844decdfd739a1ad7b02d7fec9421476';
 
-        const signature = kuCoinSignatureMaker.sign(currentApiInfo.secret, endpoint, undefined, nonce);
-        const signatureWithQueryString = kuCoinSignatureMaker.sign(currentApiInfo.secret, endpoint, queryString, nonce);
+        const signature = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, undefined, nonce);
+        const signatureWithQueryString = kuCoinSignatureMaker.sign(
+            currentCredentials.secret, endpoint, queryString, nonce
+        );
 
-        expect(kuCoinSignatureMaker.sign(currentApiInfo.secret, endpoint, undefined)).to.not.be.empty;
+        expect(kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, undefined)).to.not.be.empty;
         expect(signature).to.not.eql(signatureWithQueryString);
         expect(signature).to.eql(expectedSignature);
         expect(signatureWithQueryString).to.eql(expectedSignatureWithQueryString);
     });
 
-    it('should be return different signatures when parameters is different', () => {
+    it('should return different signatures when parameters is different', () => {
         const endpoints = ['/v1/user/info', '/v1/account/balances'];
         const nonces = [1515531600000, 1527109200000];
 
@@ -84,5 +86,24 @@ describe('KuCoin Signature Maker', () => {
 
         expect(new Set(signaturesList).size).to.eql(signaturesList.length);
         expect(signatures).to.eql(expectedSignatures);
+    });
+
+    it('should sign with different formats of the querystring correctly', () => {
+        const currentCredentials = exchangeCredentialsCases[0];
+        const endpoint = '/v1/account/active';
+        const nonce = 1506219855000;
+        const queryString = '?symbol=AAA-BBB&limit=15';
+        const queryStringObj = {
+            symbol: 'AAA-BBB',
+            limit: 15
+        };
+        const expectedSignature = '55d13353b23c13e1f38d62e8c49b2d40ea55b5308c5829de971df0e8a9c90fa2';
+
+        const signature1 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryString, nonce);
+        const signature2 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryStringObj, nonce);
+
+        expect(signature1)
+            .to.eql(signature2)
+            .to.eql(expectedSignature);
     });
 });
