@@ -3,9 +3,7 @@ import * as qs from 'qs';
 import { Buffer } from 'safe-buffer';
 
 export class KuCoinSignatureMaker {
-    private readonly _queryStringStringifyOptions: qs.IStringifyOptions = {
-        addQueryPrefix: true
-    };
+    private readonly _queryStringStringifyOptions: qs.IStringifyOptions = {};
 
     get queryStringStringifyOptions() {
         return this._queryStringStringifyOptions;
