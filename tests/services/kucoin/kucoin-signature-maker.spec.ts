@@ -13,9 +13,9 @@ describe('KuCoin Signature Maker', () => {
         const currentCredentials = exchangeCredentialsCases[0];
         const endpoint = '/v1/account/balances';
         const nonce = 1506219855000;
-        const queryString = '?limit=15';
+        const queryString = 'limit=15';
         const expectedSignature = '6e5cb82abea3ca77e974af3069bdad91d3a34a09314594d56edb749d7e139adf';
-        const expectedSignatureWithQueryString = 'c987bc627ef051f2f09a9c1a386f9aad844decdfd739a1ad7b02d7fec9421476';
+        const expectedSignatureWithQueryString = '853595102389dd170ea0fbd74b0f78a3e12915df038dae7a8984c7c058836417';
 
         const signature = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, undefined, nonce);
         const signatureWithQueryString = kuCoinSignatureMaker.sign(
@@ -92,12 +92,12 @@ describe('KuCoin Signature Maker', () => {
         const currentCredentials = exchangeCredentialsCases[0];
         const endpoint = '/v1/account/active';
         const nonce = 1506219855000;
-        const queryString = '?symbol=AAA-BBB&limit=15';
+        const queryString = 'symbol=AAA-BBB&limit=15';
         const queryStringObj = {
             symbol: 'AAA-BBB',
             limit: 15
         };
-        const expectedSignature = '55d13353b23c13e1f38d62e8c49b2d40ea55b5308c5829de971df0e8a9c90fa2';
+        const expectedSignature = 'bb8415258912b891e92fad1d286745d73a89f863a61c66eac55f10660918d5ef';
 
         const signature1 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryString, nonce);
         const signature2 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryStringObj, nonce);
