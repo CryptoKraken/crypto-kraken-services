@@ -17,7 +17,7 @@ export class KuCoinSignatureMaker {
             stringForSign += typeof queryString === 'string' ?
                 queryString : qs.stringify(queryString, this.queryStringStringifyOptions);
 
-        const signatureString = new Buffer(stringForSign).toString('base64');
+        const signatureString = Buffer.from(stringForSign).toString('base64');
         return createHmac('sha256', secretKey)
             .update(signatureString)
             .digest('hex');
