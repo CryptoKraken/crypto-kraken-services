@@ -6,14 +6,14 @@ import {
 import { Identified, RepeatPromise } from '../../utils';
 import { YobitConstants } from './constants';
 import { YobitExchangeCredentials } from './yobit-exchange-credentials';
-import { YobitNonceFactory } from './yobit-nonce-factory';
+import { yobitNonceFactory } from './yobit-nonce-factory';
 import { YobitResponseParser } from './yobit-response-parser';
 import { YobitSignatureMaker } from './yobit-signature-maker';
 
 export class YobitService implements RestExchangeService, AuthenticatedRestExchangeService {
     private responseParser: YobitResponseParser = new YobitResponseParser();
     private _signatureMaker: YobitSignatureMaker = new YobitSignatureMaker();
-    private _nonceFactory: () => Promise<number> | number = YobitNonceFactory;
+    private _nonceFactory: () => Promise<number> | number = yobitNonceFactory;
     private _requestTryCount: number;
 
     constructor(requestTryCount: number = 3) {

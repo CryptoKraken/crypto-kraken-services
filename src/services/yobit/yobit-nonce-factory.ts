@@ -1,1 +1,1 @@
-export const YobitNonceFactory = () => Date.now() / 10000;
+export const yobitNonceFactory = () => Date.now() / 10000;
