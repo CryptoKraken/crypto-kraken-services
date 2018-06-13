@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
-import { orderBookCases, tradesCases, yobitGeneralError } from './data';
+import { balanceCases, orderBookCases, tradesCases, wrongBalanceCases, yobitGeneralError } from './data';
 
-describe('YoBit Response Parser', () => {
+describe('Yobit Response Parser', () => {
     let parser: YobitResponseParser;
 
     beforeEach(() => {
@@ -42,5 +42,31 @@ describe('YoBit Response Parser', () => {
             .to.throw(/Data object is empty/);
         expect(() => parser.parseTrades(JSON.stringify({}), ['aaa', 'bbb']))
             .to.throw(/Data object does not have the .* property./);
+    });
+
+    it('should parse balance', () => {
+        let result = parser.parseBalance(JSON.stringify(balanceCases.defaultLtcBalance.data), 'ltc');
+        expect(result).to.eql(balanceCases.defaultLtcBalance.expect);
+
+        result = parser.parseBalance(JSON.stringify(balanceCases.zeroLtcBalance.data), 'ltc');
+        expect(result).to.eql(balanceCases.zeroLtcBalance.expect);
+
+        result = parser.parseBalance(JSON.stringify(balanceCases.allLockedLtcBalance.data), 'ltc');
+        expect(result).to.eql(balanceCases.allLockedLtcBalance.expect);
+
+        expect(() => parser.parseBalance(JSON.stringify(yobitGeneralError), 'aaa'))
+            .to.throw(/Yobit error text/);
+        expect(() => parser.parseBalance(JSON.stringify(''), 'aaa'))
+            .to.throw(/Data object is empty/);
+        expect(() => parser.parseBalance(JSON.stringify(wrongBalanceCases.dataWithoutReturnField), 'aaa'))
+            .to.throw(/.*return.*/);
+        expect(() => parser.parseBalance(JSON.stringify(wrongBalanceCases.dataWithoutFundField), 'aaa'))
+            .to.throw(/.*funds.*/);
+        expect(() => parser.parseBalance(JSON.stringify(wrongBalanceCases.dataWithoutCurrencyInfoInFunds), 'ltc'))
+            .to.throw(/.*ltc.*/);
+        expect(() => {
+            parser.parseBalance(JSON.stringify(wrongBalanceCases.dataWithoutCurrencyInfoInFundsInclOrders), 'ltc');
+        })
+            .to.throw(/.*ltc.*/);
     });
 });

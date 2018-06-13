@@ -1,5 +1,5 @@
 import { isArray, isNumber } from 'util';
-import { CurrencyPair, Order, OrderBook, OrderType } from '../../core';
+import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
 import { YobitUtils } from './yobit-utils';
 
 interface YobitTrade {
@@ -14,6 +14,15 @@ type YobitOrder = [
     /*price*/ number,
     /*amount*/ number
 ];
+
+interface YobitSuccessResultContainer {
+    success: 1;
+    return: any;
+}
+interface YobitBalanceContainer {
+    funds: any;
+    funds_incl_orders: any;
+}
 
 const Guards = {
     isErrorResponse: (data: any): data is { error: string } => {
@@ -37,6 +46,14 @@ const Guards = {
 
     isYobitTradeArray: (data: any): data is YobitTrade[] => {
         return data && isArray(data) && data.every(o => Guards.isYobitTrade(o));
+    },
+
+    isYobitSuccessResultContainer: (data: any): data is YobitSuccessResultContainer => {
+        return data && data.success && data.success === 1 && data.return;
+    },
+
+    isYobitBalanceContainer: (data: any): data is YobitBalanceContainer => {
+        return data && data.funds && data.funds_incl_orders;
     }
 };
 
@@ -81,6 +98,29 @@ export class YobitResponseParser {
         }));
     }
 
+    parseBalance(data: string, currency: string): CurrencyBalance {
+        const dataObject = JSON.parse(data);
+        if (!dataObject)
+            throw new Error('Data object is empty.');
+        if (Guards.isErrorResponse(dataObject))
+            throw new Error(dataObject.error);
+        if (!Guards.isYobitSuccessResultContainer(dataObject))
+            throw new Error('Data object does not contain the \'return\' property');
+        if (!Guards.isYobitBalanceContainer(dataObject.return))
+            throw new Error('Data object does not contain the \'funds\' or the \'funds_incl_orders\' property');
+
+        const allAmount = dataObject.return.funds_incl_orders[currency];
+        const freeAmount = dataObject.return.funds[currency];
+        if (allAmount === undefined || !isNumber(allAmount)
+            || freeAmount === undefined || !isNumber(freeAmount))
+            throw new Error(`Data object does not contain data for ${currency} currency`);
+
+        return {
+            allAmount,
+            freeAmount,
+            lockedAmount: allAmount - freeAmount
+        };
+    }
     private getOrders(items: YobitOrder[], pair: CurrencyPair, type: OrderType): Order[] {
         return items.map<Order>(o => ({
             price: o[0],
