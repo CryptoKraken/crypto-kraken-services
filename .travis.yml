@@ -1,0 +1,28 @@
+language: node_js
+
+node_js:
+  - node
+
+branches:
+  only:
+    - master
+    - dev
+
+stages:
+  - build
+  - test
+  
+jobs:
+  include:    
+    - stage: build
+      env: JOB="Build"
+      script: npm run build
+
+    - stage: test
+      env: JOB="Mocha unit tests"
+      script: npm run test
+      after_success: npm run codecov
+
+    - stage: test
+      env: JOB="Tslint"
+      script: npm run tslint

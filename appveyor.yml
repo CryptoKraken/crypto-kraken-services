@@ -21,10 +21,3 @@ build: off
 test_script:
   - ps: npm run build
   - ps: npm run $env:current_test_script
-
-after_test:
-  - ps: | 
-      if ($env:current_test_script -eq "test")
-      {
-        npm run codecov
-      }
