@@ -3,3 +3,4 @@ dist/
 coverage/
 environment/**/*.js
 environment/**/*.js.map
+.ENV
