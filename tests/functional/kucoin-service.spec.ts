@@ -75,12 +75,12 @@ describe('The KuCoin service', () => {
         };
 
         Object.getOwnPropertyNames(operations).forEach(operationName => {
-            it(`The operation === ${operationName}`, async () => {
+            it(`the operation === ${operationName}`, async () => {
                 try {
                     await operations[operationName]();
                     expect.fail(`This operation (${operationName}) should throw an exception`);
                 } catch (error) {
-                    expect(error.statusCode).to.eql(false, ``);
+                    expect(error.statusCode).to.eql(false);
                     expect(error.code).to.eql('ERROR');
                     expect(error.msg).to.eql('SYMBOL NOT FOUND');
                 }
