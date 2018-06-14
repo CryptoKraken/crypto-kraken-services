@@ -11,6 +11,7 @@ branches:
 stages:
   - build
   - test
+  - functional_tests
   
 jobs:
   include:    
@@ -26,3 +27,7 @@ jobs:
     - stage: test
       env: JOB="Tslint"
       script: npm run tslint
+
+    - stage: functional_tests
+      env: JOB="Functional Tests"
+      script: npm run test-functional

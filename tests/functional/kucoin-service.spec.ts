@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { KuCoinExchangeCredentials, KuCoinService } from '../../src/index';
-import * as environment from './test-utils/environment';
+import { testsConfig } from './tests.config';
 
 describe('The KuCoin service', () => {
     let kuCoinService: KuCoinService;
@@ -9,13 +9,10 @@ describe('The KuCoin service', () => {
     const maxLimit = 1000;
 
     before(() => {
-        const config = environment.load();
-        if (!config)
-            throw new Error('The config is not loaded');
         kuCoinService = new KuCoinService();
         kuCoinExchangeCredentials = {
-            apiKey: config.KUCOIN_API_KEY,
-            secret: config.KUCOIN_API_SECRET
+            apiKey: testsConfig.exchangeCredentials.kuCoin.apiKey,
+            secret: testsConfig.exchangeCredentials.kuCoin.secret
         };
     });
 
