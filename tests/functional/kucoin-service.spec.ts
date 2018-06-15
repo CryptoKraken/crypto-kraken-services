@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { KuCoinExchangeCredentials, KuCoinService } from '../../src/index';
+import { KuCoinExchangeCredentials, KuCoinService, OrderType } from '../../src/index';
 import { testsConfig } from './tests.config';
 
 describe('The KuCoin service', () => {
@@ -10,6 +10,7 @@ describe('The KuCoin service', () => {
 
     before(() => {
         kuCoinService = new KuCoinService();
+        kuCoinService.requestTryCount = 0;
         kuCoinExchangeCredentials = {
             apiKey: testsConfig.exchangeCredentials.kuCoin.apiKey,
             secret: testsConfig.exchangeCredentials.kuCoin.secret
@@ -62,6 +63,20 @@ describe('The KuCoin service', () => {
             .to.eql(balance.freeAmount)
             .to.eql(balance.lockedAmount)
             .to.eql(0);
+    });
+
+    it.skip('should create an order and cancel it correctly', async () => {
+        const order = {
+            pair: { 0: 'ETH', 1: 'BTC' },
+            orderType: OrderType.Buy,
+            amount: 100,
+            price: 1
+        };
+        const identifiedOrder = await kuCoinService.createOrder(order, kuCoinExchangeCredentials);
+        expect(identifiedOrder).to.include(order);
+        expect(identifiedOrder.id).to.exist;
+
+        await kuCoinService.deleteOrder(identifiedOrder, kuCoinExchangeCredentials);
     });
 
     describe.skip('should throw an error when it get an wrong currency/currency pair', async () => {
