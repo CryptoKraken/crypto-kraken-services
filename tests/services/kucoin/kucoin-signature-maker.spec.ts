@@ -92,15 +92,39 @@ describe('KuCoin Signature Maker', () => {
         const currentCredentials = exchangeCredentialsCases[0];
         const endpoint = '/v1/account/active';
         const nonce = 1506219855000;
-        const queryString = 'symbol=AAA-BBB&limit=15';
+        const queryString = 'limit=15&symbol=AAA-BBB';
         const queryStringObj = {
-            symbol: 'AAA-BBB',
-            limit: 15
+            limit: 15,
+            symbol: 'AAA-BBB'
         };
-        const expectedSignature = 'bb8415258912b891e92fad1d286745d73a89f863a61c66eac55f10660918d5ef';
+        const expectedSignature = 'e1efad6848c5c0d2bb8fce776e03afc41cd826dbd5c389e9499cf222bac8fac2';
 
         const signature1 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryString, nonce);
         const signature2 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryStringObj, nonce);
+
+        expect(signature1)
+            .to.eql(signature2)
+            .to.eql(expectedSignature);
+    });
+
+    it('should sign with a querystring object in the alphabetical order', () => {
+        const currentCredentials = exchangeCredentialsCases[0];
+        const endpoint = '/v1/account/active';
+        const nonce = 1506219855000;
+        const queryStringObj1 = {
+            a: 10,
+            b: 100,
+            c: 'value'
+        };
+        const queryStringObj2 = {
+            c: 'value',
+            b: 100,
+            a: 10,
+        };
+        const expectedSignature = 'cc26c2f8eca53b3440beacefc0ee8a8a5aa086c1b10c8c7c8da615df71f3bd42';
+
+        const signature1 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryStringObj1, nonce);
+        const signature2 = kuCoinSignatureMaker.sign(currentCredentials.secret, endpoint, queryStringObj2, nonce);
 
         expect(signature1)
             .to.eql(signature2)

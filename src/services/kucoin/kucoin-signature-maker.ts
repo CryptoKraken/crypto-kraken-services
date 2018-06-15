@@ -3,7 +3,9 @@ import * as qs from 'qs';
 import { Buffer } from 'safe-buffer';
 
 export class KuCoinSignatureMaker {
-    private readonly _queryStringStringifyOptions: qs.IStringifyOptions = {};
+    private readonly _queryStringStringifyOptions: qs.IStringifyOptions = {
+        sort: (headerName1: string, headerName2: string) => headerName1.localeCompare(headerName2)
+    };
 
     get queryStringStringifyOptions() {
         return this._queryStringStringifyOptions;
