@@ -6,6 +6,8 @@ import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-signature
 import { balanceCases, orderBookCases, tradesCases } from './data';
 
 describe('Yobit Exchange Service', () => {
+    const defaultRootPublicApiUrl = YobitConstants.getRootPublicApiUrl(YobitConstants.rootServerUrl);
+    const defaultRootPrivateApiUrl = YobitConstants.getRootPrivateApiUrl(YobitConstants.rootServerUrl);
     const orderBookPostfix = YobitConstants.getOrderBookUri(['ltc', 'btc']);
     const tradesUrlPostfix = YobitConstants.getTradesUri(['ltc', 'btc']);
     let exchangeService: YobitService;
@@ -14,8 +16,19 @@ describe('Yobit Exchange Service', () => {
         exchangeService = new YobitService();
     });
 
+    it('should allow changing the exchange server url', async () => {
+        const customRootApiUrl = 'http://www.MyExchangeProxy.com';
+        nock(YobitConstants.getRootPublicApiUrl(customRootApiUrl))
+            .get(orderBookPostfix)
+            .reply(200, JSON.stringify(orderBookCases.default.data));
+
+        exchangeService.rootServerUrl = customRootApiUrl;
+        const result = await exchangeService.getOrderBook(['ltc', 'btc']);
+        expect(result).to.eql(orderBookCases.default.expected);
+    });
+
     it('should get an order book', async () => {
-        nock(YobitConstants.rootPublicApiUrl)
+        nock(defaultRootPublicApiUrl)
             .get(orderBookPostfix)
             .reply(200, JSON.stringify(orderBookCases.default.data));
 
@@ -24,7 +37,7 @@ describe('Yobit Exchange Service', () => {
     });
 
     it('should get an order book by the second request (the first request causes an error)', async () => {
-        nock(YobitConstants.rootPublicApiUrl)
+        nock(defaultRootPublicApiUrl)
             .get(orderBookPostfix)
             .reply(500)
             .get(orderBookPostfix)
@@ -35,7 +48,7 @@ describe('Yobit Exchange Service', () => {
     });
 
     it('should pass query parameters for getting an order book with applied maxLimit', async () => {
-        nock(YobitConstants.rootPublicApiUrl)
+        nock(defaultRootPublicApiUrl)
             .get(orderBookPostfix)
             .query({ limit: 4 })
             .reply(200, JSON.stringify(orderBookCases.default.data));
@@ -45,7 +58,7 @@ describe('Yobit Exchange Service', () => {
     });
 
     it('should get trades', async () => {
-        nock(YobitConstants.rootPublicApiUrl)
+        nock(defaultRootPublicApiUrl)
             .get(tradesUrlPostfix)
             .reply(200, JSON.stringify(tradesCases.default.data));
 
@@ -54,7 +67,7 @@ describe('Yobit Exchange Service', () => {
     });
 
     it('should get trades by the second request (the first request causes an error)', async () => {
-        nock(YobitConstants.rootPublicApiUrl)
+        nock(defaultRootPublicApiUrl)
             .get(tradesUrlPostfix)
             .reply(500)
             .get(tradesUrlPostfix)
@@ -65,7 +78,7 @@ describe('Yobit Exchange Service', () => {
     });
 
     it('should pass query parameters for getting trades with applied maxLimit', async () => {
-        nock(YobitConstants.rootPublicApiUrl)
+        nock(defaultRootPublicApiUrl)
             .get(tradesUrlPostfix)
             .query({ limit: 4 })
             .reply(200, JSON.stringify(tradesCases.default.data));
@@ -92,7 +105,7 @@ describe('Yobit Exchange Service', () => {
         exchangeService.signatureMaker = new TestSignatureMaker();
         exchangeService.nonceFactory = () => 1;
 
-        nock(YobitConstants.rootPrivateApiUrl, {
+        nock(defaultRootPrivateApiUrl, {
             reqheaders: getAuthRequestHeaders('AAA', 'SSS')
         })
             .post('/', {
@@ -109,7 +122,7 @@ describe('Yobit Exchange Service', () => {
     });
 
     it('should get a balance', async () => {
-        nock(YobitConstants.rootPrivateApiUrl, {
+        nock(defaultRootPrivateApiUrl, {
             // tslint:disable-next-line:max-line-length
             reqheaders: getAuthRequestHeaders('AAA', '0045ffa68a6a605d9d23a066efaef24a1bcfbd8de3b4b595fc09b831f91ce6bd2bb6be8aadb64a2e67af29b9a2d3ca56299d76633486889e1c92513c9f2b74af')
         })
@@ -128,7 +141,7 @@ describe('Yobit Exchange Service', () => {
     });
 
     it('should get a balance by the second request (the first request causes an error)', async () => {
-        nock(YobitConstants.rootPrivateApiUrl, {
+        nock(defaultRootPrivateApiUrl, {
             // tslint:disable-next-line:max-line-length
             reqheaders: getAuthRequestHeaders('AAA', '0045ffa68a6a605d9d23a066efaef24a1bcfbd8de3b4b595fc09b831f91ce6bd2bb6be8aadb64a2e67af29b9a2d3ca56299d76633486889e1c92513c9f2b74af')
         })

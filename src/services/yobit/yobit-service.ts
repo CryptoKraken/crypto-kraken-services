@@ -14,10 +14,19 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
     private responseParser: YobitResponseParser = new YobitResponseParser();
     private _signatureMaker: YobitSignatureMaker = new YobitSignatureMaker();
     private _nonceFactory: () => Promise<number> | number = yobitNonceFactory;
+    private _rootServerUrl: string = YobitConstants.rootServerUrl;
     private _requestTryCount: number;
 
     constructor(requestTryCount: number = 3) {
         this._requestTryCount = requestTryCount;
+    }
+
+    get rootServerUrl(): string {
+        return this._rootServerUrl;
+    }
+
+    set rootServerUrl(value: string) {
+        this._rootServerUrl = value;
     }
 
     get signatureMaker(): YobitSignatureMaker {
@@ -47,7 +56,7 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
     getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
         return new RepeatPromise((resolve, reject) => {
             request.get(YobitConstants.getOrderBookUri(pair), {
-                baseUrl: YobitConstants.rootPublicApiUrl,
+                baseUrl: YobitConstants.getRootPublicApiUrl(this.rootServerUrl),
                 qs: maxLimit ? { limit: maxLimit } : undefined
             })
                 .then(value => resolve(this.responseParser.parseOrderBook(value, pair)))
@@ -58,7 +67,7 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
     getTrades(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
         return new RepeatPromise((resolve, reject) => {
             request.get(YobitConstants.getTradesUri(pair), {
-                baseUrl: YobitConstants.rootPublicApiUrl,
+                baseUrl: YobitConstants.getRootPublicApiUrl(this.rootServerUrl),
                 qs: maxLimit ? { limit: maxLimit } : undefined
             })
                 .then(value => resolve(this.responseParser.parseTrades(value, pair)))
@@ -87,7 +96,7 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
 
             const authHeaders = this.getAuthHeaders(exchangeCredentials, params);
             request.post('/', {
-                baseUrl: YobitConstants.rootPrivateApiUrl,
+                baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
                 headers: authHeaders,
                 form: params
             })
