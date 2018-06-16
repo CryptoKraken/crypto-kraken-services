@@ -11,6 +11,7 @@ environment:
   matrix:
   - current_test_script: test
   - current_test_script: tslint
+  - current_test_script: test-functional
 
 install:
   - npm install
