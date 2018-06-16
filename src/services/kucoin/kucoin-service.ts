@@ -83,13 +83,12 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
 
     async createOrder(order: Order, exchangeCredentials: KuCoinExchangeCredentials): Promise<Identified<Order>> {
         const queryString = {
-            symbol: this.getSymbol(order.pair),
-            type: KuCoinUtils.getKuCoinOrderType(order.orderType),
+            amount: order.amount,
             price: order.price,
-            amount: order.amount
+            symbol: this.getSymbol(order.pair),
+            type: KuCoinUtils.getKuCoinOrderType(order.orderType)
         };
         const authHeaders = await this.getAuthHeaders(exchangeCredentials, KuCoinConstants.createOrderUri, queryString);
-
         return new RepeatPromise<Identified<Order>>((resolve, reject) => {
             request.post(KuCoinConstants.createOrderUri, {
                 baseUrl: this.serverUri,
@@ -106,8 +105,8 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         exchangeCredentials: KuCoinExchangeCredentials
     ): Promise<void> {
         const queryString = {
-            symbol: this.getSymbol(identifiedOrder.pair),
             orderOid: identifiedOrder.id,
+            symbol: this.getSymbol(identifiedOrder.pair),
             type: KuCoinUtils.getKuCoinOrderType(identifiedOrder.orderType)
         };
         const authHeaders = await this.getAuthHeaders(exchangeCredentials, KuCoinConstants.deleteOrderUri, queryString);
