@@ -1,11 +1,10 @@
 import { CurrencyPair } from '../../core';
 import { YobitUtils } from './yobit-utils';
 
-const rootServerUrl = 'https://yobit.net';
-
 const constants = {
-    rootPublicApiUrl: `${rootServerUrl}/api/3`,
-    rootPrivateApiUrl: `${rootServerUrl}/tapi`,
+    rootServerUrl: 'https://yobit.net',
+    getRootPublicApiUrl: (rootServerUrl: string) => `${rootServerUrl}/api/3`,
+    getRootPrivateApiUrl: (rootServerUrl: string) => `${rootServerUrl}/tapi`,
     getOrderBookUri: (pair: CurrencyPair) => `/depth/${YobitUtils.getPairSymbol(pair)}`,
     getTradesUri: (pair: CurrencyPair) => `/trades/${YobitUtils.getPairSymbol(pair)}`,
     balanceMethod: 'getInfo'
