@@ -1,3 +1,4 @@
+import { Identified } from '../utils';
 import { CurrencyPair } from './currency-pair';
 
 export enum OrderType { Buy, Sell }
@@ -10,6 +11,8 @@ export interface Order {
 }
 
 export interface OrderInfo {
+    order: Identified<Order>;
     startAmount: number;
     currentAmount: number;
+    remainingAmount: number;
 }
