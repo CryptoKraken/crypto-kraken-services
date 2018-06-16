@@ -15,11 +15,12 @@ type YobitOrder = [
     /*amount*/ number
 ];
 
-interface YobitSuccessResultContainer {
+interface YobitSuccessResponseResult {
     success: 1;
     return: any;
 }
-interface YobitBalanceContainer {
+
+interface YobitBalance {
     funds: any;
     funds_incl_orders: any;
 }
@@ -48,11 +49,11 @@ const Guards = {
         return data && isArray(data) && data.every(o => Guards.isYobitTrade(o));
     },
 
-    isYobitSuccessResultContainer: (data: any): data is YobitSuccessResultContainer => {
+    isYobitSuccessResponseResult: (data: any): data is YobitSuccessResponseResult => {
         return data && data.success && data.success === 1 && data.return;
     },
 
-    isYobitBalanceContainer: (data: any): data is YobitBalanceContainer => {
+    isYobitBalance: (data: any): data is YobitBalance => {
         return data && data.funds && data.funds_incl_orders;
     }
 };
@@ -104,9 +105,9 @@ export class YobitResponseParser {
             throw new Error('Data object is empty.');
         if (Guards.isErrorResponse(dataObject))
             throw new Error(dataObject.error);
-        if (!Guards.isYobitSuccessResultContainer(dataObject))
+        if (!Guards.isYobitSuccessResponseResult(dataObject))
             throw new Error('Data object does not contain the \'return\' property');
-        if (!Guards.isYobitBalanceContainer(dataObject.return))
+        if (!Guards.isYobitBalance(dataObject.return))
             throw new Error('Data object does not contain the \'funds\' or the \'funds_incl_orders\' property');
 
         const allAmount = dataObject.return.funds_incl_orders[currency];
