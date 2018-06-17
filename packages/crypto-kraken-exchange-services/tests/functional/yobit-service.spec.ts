@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { YobitExchangeCredentials, YobitService } from '../../src';
+import { Order, OrderType, YobitExchangeCredentials, YobitService } from '../../src';
 import { testsConfig } from './tests.config';
 
 describe('The Yobit service', () => {
@@ -49,4 +49,40 @@ describe('The Yobit service', () => {
             .to.eql(balance.lockedAmount)
             .to.eql(0);
     });
+
+    it('should get create a buy order correctly', async () => {
+        const order: Order = {
+            pair: ['eth', 'btc'],
+            orderType: OrderType.Buy,
+            amount: 100,
+            price: 1
+        };
+        try {
+            await wait(1000);
+            await service.createOrder(order, credentials);
+            expect.fail('The test should throw an exception');
+        } catch (error) {
+            expect(error).to.match(/insufficient/i);
+        }
+    });
+
+    it('should get create a sell order correctly', async () => {
+        const order: Order = {
+            pair: ['eth', 'btc'],
+            orderType: OrderType.Sell,
+            amount: 100,
+            price: 1
+        };
+        try {
+            await wait(1000);
+            await service.createOrder(order, credentials);
+            expect.fail('The test should throw an exception');
+        } catch (error) {
+            expect(error).to.match(/insufficient/i);
+        }
+    });
 });
+
+const wait = (milliseconds: number): Promise<void> => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+};

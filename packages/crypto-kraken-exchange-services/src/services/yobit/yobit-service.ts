@@ -1,7 +1,7 @@
 import * as request from 'request-promise-native';
 import {
     AuthenticatedRestExchangeService, CurrencyBalance, CurrencyPair,
-    ExchangeCredentials, Order, OrderBook, OrderInfo, RestExchangeService
+    Order, OrderBook, OrderInfo, RestExchangeService
 } from '../../core';
 import { Identified, RepeatPromise } from '../../utils';
 import { YobitConstants } from './constants';
@@ -9,6 +9,7 @@ import { YobitExchangeCredentials } from './yobit-exchange-credentials';
 import { yobitNonceFactory } from './yobit-nonce-factory';
 import { YobitResponseParser } from './yobit-response-parser';
 import { YobitSignatureMaker } from './yobit-signature-maker';
+import { YobitUtils } from './yobit-utils';
 
 export class YobitService implements RestExchangeService, AuthenticatedRestExchangeService {
     private responseParser: YobitResponseParser = new YobitResponseParser();
@@ -75,24 +76,48 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
         }, this.requestTryCount);
     }
 
-    createOrder(order: Order, exchangeCredentials: ExchangeCredentials): Promise<Identified<Order>> {
+    async createOrder(order: Order, exchangeCredentials: YobitExchangeCredentials): Promise<Identified<Order>> {
+        const params = {
+            method: YobitConstants.createOrderMethod,
+            nonce: await this.nonceFactory(),
+            pair: YobitUtils.getPairSymbol(order.pair),
+            type: YobitUtils.getOrderTypeSymbol(order.orderType),
+            rate: order.price,
+            amount: order.amount
+        };
+
+        const authHeaders = await this.getAuthHeaders(exchangeCredentials, params);
+        const response = await request.post('/', {
+            baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
+            headers: authHeaders,
+            form: params
+        });
+
+        return this.responseParser.parseCreateOrder(response, order);
+    }
+
+    deleteOrder(identifiedOrder: Identified<Order>, exchangeCredentials: YobitExchangeCredentials): Promise<void> {
         throw new Error('Method not implemented.');
     }
-    deleteOrder(identifiedOrder: Identified<Order>, exchangeCredentials: ExchangeCredentials): Promise<void> {
+    getOrderInfo(
+        identifiedOrder: Identified<Order>,
+        exchangeCredentials: YobitExchangeCredentials
+    ): Promise<OrderInfo> {
         throw new Error('Method not implemented.');
     }
-    getOrderInfo(identifiedOrder: Identified<Order>, exchangeCredentials: ExchangeCredentials): Promise<OrderInfo> {
-        throw new Error('Method not implemented.');
-    }
-    getActiveOrders(pair: CurrencyPair, exchangeCredentials: ExchangeCredentials): Promise<Array<Identified<Order>>> {
+    getActiveOrders(
+        pair: CurrencyPair,
+        exchangeCredentials: YobitExchangeCredentials
+    ): Promise<Array<Identified<Order>>> {
         throw new Error('Method not implemented.');
     }
 
     getBalance(currency: string, exchangeCredentials: YobitExchangeCredentials): Promise<CurrencyBalance> {
         return new RepeatPromise(async (resolve, reject) => {
-            const params: { [key: string]: string | number } = {};
-            params.method = YobitConstants.balanceMethod;
-            params.nonce = await this.nonceFactory();
+            const params = {
+                method: YobitConstants.balanceMethod,
+                nonce: await this.nonceFactory()
+            };
 
             const authHeaders = this.getAuthHeaders(exchangeCredentials, params);
             request.post('/', {
