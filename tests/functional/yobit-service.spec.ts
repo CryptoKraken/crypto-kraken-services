@@ -40,4 +40,13 @@ describe('The Yobit service', () => {
 
         expect(trades.length).to.eql(1);
     });
+
+    it('should get balance correctly', async () => {
+        const balance = await service.getBalance('dash', credentials);
+
+        expect(balance.allAmount)
+            .to.eql(balance.freeAmount)
+            .to.eql(balance.lockedAmount)
+            .to.eql(0);
+    });
 });
