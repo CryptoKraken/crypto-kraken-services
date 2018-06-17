@@ -11,8 +11,8 @@ export interface Order {
 }
 
 export interface OrderInfo {
-    order: Identified<Order>;
-    startAmount: number;
-    currentAmount: number;
-    remainingAmount: number;
+    readonly order: Readonly<Identified<Order>>;
+    readonly currentAmount: number;
+    readonly remainingAmount: number;
+    readonly createdDate: Date;
 }

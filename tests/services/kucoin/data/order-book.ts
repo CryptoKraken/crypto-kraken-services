@@ -2,7 +2,7 @@ import { OrderBook, OrderType } from '../../../../src/core';
 
 /* tslint:disable */
 export const orderBookCases = {
-    /** This case from the KuCoin documentation: https://kucoinapidocs.docs.apiary.io/#reference/0/market/order-books(open) */
+    /* This case from the KuCoin documentation: https://kucoinapidocs.docs.apiary.io/#reference/0/market/order-books(open) */
     default: {
         data: {
             "success": true,

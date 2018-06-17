@@ -7,13 +7,6 @@ export const deleteOrderCases = {
             "data": null
         },
         expected: undefined
-    },
-    error: {
-        data: {
-            success: false,
-            code: 'ERROR',
-            msg: 'Some error'
-        }
     }
 };
 
