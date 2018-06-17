@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { KuCoinExchangeCredentials, KuCoinService, OrderType } from '../../src/index';
+import { Identified, KuCoinExchangeCredentials, KuCoinService, Order, OrderType } from '../../src/index';
 import { testsConfig } from './tests.config';
 
 describe('The KuCoin service', () => {
@@ -66,17 +66,47 @@ describe('The KuCoin service', () => {
     });
 
     it.skip('should create an order and cancel it correctly', async () => {
-        const order = {
-            pair: { 0: 'ETH', 1: 'BTC' },
-            orderType: OrderType.Buy,
-            amount: 100,
-            price: 1
-        };
-        const identifiedOrder = await kuCoinService.createOrder(order, kuCoinExchangeCredentials);
-        expect(identifiedOrder).to.include(order);
-        expect(identifiedOrder.id).to.exist;
+        let identifiedOrder: Identified<Order> | undefined;
+        try {
+            const order: Order = {
+                pair: { 0: 'ETH', 1: 'BTC' },
+                orderType: OrderType.Buy,
+                amount: 100,
+                price: 1
+            };
+            identifiedOrder = await kuCoinService.createOrder(order, kuCoinExchangeCredentials);
+            expect(identifiedOrder).to.include(order);
+            expect(identifiedOrder.id).to.exist;
+        } catch (error) {
+            throw error;
+        } finally {
+            if (identifiedOrder)
+                await kuCoinService.deleteOrder(identifiedOrder, kuCoinExchangeCredentials);
+        }
+    });
 
-        await kuCoinService.deleteOrder(identifiedOrder, kuCoinExchangeCredentials);
+    it.skip('should get an order info correctly', async () => {
+        let identifiedOrder: Identified<Order> | undefined;
+        try {
+            const order: Order = {
+                pair: { 0: 'ETH', 1: 'BTC' },
+                orderType: OrderType.Sell,
+                amount: 10,
+                price: 1
+            };
+
+            identifiedOrder = await kuCoinService.createOrder(order, kuCoinExchangeCredentials);
+            const orderInfo = await kuCoinService.getOrderInfo(identifiedOrder, kuCoinExchangeCredentials);
+
+            expect(identifiedOrder).to.eql(orderInfo.order);
+            expect(orderInfo.currentAmount).to.eql(orderInfo.order.amount);
+            expect(orderInfo.remainingAmount).to.eql(0);
+        } catch (error) {
+            throw error;
+        } finally {
+            if (identifiedOrder)
+                await kuCoinService.deleteOrder(identifiedOrder, kuCoinExchangeCredentials);
+        }
     });
 
     describe.skip('should throw an error when it get an wrong currency/currency pair', async () => {
