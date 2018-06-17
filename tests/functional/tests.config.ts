@@ -6,6 +6,10 @@ const config = {
         kuCoin: {
             apiKey: process.env.KUCOIN_API_KEY || '',
             secret: process.env.KUCOIN_API_SECRET || ''
+        },
+        yobit: {
+            apiKey: process.env.YOBIT_API_KEY || '',
+            secret: process.env.YOBIT_API_SECRET || ''
         }
     }
 };
