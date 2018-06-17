@@ -1,5 +1,6 @@
 import { isArray, isNumber } from 'util';
 import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
+import { Identified } from '../../utils/identifier';
 import { YobitUtils } from './yobit-utils';
 
 interface YobitTrade {
@@ -23,6 +24,10 @@ interface YobitSuccessResponseResult {
 interface YobitBalance {
     funds: any;
     funds_incl_orders: any;
+}
+
+interface YobitCreateOrderInfo {
+    order_id: number;
 }
 
 const Guards = {
@@ -55,6 +60,10 @@ const Guards = {
 
     isYobitBalance: (data: any): data is YobitBalance => {
         return data && data.funds && data.funds_incl_orders;
+    },
+
+    isYobitCreateOrderInfo: (data: any): data is YobitCreateOrderInfo => {
+        return data && data.hasOwnProperty('order_id') && isNumber(data.order_id);
     }
 };
 
@@ -99,14 +108,15 @@ export class YobitResponseParser {
         }));
     }
 
+    parseCreateOrder(data: string, order: Order): Identified<Order> {
+        const dataObject = this.getYobitResponseResult(JSON.parse(data));
+        if (!Guards.isYobitCreateOrderInfo(dataObject.return))
+            throw new Error('Data object does not contain the \'order_id\' property');
+        return { ...order, id: dataObject.return.order_id.toString() };
+    }
+
     parseBalance(data: string, currency: string): CurrencyBalance {
-        const dataObject = JSON.parse(data);
-        if (!dataObject)
-            throw new Error('Data object is empty.');
-        if (Guards.isErrorResponse(dataObject))
-            throw new Error(dataObject.error);
-        if (!Guards.isYobitSuccessResponseResult(dataObject))
-            throw new Error('Data object does not contain the \'return\' property');
+        const dataObject = this.getYobitResponseResult(JSON.parse(data));
         if (!Guards.isYobitBalance(dataObject.return))
             throw new Error('Data object does not contain the \'funds\' or the \'funds_incl_orders\' property');
 
@@ -122,6 +132,7 @@ export class YobitResponseParser {
             lockedAmount: allAmount - freeAmount
         };
     }
+
     private getOrders(items: YobitOrder[], pair: CurrencyPair, type: OrderType): Order[] {
         return items.map<Order>(o => ({
             price: o[0],
@@ -129,5 +140,15 @@ export class YobitResponseParser {
             pair,
             orderType: type
         }));
+    }
+
+    private getYobitResponseResult(dataObject: any): YobitSuccessResponseResult {
+        if (!dataObject)
+            throw new Error('Data object is empty.');
+        if (Guards.isErrorResponse(dataObject))
+            throw new Error(dataObject.error);
+        if (!Guards.isYobitSuccessResponseResult(dataObject))
+            throw new Error('Data object does not contain the \'return\' property');
+        return dataObject;
     }
 }
