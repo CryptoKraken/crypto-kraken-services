@@ -28,4 +28,16 @@ describe('The Yobit service', () => {
         expect(orderBook.buyOrders.length).to.eql(1);
         expect(orderBook.sellOrders.length).to.eql(1);
     });
+
+    it('should get trades correctly', async () => {
+        const trades = await service.getTrades(['eth', 'btc']);
+
+        expect(trades.length).to.eql(150);
+    });
+
+    it('should get trades correctly with max limit equaling 1', async () => {
+        const trades = await service.getTrades(['eth', 'btc'], 1);
+
+        expect(trades.length).to.eql(1);
+    });
 });
