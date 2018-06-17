@@ -126,7 +126,21 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         identifiedOrder: Identified<Order>,
         exchangeCredentials: KuCoinExchangeCredentials
     ): Promise<OrderInfo> {
-        throw new Error('Method not implemented.');
+        const queryString = {
+            orderOid: identifiedOrder.id,
+            symbol: this.getSymbol(identifiedOrder.pair),
+            type: KuCoinUtils.getKuCoinOrderType(identifiedOrder.orderType)
+        };
+        const authHeaders = await this.getAuthHeaders(
+            exchangeCredentials, KuCoinConstants.orderInfoUri, queryString
+        );
+        const responseResult = await request.get(KuCoinConstants.orderInfoUri, {
+            baseUrl: this.serverUri,
+            headers: authHeaders,
+            qs: queryString
+        });
+
+        return this.kuCoinResponseParser.parseOrderInfo(responseResult);
     }
 
     async getActiveOrders(
@@ -137,9 +151,9 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
             symbol: this.getSymbol(pair)
         };
         const authHeaders = await this.getAuthHeaders(
-            exchangeCredentials, KuCoinConstants.getActiveOrdersUri, queryString
+            exchangeCredentials, KuCoinConstants.activeOrdersUri, queryString
         );
-        const responseResult = await request.get(KuCoinConstants.getActiveOrdersUri, {
+        const responseResult = await request.get(KuCoinConstants.activeOrdersUri, {
             baseUrl: this.serverUri,
             headers: authHeaders,
             qs: queryString

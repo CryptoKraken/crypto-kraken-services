@@ -54,7 +54,7 @@ export const orderInfoCases = {
                 orderType: OrderType.Sell,
                 pair: { 0: 'KCS', 1: 'BTC' },
                 price: 0.0001067,
-                amount: 896.34,
+                amount: 896.34
             },
             createdDate: new Date(1508308340807),
             currentAmount: 187.34,
@@ -96,7 +96,7 @@ export const orderInfoCases = {
                 orderType: OrderType.Sell,
                 pair: { 0: 'AAA', 1: 'BBB' },
                 price: 1,
-                amount: 10,
+                amount: 10
             },
             createdDate: new Date(1529250107000),
             currentAmount: 10,
