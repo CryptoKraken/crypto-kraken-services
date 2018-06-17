@@ -1,11 +1,21 @@
 import { isArray, isBoolean, isNumber, isString } from 'util';
-import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
+import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderInfo, OrderType } from '../../core';
 import { Identified } from '../../utils';
 import {
     KuCoinActiveOrder, KuCoinActiveOrders, KuCoinCreatedOrder,
-    KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderType, KuCoinTrade
+    KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderInfo, KuCoinOrderType, KuCoinTrade
 } from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
+
+type FieldGuardsMap<T> = {
+    [P in keyof T]: (value: any) => boolean;
+};
+
+type KuCoinGuard<Type> = <Selector extends Array<keyof Type> | undefined = undefined>(
+    data: any, fields?: Selector
+) => data is Selector extends undefined ? Type :
+Pick<Type, (Selector extends Array<infer T> ? T : keyof Type)>
+& { [P in keyof Type]?: P extends (Selector extends Array<infer U> ? U : keyof Type) ? Type[P] : any };
 
 interface KuCoinResponseResult {
     success: boolean;
@@ -70,7 +80,39 @@ const Guards = {
 
     isKuCoinCurrencyBalance: (data: any): data is KuCoinCurrencyBalance => {
         return data && isString(data.coinType) && isNumber(data.balance) && isNumber(data.freezeBalance);
-    }
+    },
+
+    isKuCoinOrderInfo: ((data, fields?) => {
+        // TODO: move this map to a property of the KuCoinGuard class/type
+        const kuCoinOrderInfoFieldsMap: FieldGuardsMap<KuCoinOrderInfo> = {
+            coinType: isString,
+            dealValueTotal: isNumber,
+            feeTotal: isNumber,
+            userOid: isString,
+            dealAmount: isNumber,
+            coinTypePair: isString,
+            type: Guards.isKuCoinOrderType,
+            orderOid: isString,
+            createdAt: isNumber,
+            dealPriceAverage: isNumber,
+            orderPrice: isNumber,
+            pendingAmount: isNumber,
+            dealOrders: value => {
+                return value && isNumber(value.total) && isBoolean(value.firstPage) && isBoolean(value.lastPage)
+                    && isNumber(value.currPageNo) && isNumber(value.limit) && isNumber(value.pageNos)
+                    && isArray(value.datas) && (value.datas.length === 0 || value.datas.every((dealOrder: any) => {
+                        return isNumber(dealOrder.amount) && isNumber(dealOrder.dealValue) && isNumber(dealOrder.fee)
+                            && isNumber(dealOrder.dealPrice) && isNumber(dealOrder.feeRate);
+                    }));
+            }
+        };
+
+        const fieldNames = (fields ||
+            (Object.getOwnPropertyNames(kuCoinOrderInfoFieldsMap) as Array<keyof KuCoinOrderInfo>)
+        );
+        return fieldNames.every(field => kuCoinOrderInfoFieldsMap[field](data[field]));
+
+    }) as KuCoinGuard<KuCoinOrderInfo>
 };
 
 export class KuCoinResponseParser {
@@ -170,6 +212,31 @@ export class KuCoinResponseParser {
                     price: kuCoinActiveOrder[2]
                 }))
             );
+    }
+
+    parseOrderInfo(responseResult: string): OrderInfo {
+        const response = this.parseResponseDataObj(responseResult);
+        if (!Guards.isKuCoinOrderInfo(response.data,
+            [
+                'coinType', 'coinTypePair', 'type', 'createdAt',
+                'orderOid', 'dealOrders', 'orderPrice', 'pendingAmount'
+            ]
+        ))
+            throw new Error(`The result '${responseResult}' doesn't contain an order info`);
+
+        const orderInfo = response.data;
+        return {
+            order: {
+                id: orderInfo.orderOid,
+                pair: { 0: orderInfo.coinType, 1: orderInfo.coinTypePair },
+                orderType: KuCoinUtils.getOrderType(orderInfo.type),
+                amount: orderInfo.pendingAmount + orderInfo.dealOrders.total,
+                price: orderInfo.orderPrice
+            },
+            currentAmount: orderInfo.pendingAmount,
+            remainingAmount: orderInfo.dealOrders.total,
+            createdDate: new Date(orderInfo.createdAt)
+        };
     }
 
     protected parseResponseDataObj(responseResult: string): KuCoinSuccessResponseResult & { data: any } {
