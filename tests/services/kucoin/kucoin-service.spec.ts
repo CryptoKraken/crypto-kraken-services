@@ -274,13 +274,13 @@ describe('KuCoin Exchange Service', () => {
 
     it('should get active orders correctly', async () => {
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.getActiveOrdersUri)
+            .get(KuCoinConstants.activeOrdersUri)
             .query({
                 symbol: 'AAA-BBB'
             })
             .reply(200, activeOrderCases.default.data);
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.getActiveOrdersUri)
+            .get(KuCoinConstants.activeOrdersUri)
             .query({
                 symbol: 'AAA-CCC'
             })
