@@ -3,7 +3,8 @@ import * as nock from 'nock';
 import { YobitService } from '../../../src/services/yobit';
 import { YobitConstants } from '../../../src/services/yobit/constants';
 import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-signature-maker';
-import { balanceCases, orderBookCases, tradesCases } from './data';
+import { balanceCases, orderBookCases, tradesCases, createOrderCases } from './data';
+import { Order, OrderType } from '../../../src';
 
 describe('Yobit Exchange Service', () => {
     const defaultRootPublicApiUrl = YobitConstants.getRootPublicApiUrl(YobitConstants.rootServerUrl);
@@ -162,5 +163,34 @@ describe('Yobit Exchange Service', () => {
             secret: 'BBB'
         });
         expect(result).to.eql(balanceCases.defaultLtcBalance.expect);
+    });
+
+    it('should create an order', async () => {
+        nock(defaultRootPrivateApiUrl, {
+            // tslint:disable-next-line:max-line-length
+            reqheaders: getAuthRequestHeaders('AAA', 'be947ae7f28ebc761a997d06037fbf0a15ac6627593149472d812d6d6ec5573ac6bf393e96e9fac81825ad037722d8b06f395895b494741eb0fe7196004f1aa2')
+        })
+            .post('/', {
+                method: YobitConstants.createOrderMethod,
+                nonce: 1,
+                pair: 'ltc_btc',
+                type: 'sell',
+                rate: 100,
+                amount: 12
+            })
+            .reply(200, JSON.stringify(createOrderCases.defaultSellLtcBtcWithPrice100Order.data));
+
+        exchangeService.nonceFactory = () => 1;
+        const order: Order = {
+            amount: 12,
+            orderType: OrderType.Sell,
+            pair: ['ltc', 'btc'],
+            price: 100
+        }
+        const result = await exchangeService.createOrder(order, {
+            apiKey: 'AAA',
+            secret: 'BBB'
+        });
+        expect(result).to.eql(createOrderCases.defaultSellLtcBtcWithPrice100Order.expect);
     });
 });
