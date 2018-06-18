@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
+import { Order, OrderType } from '../../../src';
 import { YobitService } from '../../../src/services/yobit';
 import { YobitConstants } from '../../../src/services/yobit/constants';
 import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-signature-maker';
-import { balanceCases, orderBookCases, tradesCases, createOrderCases } from './data';
-import { Order, OrderType } from '../../../src';
+import { balanceCases, createOrderCases, orderBookCases, tradesCases } from './data';
 
 describe('Yobit Exchange Service', () => {
     const defaultRootPublicApiUrl = YobitConstants.getRootPublicApiUrl(YobitConstants.rootServerUrl);
@@ -186,7 +186,7 @@ describe('Yobit Exchange Service', () => {
             orderType: OrderType.Sell,
             pair: ['ltc', 'btc'],
             price: 100
-        }
+        };
         const result = await exchangeService.createOrder(order, {
             apiKey: 'AAA',
             secret: 'BBB'
