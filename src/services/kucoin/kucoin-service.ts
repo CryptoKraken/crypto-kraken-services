@@ -104,17 +104,19 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         identifiedOrder: Identified<Order>,
         exchangeCredentials: KuCoinExchangeCredentials
     ): Promise<void> {
-        const queryString = {
+        const queryStringObj = {
             orderOid: identifiedOrder.id,
             symbol: this.getSymbol(identifiedOrder.pair),
             type: KuCoinUtils.getKuCoinOrderType(identifiedOrder.orderType)
         };
-        const authHeaders = await this.getAuthHeaders(exchangeCredentials, KuCoinConstants.deleteOrderUri, queryString);
+        const authHeaders = await this.getAuthHeaders(
+            exchangeCredentials, KuCoinConstants.deleteOrderUri, queryStringObj
+        );
 
         return new RepeatPromise<void>((resolve, reject) => {
             request.post(KuCoinConstants.deleteOrderUri, {
                 baseUrl: this.serverUri,
-                qs: queryString,
+                qs: queryStringObj,
                 headers: authHeaders
             })
                 .then(value => resolve(this.kuCoinResponseParser.parseDeletedOrder(value)))
@@ -126,18 +128,18 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         identifiedOrder: Identified<Order>,
         exchangeCredentials: KuCoinExchangeCredentials
     ): Promise<OrderInfo> {
-        const queryString = {
+        const queryStringObj = {
             orderOid: identifiedOrder.id,
             symbol: this.getSymbol(identifiedOrder.pair),
             type: KuCoinUtils.getKuCoinOrderType(identifiedOrder.orderType)
         };
         const authHeaders = await this.getAuthHeaders(
-            exchangeCredentials, KuCoinConstants.orderInfoUri, queryString
+            exchangeCredentials, KuCoinConstants.orderInfoUri, queryStringObj
         );
         const responseResult = await request.get(KuCoinConstants.orderInfoUri, {
             baseUrl: this.serverUri,
             headers: authHeaders,
-            qs: queryString
+            qs: queryStringObj
         });
 
         return this.kuCoinResponseParser.parseOrderInfo(responseResult);
@@ -147,16 +149,16 @@ export class KuCoinService implements RestExchangeService, AuthenticatedRestExch
         pair: CurrencyPair,
         exchangeCredentials: KuCoinExchangeCredentials
     ): Promise<Array<Identified<Order>>> {
-        const queryString = {
+        const queryStringObj = {
             symbol: this.getSymbol(pair)
         };
         const authHeaders = await this.getAuthHeaders(
-            exchangeCredentials, KuCoinConstants.activeOrdersUri, queryString
+            exchangeCredentials, KuCoinConstants.activeOrdersUri, queryStringObj
         );
         const responseResult = await request.get(KuCoinConstants.activeOrdersUri, {
             baseUrl: this.serverUri,
             headers: authHeaders,
-            qs: queryString
+            qs: queryStringObj
         });
         return this.kuCoinResponseParser.parseActiveOrders(responseResult, pair);
     }
