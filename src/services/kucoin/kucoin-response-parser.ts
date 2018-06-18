@@ -233,8 +233,8 @@ export class KuCoinResponseParser {
                 amount: orderInfo.pendingAmount + orderInfo.dealOrders.total,
                 price: orderInfo.orderPrice
             },
-            currentAmount: orderInfo.pendingAmount,
-            remainingAmount: orderInfo.dealOrders.total,
+            remainingAmount: orderInfo.pendingAmount,
+            executedAmount: orderInfo.dealOrders.total,
             createdDate: new Date(orderInfo.createdAt)
         };
     }
