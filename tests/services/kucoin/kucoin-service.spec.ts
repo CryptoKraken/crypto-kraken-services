@@ -7,7 +7,7 @@ import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-ex
 import {
     activeOrderCases, createOrderCases,
     currencyBalancesCases, deleteOrderCases,
-    exchangeCredentialsCases, orderBookCases, tradesCases
+    exchangeCredentialsCases, orderBookCases, orderInfoCases, tradesCases
 } from './data';
 
 describe('KuCoin Exchange Service', () => {
@@ -274,13 +274,13 @@ describe('KuCoin Exchange Service', () => {
 
     it('should get active orders correctly', async () => {
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.getActiveOrdersUri)
+            .get(KuCoinConstants.activeOrdersUri)
             .query({
                 symbol: 'AAA-BBB'
             })
             .reply(200, activeOrderCases.default.data);
         nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.getActiveOrdersUri)
+            .get(KuCoinConstants.activeOrdersUri)
             .query({
                 symbol: 'AAA-CCC'
             })
@@ -292,6 +292,46 @@ describe('KuCoin Exchange Service', () => {
         expect(
             await kuCoinService.getActiveOrders(['AAA', 'CCC'], exchangeCredentialsCases[0])
         ).to.eql(activeOrderCases.buyAndSellOrders.expected);
+    });
+
+    it('should get an order info correctly', async () => {
+        const order1 = {
+            id: '59e41cd69bd8d374c9956c75',
+            orderType: OrderType.Sell,
+            pair: { 0: 'KCS', 1: 'BTC' },
+            price: 0.0001067,
+            amount: 896.34
+        };
+        const order2 = {
+            id: '5b26813af576fd2018168949',
+            orderType: OrderType.Sell,
+            pair: { 0: 'AAA', 1: 'BBB' },
+            price: 1,
+            amount: 10
+        };
+
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.orderInfoUri)
+            .query({
+                symbol: 'KCS-BTC',
+                type: 'SELL',
+                orderOid: '59e41cd69bd8d374c9956c75'
+            })
+            .reply(200, orderInfoCases.default.data);
+        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
+            .get(KuCoinConstants.orderInfoUri)
+            .query({
+                symbol: 'AAA-BBB',
+                type: 'SELL',
+                orderOid: '5b26813af576fd2018168949'
+            })
+            .reply(200, orderInfoCases.withZeroRemainingAmount.data);
+
+        const orderInfo1 = await kuCoinService.getOrderInfo(order1, exchangeCredentialsCases[0]);
+        const orderInfo2 = await kuCoinService.getOrderInfo(order2, exchangeCredentialsCases[0]);
+
+        expect(orderInfo1).to.eql(orderInfoCases.default.expected);
+        expect(orderInfo2).to.eql(orderInfoCases.withZeroRemainingAmount.expected);
     });
 
     it('should allow using a custom nonce generator', async () => {

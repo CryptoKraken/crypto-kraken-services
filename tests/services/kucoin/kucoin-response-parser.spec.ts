@@ -3,14 +3,17 @@ import { CurrencyPair, Order, OrderType } from '../../../src/core';
 import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
 import {
     activeOrderCases, createOrderCases, currencyBalancesCases,
-    deleteOrderCases, orderBookCases, tradesCases,
+    deleteOrderCases, orderBookCases, orderInfoCases,
+    tradesCases,
     wrongActiveOrderCases,
     wrongCommonCases,
     wrongCreateOrderCases,
     wrongDeleteOrderCases,
     wrongOrderBookCases,
+    wrongOrderInfoCases,
     wrongTradesCases
 } from './data';
+import { commonCases } from './data/common';
 import { wrongCurrencyBalancesBalances } from './data/currency-balances';
 
 describe('KuCoin Response Parser', () => {
@@ -81,8 +84,8 @@ describe('KuCoin Response Parser', () => {
         );
 
         expect(() => kuCoinResponseParser.parseDeletedOrder(
-            JSON.stringify(deleteOrderCases.error.data)
-        )).to.throw(deleteOrderCases.error.data.msg);
+            JSON.stringify(commonCases.error.data)
+        )).to.throw(commonCases.error.data.msg);
         expect(() => kuCoinResponseParser.parseDeletedOrder(
             JSON.stringify(wrongDeleteOrderCases.dataWithBody))
         ).to.throw(/isn't a KuCoin response result/);
@@ -96,8 +99,8 @@ describe('KuCoin Response Parser', () => {
             JSON.stringify(activeOrderCases.buyAndSellOrders.data), ['AAA', 'CCC']
         )).to.eql(activeOrderCases.buyAndSellOrders.expected);
         expect(() => kuCoinResponseParser.parseActiveOrders(
-            JSON.stringify(activeOrderCases.error.data), ['AAA', 'BBB']
-        )).to.throw(activeOrderCases.error.data.msg);
+            JSON.stringify(commonCases.error.data), ['AAA', 'BBB']
+        )).to.throw(commonCases.error.data.msg);
 
         expect(() => kuCoinResponseParser.parseActiveOrders(
             JSON.stringify(wrongCommonCases.responseWithoutData), ['AAA', 'BBB']
@@ -148,5 +151,23 @@ describe('KuCoin Response Parser', () => {
         expect(() => kuCoinResponseParser.parseCurrencyBalance(
             JSON.stringify(wrongCurrencyBalancesBalances.balanceWithWrongFreezeAmountType), currencies.AAA
         )).to.throw(/isn't the currency balance type/);
+    });
+
+    it('should parse an order info correctly', () => {
+        expect(kuCoinResponseParser.parseOrderInfo(
+            JSON.stringify(orderInfoCases.default.data)
+        )).to.eql(orderInfoCases.default.expected);
+
+        expect(kuCoinResponseParser.parseOrderInfo(
+            JSON.stringify(orderInfoCases.withZeroRemainingAmount.data)
+        )).to.eql(orderInfoCases.withZeroRemainingAmount.expected);
+
+        expect(() => kuCoinResponseParser.parseOrderInfo(
+            JSON.stringify(commonCases.error.data)
+        )).to.throw(commonCases.error.data.msg);
+
+        expect(() => kuCoinResponseParser.parseOrderInfo(
+            JSON.stringify(wrongOrderInfoCases.withMissingDatas)
+        )).to.throw(/doesn't contain an order info/);
     });
 });

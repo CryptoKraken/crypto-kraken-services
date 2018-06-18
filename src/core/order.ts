@@ -1,3 +1,4 @@
+import { Identified } from '../utils';
 import { CurrencyPair } from './currency-pair';
 
 export enum OrderType { Buy, Sell }
@@ -10,6 +11,8 @@ export interface Order {
 }
 
 export interface OrderInfo {
-    startAmount: number;
-    currentAmount: number;
+    readonly order: Readonly<Identified<Order>>;
+    readonly remainingAmount: number;
+    readonly executedAmount: number;
+    readonly createdDate: Date;
 }
