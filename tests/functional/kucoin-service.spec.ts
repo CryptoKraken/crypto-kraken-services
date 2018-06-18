@@ -99,8 +99,8 @@ describe('The KuCoin service', () => {
             const orderInfo = await kuCoinService.getOrderInfo(identifiedOrder, kuCoinExchangeCredentials);
 
             expect(identifiedOrder).to.eql(orderInfo.order);
-            expect(orderInfo.currentAmount).to.eql(orderInfo.order.amount);
-            expect(orderInfo.remainingAmount).to.eql(0);
+            expect(orderInfo.remainingAmount).to.eql(orderInfo.order.amount);
+            expect(orderInfo.executedAmount).to.eql(0);
         } catch (error) {
             throw error;
         } finally {

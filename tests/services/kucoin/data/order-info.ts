@@ -57,8 +57,8 @@ export const orderInfoCases = {
                 amount: 896.34
             },
             createdDate: new Date(1508308340807),
-            currentAmount: 187.34,
-            remainingAmount: 709
+            remainingAmount: 187.34,
+            executedAmount: 709
         } as OrderInfo
     },
     withZeroRemainingAmount: {
@@ -99,8 +99,8 @@ export const orderInfoCases = {
                 amount: 10
             },
             createdDate: new Date(1529250107000),
-            currentAmount: 10,
-            remainingAmount: 0
+            remainingAmount: 10,
+            executedAmount: 0
         } as OrderInfo
     }
 };

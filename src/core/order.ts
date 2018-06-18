@@ -12,7 +12,7 @@ export interface Order {
 
 export interface OrderInfo {
     readonly order: Readonly<Identified<Order>>;
-    readonly currentAmount: number;
     readonly remainingAmount: number;
+    readonly executedAmount: number;
     readonly createdDate: Date;
 }
