@@ -21,9 +21,9 @@
     "test": "lerna run test",
     "test-functional": "lerna run test-functional",
     "coverage": "lerna run coverage-without-clear",
-    "postcoverage": "lerna run postcoverage",
+    "postcoverage": "npm run build-plugins && lerna run postcoverage",
     "coverage-without-clear": "npm run build-plugins && lerna run coverage-without-clear",
-    "codecov": "lerna run codecov",
+    "codecov": "npm run build-plugins && lerna run codecov",
     "tslint": "tslint -p ./tsconfig.json"    
   },
   "devDependencies": {
