@@ -8,6 +8,10 @@ branches:
     - master
     - dev
 
+install:
+  - npm install
+  - npm run bootstrap
+
 stages:
   - build
   - test

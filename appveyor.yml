@@ -17,6 +17,7 @@ install:
   - npm install
   - node --version
   - npm --version
+  - npm run bootstrap
 build: off
 
 test_script:

@@ -1,0 +1,20 @@
+{
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/types"
+    ],
+    "extension": [
+        ".ts"
+    ],
+    "reporter": [
+        "json",
+        "text"
+    ],
+    "require": [
+        "../../environment/plugins/remove-empty-module-init-ts-node"
+    ],
+    "temp-directory": "./coverage/.nyc_output",
+    "all": true
+}

@@ -1,6 +1,7 @@
-node_modules/
-dist/
+**/node_modules/
+**/dist/
 coverage/
 environment/**/*.js
 environment/**/*.js.map
-.ENV
+**/.ENV
+*.log
