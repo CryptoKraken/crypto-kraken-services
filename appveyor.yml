@@ -7,13 +7,15 @@ branches:
     - dev
 
 environment:
-  nodejs_version: "stable"
+  nodejs_version: "Current"
   matrix:
   - current_test_script: test
   - current_test_script: tslint
   - current_test_script: test-functional
 
 install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm install --global npm@latest
   - npm install
   - node --version
   - npm --version
@@ -21,5 +23,5 @@ install:
 build: off
 
 test_script:
-  - ps: npm run build
-  - ps: npm run $env:current_test_script
+  - npm run build
+  - npm run %current_test_script%
