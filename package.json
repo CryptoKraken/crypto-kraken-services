@@ -14,7 +14,8 @@
   },
   "keywords": [],
   "scripts": {
-    "bootstrap": "lerna bootstrap --hoist",
+    "postinstall": "lerna bootstrap",
+    "postci": "lerna bootstrap --hoist",
     "build": "lerna run build",
     "build-watch": "lerna run build-watch",
     "build-plugins": "tsc -p ./environment/tsconfig.json",
@@ -24,7 +25,7 @@
     "postcoverage": "npm run build-plugins && lerna run postcoverage",
     "coverage-without-clear": "npm run build-plugins && lerna run coverage-without-clear",
     "codecov": "npm run build-plugins && lerna run codecov",
-    "tslint": "tslint -p ./tsconfig.json"    
+    "tslint": "tslint -p ./tsconfig.json"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
