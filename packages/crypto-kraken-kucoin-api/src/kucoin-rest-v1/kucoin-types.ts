@@ -6,7 +6,6 @@ export enum KuCoinOrderType {
 export interface KuCoinResponseResult {
     success: boolean;
     code: string;
-    [nameField: string]: any;
 }
 
 export interface KuCoinSuccessResponseResult extends KuCoinResponseResult {

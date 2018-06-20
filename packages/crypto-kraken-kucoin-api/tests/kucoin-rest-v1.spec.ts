@@ -20,7 +20,7 @@ describe('The KuCoin REST service of the V1 version', () => {
             })
             .reply(200, orderBookCases.default);
 
-        const orderBook = await kuCoin.getOrderBooks(currencyPair);
+        const orderBook = await kuCoin.getOrderBooks({ symbol: currencyPair });
 
         expect(orderBook)
             .to.eql(orderBookCases.default);
