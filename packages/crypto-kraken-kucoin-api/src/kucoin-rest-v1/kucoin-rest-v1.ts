@@ -59,7 +59,7 @@ export class KuCoinRestV1 {
         },
         checkFields?: boolean | T
     ): Promise<KuCoinOrderBook | DeepPartial<KuCoinOrderBook> | GuardResult<KuCoinOrderBook, T>> {
-        const responseResult = await request.get(KuCoinConstants.orderBooksUri, {
+        await request.get(KuCoinConstants.orderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol),
@@ -68,8 +68,8 @@ export class KuCoinRestV1 {
                 direction: parameters.direction
             }
         });
-
+        if (checkFields)
+            throw new Error('Not implemented.');
         throw new Error('Not implemented.');
-
     }
 }

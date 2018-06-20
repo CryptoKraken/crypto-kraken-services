@@ -3,7 +3,7 @@ import { KuCoinOrderBook } from 'src';
 export const orderBookCases = {
     /*
         This case from the KuCoin documentation
-        https://kucoinapidocs.docs.apiary.io/#reference/0/market/order-books(open) 
+        https://kucoinapidocs.docs.apiary.io/#reference/0/market/order-books(open)
     */
     default: {
         success: true,
