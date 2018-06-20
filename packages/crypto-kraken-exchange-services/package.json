@@ -29,7 +29,8 @@
     "qs": "^6.5.2",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "safe-buffer": "^5.1.2"
+    "safe-buffer": "^5.1.2",
+    "crypto-kraken-kucoin-api": "^0.1.0"
   },
   "devDependencies": {
     "@types/qs": "^6.5.1",

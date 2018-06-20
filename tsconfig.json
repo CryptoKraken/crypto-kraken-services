@@ -3,6 +3,13 @@
     "target": "es2015",
     "module": "commonjs",
     "strict": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "declaration": true,
+    "baseUrl": "./packages/",
+    "paths": {
+      "crypto-kraken-kucoin-api": [
+        "./crypto-kraken-kucoin-api/src/index.ts"
+      ]
+    }
   }
 }
