@@ -7,16 +7,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch",
-            "program": "${workspaceFolder}/src/index.ts",
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "Launch Current Test File",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
             "args": [
