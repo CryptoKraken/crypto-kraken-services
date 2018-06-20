@@ -8,6 +8,9 @@ branches:
     - master
     - dev
 
+install:
+  - npm ci
+
 stages:
   - build
   - test
@@ -21,8 +24,7 @@ jobs:
 
     - stage: test
       env: JOB="Mocha unit tests"
-      script: npm run test
-      after_success: npm run codecov
+      script: npm run codecov
 
     - stage: test
       env: JOB="Tslint"

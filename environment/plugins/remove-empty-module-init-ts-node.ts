@@ -13,13 +13,10 @@ tsNode.register({
 
 function ignoreCommonJsModuleInitForNyc(context: ts.TransformationContext) {
     return (sourceFile: ts.SourceFile) => {
-        let needTry = true;
         const tryAddComment = (node: ts.Node): ts.Node => {
-            if (ts.isExpressionStatement(node) && isCommonJsModuleInitStatement(node)) {
-                needTry = true;
+            if (ts.isExpressionStatement(node) && isCommonJsModuleInitStatement(node))
                 return ts.addSyntheticLeadingComment(node, ts.SyntaxKind.MultiLineCommentTrivia,
                     NYC_IGNORE_NEXT_COMMENT, true);
-            }
             return ts.visitEachChild(node, tryAddComment, context);
         };
 

@@ -41,7 +41,7 @@ describe('The Yobit service', () => {
         expect(trades.length).to.eql(1);
     });
 
-    it('should get balance correctly', async () => {
+    it.skip('should get balance correctly', async () => {
         const balance = await service.getBalance('dash', credentials);
 
         expect(balance.allAmount)

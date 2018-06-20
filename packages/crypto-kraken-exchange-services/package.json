@@ -1,0 +1,44 @@
+{
+  "name": "crypto-kraken-exchange-services",
+  "author": "CryptoKraken",
+  "homepage": "https://github.com/CryptoKraken/crypto-kraken-services#readme",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "",
+  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CryptoKraken/crypto-kraken-services.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CryptoKraken/crypto-kraken-services/issues"
+  },
+  "keywords": [],
+  "scripts": {
+    "build": "tsc -p ./tsconfig-build.json",
+    "build-watch": "npm run build -- -w",
+    "test": "mocha -r ts-node/register \"./tests/{,!(functional)/**/}/*.spec.ts\"",
+    "test-functional": "mocha -r ts-node/register \"./tests/functional/**/*.spec.ts\" --timeout 10000",
+    "coverage": "npm run coverage-without-clear",
+    "postcoverage": "rimraf coverage",
+    "coverage-without-clear": "nyc mocha \"./tests/{,!(functional)/**/}/*.spec.ts\"",
+    "codecov": "npm run coverage-without-clear && nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov"
+  },
+  "dependencies": {
+    "create-hmac": "^1.1.7",
+    "qs": "^6.5.2",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5",
+    "safe-buffer": "^5.1.2",
+    "crypto-kraken-kucoin-api": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/qs": "^6.5.1",
+    "@types/request": "^2.47.0",
+    "@types/request-promise-native": "^1.0.14"
+  },
+  "engines": {
+    "node": ">= 8.0.0",
+    "npm": ">= 5.0.0"
+  }
+}
