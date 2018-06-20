@@ -1,8 +1,15 @@
 {
+  "extends": "../../../tsconfig.json",
+
   "compilerOptions": {
-    "target": "es2015",
-    "module": "commonjs",
-    "strict": true,
-    "sourceMap": true
+    "baseUrl": ".",
+    "paths": {
+      "src": [
+        "../src/index.ts"
+      ],
+      "src/*": [
+        "../src/*"
+      ]
+    }
   }
 }
