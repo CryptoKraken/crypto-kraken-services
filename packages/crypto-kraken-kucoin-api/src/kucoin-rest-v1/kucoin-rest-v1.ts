@@ -1,6 +1,6 @@
 import * as request from 'request-promise-native';
-import { KuCoinConstants } from 'src/kucoin-rest-v1/kucoin-constants';
 import { CurrencyPair, DeepPartial, GuardFieldsSelector, GuardResult } from '../core';
+import { KuCoinConstants } from './kucoin-constants';
 import { KuCoinOrderBook, KuCoinOrderType } from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
 
@@ -68,6 +68,8 @@ export class KuCoinRestV1 {
                 direction: parameters.direction
             }
         });
+
         throw new Error('Not implemented.');
+
     }
 }
