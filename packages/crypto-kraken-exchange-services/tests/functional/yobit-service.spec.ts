@@ -41,7 +41,7 @@ describe('The Yobit service', () => {
         expect(trades.length).to.eql(1);
     });
 
-    it.skip('should get balance correctly', async () => {
+    it('should get a zero balance correctly', async () => {
         const balance = await service.getBalance('dash', credentials);
 
         expect(balance.allAmount)
@@ -50,7 +50,7 @@ describe('The Yobit service', () => {
             .to.eql(0);
     });
 
-    it('should get create a buy order correctly', async () => {
+    it('should get create a buy order correctly with a zero balance', async () => {
         const order: Order = {
             pair: ['eth', 'btc'],
             orderType: OrderType.Buy,
@@ -58,7 +58,7 @@ describe('The Yobit service', () => {
             price: 1
         };
         try {
-            await wait(1000);
+            await wait(100);
             await service.createOrder(order, credentials);
             expect.fail('The test should throw an exception');
         } catch (error) {
@@ -66,7 +66,7 @@ describe('The Yobit service', () => {
         }
     });
 
-    it('should get create a sell order correctly', async () => {
+    it('should get create a sell order correctly a zero balance', async () => {
         const order: Order = {
             pair: ['eth', 'btc'],
             orderType: OrderType.Sell,
@@ -74,7 +74,7 @@ describe('The Yobit service', () => {
             price: 1
         };
         try {
-            await wait(1000);
+            await wait(100);
             await service.createOrder(order, credentials);
             expect.fail('The test should throw an exception');
         } catch (error) {
