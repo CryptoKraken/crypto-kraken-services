@@ -21,6 +21,11 @@ interface YobitSuccessResponseResult {
     return: any;
 }
 
+interface YobitErrorResponseResult {
+    success: 0;
+    error: string;
+}
+
 interface YobitBalance {
     funds: any;
     funds_incl_orders: any;
@@ -31,11 +36,11 @@ interface YobitCreateOrderInfo {
 }
 
 const Guards = {
-    isErrorResponse: (data: any): data is { error: string } => {
+    YobitErrorResponseResult: (data: any): data is YobitErrorResponseResult => {
         return data && data.hasOwnProperty('success') && data.success === 0 && data.error;
     },
 
-    isOrderType: (data: any): data is YobitOrderType => data === 'bid' || data === 'ask',
+    isYobitOrderType: (data: any): data is YobitOrderType => data === 'bid' || data === 'ask',
 
     isYobitOrder: (data: any): data is YobitOrder => {
         return data && isArray(data) && data.length === 2 && isNumber(data[0]) && isNumber(data[1]);
@@ -46,7 +51,7 @@ const Guards = {
     },
 
     isYobitTrade: (data: any): data is YobitTrade => {
-        return data.type && Guards.isOrderType(data.type) && data.price && isNumber(data.price)
+        return data.type && Guards.isYobitOrderType(data.type) && data.price && isNumber(data.price)
             && data.amount && isNumber(data.amount);
     },
 
@@ -72,7 +77,7 @@ export class YobitResponseParser {
         const dataObject = JSON.parse(data);
         if (!dataObject)
             throw new Error('Data object is empty.');
-        if (Guards.isErrorResponse(dataObject))
+        if (Guards.YobitErrorResponseResult(dataObject))
             throw new Error(dataObject.error);
         const pairSymbol = YobitUtils.getPairSymbol(pair);
         const orderBookContainer = dataObject[pairSymbol];
@@ -93,7 +98,7 @@ export class YobitResponseParser {
         const dataObject = JSON.parse(data);
         if (!dataObject)
             throw new Error('Data object is empty.');
-        if (Guards.isErrorResponse(dataObject))
+        if (Guards.YobitErrorResponseResult(dataObject))
             throw new Error(dataObject.error);
         const pairSymbol = YobitUtils.getPairSymbol(pair);
         const yobitTrades = dataObject[pairSymbol];
@@ -145,7 +150,7 @@ export class YobitResponseParser {
     private getYobitResponseResult(dataObject: any): YobitSuccessResponseResult {
         if (!dataObject)
             throw new Error('Data object is empty.');
-        if (Guards.isErrorResponse(dataObject))
+        if (Guards.YobitErrorResponseResult(dataObject))
             throw new Error(dataObject.error);
         if (!Guards.isYobitSuccessResponseResult(dataObject))
             throw new Error('Data object does not contain the \'return\' property');
