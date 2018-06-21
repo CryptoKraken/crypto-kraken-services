@@ -37,7 +37,7 @@ interface YobitCreateOrderInfo {
 
 const Guards = {
     YobitErrorResponseResult: (data: any): data is YobitErrorResponseResult => {
-        return data && data.hasOwnProperty('success') && data.success === 0 && data.error;
+        return data && data.success === 0 && data.error;
     },
 
     isYobitOrderType: (data: any): data is YobitOrderType => data === 'bid' || data === 'ask',
@@ -51,8 +51,7 @@ const Guards = {
     },
 
     isYobitTrade: (data: any): data is YobitTrade => {
-        return data.type && Guards.isYobitOrderType(data.type) && data.price && isNumber(data.price)
-            && data.amount && isNumber(data.amount);
+        return data && Guards.isYobitOrderType(data.type) && isNumber(data.price) && isNumber(data.amount);
     },
 
     isYobitTradeArray: (data: any): data is YobitTrade[] => {
@@ -60,16 +59,12 @@ const Guards = {
     },
 
     isYobitSuccessResponseResult: (data: any): data is YobitSuccessResponseResult => {
-        return data && data.success && data.success === 1 && data.return;
+        return data && data.success === 1 && data.return;
     },
 
-    isYobitBalance: (data: any): data is YobitBalance => {
-        return data && data.funds && data.funds_incl_orders;
-    },
+    isYobitBalance: (data: any): data is YobitBalance => data && data.funds && data.funds_incl_orders,
 
-    isYobitCreateOrderInfo: (data: any): data is YobitCreateOrderInfo => {
-        return data && data.hasOwnProperty('order_id') && isNumber(data.order_id);
-    }
+    isYobitCreateOrderInfo: (data: any): data is YobitCreateOrderInfo => data && isNumber(data.order_id)
 };
 
 export class YobitResponseParser {
