@@ -33,17 +33,7 @@ export class KuCoinRestV1 {
         limit?: number,
         direction?: KuCoinOrderType
     }): Promise<KuCoinOrderBook>;
-    async getOrderBooks<T extends DeepPartial<GuardFieldsSelector<KuCoinOrderBook>>
-        = DeepPartial<GuardFieldsSelector<KuCoinOrderBook>>>(
-            parameters: {
-                symbol: CurrencyPair,
-                group?: number,
-                limit?: number,
-                direction?: KuCoinOrderType
-            },
-            checkFields?: T
-        ): Promise<GuardResult<KuCoinOrderBook, T>>;
-    async getOrderBooks<T extends boolean | undefined = undefined>(
+    async getOrderBooks<T extends GuardFieldsSelector<KuCoinOrderBook>>(
         parameters: {
             symbol: CurrencyPair,
             group?: number,
@@ -51,14 +41,16 @@ export class KuCoinRestV1 {
             direction?: KuCoinOrderType
         },
         checkFields?: T
-    ): Promise<T extends true ? KuCoinOrderBook : DeepPartial<KuCoinOrderBook>>;
+    ): Promise<GuardResult<KuCoinOrderBook, T>>;
     async getOrderBooks<T>(
         parameters: {
-            symbol: CurrencyPair, group?: number,
-            limit?: number, direction?: KuCoinOrderType
+            symbol: CurrencyPair,
+            group?: number,
+            limit?: number,
+            direction?: KuCoinOrderType
         },
-        checkFields?: boolean | T
-    ): Promise<KuCoinOrderBook | DeepPartial<KuCoinOrderBook> | GuardResult<KuCoinOrderBook, T>> {
+        checkFields?: T
+    ): Promise<KuCoinOrderBook| GuardResult<KuCoinOrderBook, T>> {
         await request.get(KuCoinConstants.orderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
