@@ -62,6 +62,8 @@ const Guards = {
         return data && data.success === 1 && data.return;
     },
 
+    isYobitZeroBalance: (data: any): data is any => data && !data.funds && !data.funds_incl_orders,
+
     isYobitBalance: (data: any): data is YobitBalance => data && data.funds && data.funds_incl_orders,
 
     isYobitCreateOrderInfo: (data: any): data is YobitCreateOrderInfo => data && isNumber(data.order_id)
@@ -117,11 +119,18 @@ export class YobitResponseParser {
 
     parseBalance(data: string, currency: string): CurrencyBalance {
         const dataObject = this.getYobitResponseResult(JSON.parse(data));
-        if (!Guards.isYobitBalance(dataObject.return))
+        let allAmount: number;
+        let freeAmount: number;
+
+        if (Guards.isYobitBalance(dataObject.return)) {
+            allAmount = dataObject.return.funds_incl_orders[currency];
+            freeAmount = dataObject.return.funds[currency];
+        } else if (Guards.isYobitZeroBalance(dataObject.return)) {
+            allAmount = 0;
+            freeAmount = 0;
+        } else
             throw new Error('Data object does not contain the \'funds\' or the \'funds_incl_orders\' property');
 
-        const allAmount = dataObject.return.funds_incl_orders[currency];
-        const freeAmount = dataObject.return.funds[currency];
         if (allAmount === undefined || !isNumber(allAmount)
             || freeAmount === undefined || !isNumber(freeAmount))
             throw new Error(`Data object does not contain data for ${currency} currency`);

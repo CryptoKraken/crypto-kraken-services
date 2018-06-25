@@ -63,6 +63,9 @@ describe('Yobit Response Parser', () => {
         result = parser.parseBalance(JSON.stringify(balanceCases.allLockedLtcBalance.data), 'ltc');
         expect(result).to.eql(balanceCases.allLockedLtcBalance.expect);
 
+        result = parser.parseBalance(JSON.stringify(balanceCases.neverRefiledLtcBalance.data), 'ltc');
+        expect(result).to.eql(balanceCases.neverRefiledLtcBalance.expect);
+
         expect(() => parser.parseBalance(JSON.stringify(yobitGeneralError), 'aaa'))
             .to.throw(/Yobit error text/);
         expect(() => parser.parseBalance(JSON.stringify(''), 'aaa'))

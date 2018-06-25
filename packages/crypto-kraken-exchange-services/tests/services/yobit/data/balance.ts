@@ -46,6 +46,27 @@ export const balanceCases = {
             lockedAmount: 0
         }
     },
+    neverRefiledLtcBalance: {
+        data: {
+            success: 1,
+            return: {
+                rights: {
+                    info: 1,
+                    trade: 1,
+                    deposit: 1,
+                    withdraw: 0
+                },
+                transaction_count: 0,
+                open_orders: 0,
+                server_time: 1529926540
+            }
+        },
+        expect: <CurrencyBalance>{
+            allAmount: 0,
+            freeAmount: 0,
+            lockedAmount: 0
+        }
+    },
     allLockedLtcBalance: {
         data: {
             success: 1,
