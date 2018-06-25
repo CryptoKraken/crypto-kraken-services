@@ -119,21 +119,18 @@ export class YobitResponseParser {
 
     parseBalance(data: string, currency: string): CurrencyBalance {
         const dataObject = this.getYobitResponseResult(JSON.parse(data));
-        let allAmount: number;
-        let freeAmount: number;
+        let allAmount = 0;
+        let freeAmount = 0;
 
         if (Guards.isYobitBalance(dataObject.return)) {
+            if (!isNumber(dataObject.return.funds_incl_orders[currency])
+                || !isNumber(dataObject.return.funds[currency]))
+                throw new Error(`Data object does not contain data for ${currency} currency`);
+
             allAmount = dataObject.return.funds_incl_orders[currency];
             freeAmount = dataObject.return.funds[currency];
-        } else if (Guards.isYobitZeroBalance(dataObject.return)) {
-            allAmount = 0;
-            freeAmount = 0;
-        } else
+        } else if (!Guards.isYobitZeroBalance(dataObject.return))
             throw new Error('Data object does not contain the \'funds\' or the \'funds_incl_orders\' property');
-
-        if (allAmount === undefined || !isNumber(allAmount)
-            || freeAmount === undefined || !isNumber(freeAmount))
-            throw new Error(`Data object does not contain data for ${currency} currency`);
 
         return {
             allAmount,
