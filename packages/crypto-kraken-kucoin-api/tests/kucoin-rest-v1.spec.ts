@@ -1,7 +1,7 @@
 import { expect } from 'chai';
+import { CurrencyPair } from 'crypto-kraken-core';
 import * as nock from 'nock';
 import { KuCoinConstants, KuCoinRestV1 } from 'src';
-import { CurrencyPair } from 'src/core';
 import { orderBookCases } from './data';
 
 describe('The KuCoin REST service of the V1 version', () => {

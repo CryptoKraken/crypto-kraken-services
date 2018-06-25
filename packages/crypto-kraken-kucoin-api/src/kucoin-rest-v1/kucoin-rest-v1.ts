@@ -1,5 +1,5 @@
+import { CurrencyPair, FieldsSelector, FieldsSelectorResult } from 'crypto-kraken-core';
 import * as request from 'request-promise-native';
-import { CurrencyPair, DeepPartial, GuardFieldsSelector, GuardResult } from '../core';
 import { KuCoinConstants } from './kucoin-constants';
 import { KuCoinOrderBook, KuCoinOrderType } from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
@@ -33,7 +33,7 @@ export class KuCoinRestV1 {
         limit?: number,
         direction?: KuCoinOrderType
     }): Promise<KuCoinOrderBook>;
-    async getOrderBooks<T extends GuardFieldsSelector<KuCoinOrderBook>>(
+    async getOrderBooks<T extends FieldsSelector<KuCoinOrderBook>>(
         parameters: {
             symbol: CurrencyPair,
             group?: number,
@@ -41,7 +41,7 @@ export class KuCoinRestV1 {
             direction?: KuCoinOrderType
         },
         checkFields?: T
-    ): Promise<GuardResult<KuCoinOrderBook, T>>;
+    ): Promise<FieldsSelectorResult<KuCoinOrderBook, T>>;
     async getOrderBooks<T>(
         parameters: {
             symbol: CurrencyPair,
@@ -50,7 +50,7 @@ export class KuCoinRestV1 {
             direction?: KuCoinOrderType
         },
         checkFields?: T
-    ): Promise<KuCoinOrderBook| GuardResult<KuCoinOrderBook, T>> {
+    ): Promise<KuCoinOrderBook | FieldsSelectorResult<KuCoinOrderBook, T>> {
         await request.get(KuCoinConstants.orderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
