@@ -7,7 +7,8 @@ const constants = {
     getRootPrivateApiUrl: (rootServerUrl: string) => `${rootServerUrl}/tapi`,
     getOrderBookUri: (pair: CurrencyPair) => `/depth/${YobitUtils.getPairSymbol(pair)}`,
     getTradesUri: (pair: CurrencyPair) => `/trades/${YobitUtils.getPairSymbol(pair)}`,
-    balanceMethod: 'getInfo'
+    balanceMethod: 'getInfo',
+    createOrderMethod: 'Trade'
 };
 
 export const YobitConstants: Readonly<typeof constants> = constants;

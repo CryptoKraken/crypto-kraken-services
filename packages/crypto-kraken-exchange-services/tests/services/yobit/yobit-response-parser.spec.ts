@@ -1,6 +1,15 @@
 import { expect } from 'chai';
+import { Order, OrderType } from '../../../src';
 import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
-import { balanceCases, orderBookCases, tradesCases, wrongBalanceCases, yobitGeneralError } from './data';
+import {
+    balanceCases,
+    createOrderCases,
+    orderBookCases,
+    tradesCases,
+    wrongBalanceCases,
+    wrongCreateOrderCases,
+    yobitGeneralError
+} from './data';
 
 describe('Yobit Response Parser', () => {
     let parser: YobitResponseParser;
@@ -54,6 +63,9 @@ describe('Yobit Response Parser', () => {
         result = parser.parseBalance(JSON.stringify(balanceCases.allLockedLtcBalance.data), 'ltc');
         expect(result).to.eql(balanceCases.allLockedLtcBalance.expect);
 
+        result = parser.parseBalance(JSON.stringify(balanceCases.neverRefiledLtcBalance.data), 'ltc');
+        expect(result).to.eql(balanceCases.neverRefiledLtcBalance.expect);
+
         expect(() => parser.parseBalance(JSON.stringify(yobitGeneralError), 'aaa'))
             .to.throw(/Yobit error text/);
         expect(() => parser.parseBalance(JSON.stringify(''), 'aaa'))
@@ -68,5 +80,22 @@ describe('Yobit Response Parser', () => {
             parser.parseBalance(JSON.stringify(wrongBalanceCases.dataWithoutCurrencyInfoInFundsInclOrders), 'ltc');
         })
             .to.throw(/.*ltc.*/);
+    });
+
+    it('should parse create order result', () => {
+        const order: Order = { amount: 12, orderType: OrderType.Sell, pair: ['ltc', 'btc'], price: 100 };
+        const result = parser.parseCreateOrder(
+            JSON.stringify(createOrderCases.defaultSellLtcBtcWithPrice100Order.data),
+            order);
+
+        expect(result).to.eql(createOrderCases.defaultSellLtcBtcWithPrice100Order.expect);
+        expect(() => parser.parseCreateOrder(JSON.stringify(yobitGeneralError), order))
+            .to.throw(/Yobit error text/);
+        expect(() => parser.parseCreateOrder(JSON.stringify(''), order))
+            .to.throw(/Data object is empty/);
+        expect(() => parser.parseCreateOrder(JSON.stringify(wrongCreateOrderCases.dataWithoutReturnField), order))
+            .to.throw(/.*return.*/);
+        expect(() => parser.parseCreateOrder(JSON.stringify(wrongCreateOrderCases.dataWithoutOrderIdField), order))
+            .to.throw(/.*order_id.*/);
     });
 });
