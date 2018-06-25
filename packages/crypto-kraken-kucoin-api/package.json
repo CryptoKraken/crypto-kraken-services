@@ -23,6 +23,8 @@
     "coverage-without-clear": "nyc mocha \"./tests/{,!(functional)/**/}/*.spec.ts\"",
     "codecov": "npm run coverage-without-clear && nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov"
   },
+    "crypto-kraken-core": "^0.1.0",
+    "crypto-kraken-kucoin-api": "^0.1.0"
   "engines": {
     "node": ">= 8.0.0",
     "npm": ">= 5.0.0"
