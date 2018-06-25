@@ -9,6 +9,9 @@
       ],
       "src/*": [
         "../src/*"
+      ],
+      "crypto-kraken-core": [
+        "../../crypto-kraken-core/src/index.ts"
       ]
     }
   }

@@ -17,7 +17,7 @@
     "environment": "cross-env NODE_PATH=\"./\" TS_NODE_PROJECT=\"./tests/tsconfig.json\"",
     "build": "tsc -p ./tsconfig-build.json",
     "build-watch": "npm run build -- -w",
-    "test": "npm run environment -- mocha -r ts-node/register \"./tests/{,!(functional)/**/}/*.spec.ts\" --project",
+    "test": "npm run environment -- mocha -r ts-node/register \"./tests/{,!(functional)/**/}/*.spec.ts\"",
     "test-functional": "npm run environment -- mocha -r ts-node/register \"./tests/functional/**/*.spec.ts\" --timeout 10000",
     "coverage": "npm run coverage-without-clear",
     "postcoverage": "rimraf coverage",
@@ -27,7 +27,6 @@
   "dependencies": {
     "create-hmac": "^1.1.7",
     "crypto-kraken-core": "^0.1.0",
-    "crypto-kraken-kucoin-api": "^0.1.0",
     "qs": "^6.5.2",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
