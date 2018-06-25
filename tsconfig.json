@@ -7,7 +7,7 @@
     "declaration": true,
     "baseUrl": "./packages/",
     "paths": {
-      "crptyp-kraken-core": [
+      "crypto-kraken-core": [
         "./crypto-kraken-core/src/index.ts"
       ],
       "crypto-kraken-kucoin-api": [

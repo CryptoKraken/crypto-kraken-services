@@ -12,18 +12,28 @@ export type DeepPartial<T> = {
 };
 
 export type FieldsSelector<T> = {
-    [P in keyof T]?: T[P] extends Array<infer U> ?
-    FieldsSelector<U> | true : (T[P] extends object ? FieldsSelector<T[P]> | true : true);
+    [P in keyof T]?: T[P] extends Array<infer U> ? (
+        FieldsSelector<U> | true
+    ) : (
+        T[P] extends object ? FieldsSelector<T[P]> | true : true
+    );
 };
 
-export type FieldsSelectorMapper<Type, Selector, UncheckedType = any> = {
-    [P in keyof Type]: Type[P] extends Array<infer U> ?
-    (P extends keyof Selector ?
-        (Selector[P] extends true ? U[] : Array<FieldsSelectorMapper<U, Selector[P], UncheckedType>>) : UncheckedType) :
-    (P extends keyof Selector ?
-        (Selector[P] extends true ? Type[P] :
-            FieldsSelectorMapper<Type[P], Selector[P], UncheckedType>) : UncheckedType);
+type FieldsSelectorMapper<Type, Selector, UncheckedType = any> = {
+    [P in keyof Type]: P extends keyof Selector ? (
+        Selector[P] extends true ? (
+            Type[P]
+        ) : (
+            Type[P] extends Array<infer U> ? Array<FieldsSelectorMapper<U, Selector[P], UncheckedType>>
+            : FieldsSelectorMapper<Type[P], Selector[P], UncheckedType>
+        )
+    ) : UncheckedType;
 };
 
+/*
+    It's impossible to call recursively this type because of the Selector's constraints
+    (typescript [2.9.1] shows an error in this case), so we extract the logic into a separate internal type:
+    the FieldsSelectorMapper type.
+*/
 export type FieldsSelectorResult<Type, Selector extends FieldsSelector<Type>, UncheckedType = any> =
     FieldsSelectorMapper<Type, Selector, UncheckedType>;

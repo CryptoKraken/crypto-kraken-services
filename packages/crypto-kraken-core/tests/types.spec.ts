@@ -35,9 +35,6 @@ describe.skip('The types:', () => {
             }>;
         }
 
-        // type TypeChecking<T> = <S extends FieldsSelector<T>>(obj: T, fieldsSelector: S)
-        //     => FieldsSelectorResult<T, S, UncheckedType>;
-
         const instance: TestType = {} as any;
         const check = <S extends FieldsSelector<TestType>>(
             obj: TestType, fieldsSelector: S
@@ -59,20 +56,6 @@ describe.skip('The types:', () => {
         });
 
         it('should return checked fields when a selector contains true values for corresponding fields', () => {
-            const result = check(instance, {
-                numberField: true,
-                stringField: true,
-                booleanField: true
-            });
-
-            checked(result.numberField).yes;
-            checked(result.stringField).yes;
-            checked(result.booleanField).yes;
-            checked(result.arrayField).no;
-        });
-
-        it('should return unchecked fields when a selector contains false values for corresponding fields', () => {
-            // TODO: true -> false
             const result = check(instance, {
                 numberField: true,
                 stringField: true,
