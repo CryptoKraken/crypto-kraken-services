@@ -8,6 +8,12 @@ export interface KuCoinResponseResult {
     code: string;
 }
 
+export interface KuCoinErrorResponseResult extends KuCoinResponseResult {
+    success: false;
+    code: string;
+    msg: string;
+}
+
 export interface KuCoinSuccessResponseResult extends KuCoinResponseResult {
     success: true;
     code: 'OK';
@@ -16,7 +22,7 @@ export interface KuCoinSuccessResponseResult extends KuCoinResponseResult {
 
 export interface KuCoinOrderBook extends KuCoinSuccessResponseResult {
     data: {
-        '_comment': 'arr[0]   Price arr[1]   Amount arr[2]   Volume',
+        _comment: string,
         timestamp: number,
         SELL: Array<[
             /*Price*/ number,

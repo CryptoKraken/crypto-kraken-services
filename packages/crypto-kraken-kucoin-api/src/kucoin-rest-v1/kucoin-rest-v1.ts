@@ -1,7 +1,16 @@
-import { CurrencyPair, FieldsSelector, FieldsSelectorResult } from 'crypto-kraken-core';
+import { CurrencyPair, FieldsSelector, FieldsSelectorResult, is } from 'crypto-kraken-core';
 import * as request from 'request-promise-native';
 import { KuCoinConstants } from './kucoin-constants';
-import { KuCoinOrderBook, KuCoinOrderType } from './kucoin-types';
+import {
+    kuCoinErrorResponseResultGuardsMap,
+    kuCoinOrderBookGuardsMap,
+    kuCoinResponseResultGuardsMap
+} from './kucoin-guards';
+import {
+    KuCoinErrorResponseResult,
+    KuCoinOrderBook,
+    KuCoinOrderType
+} from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
 
 export interface KuCoinRestV1Options {
@@ -32,7 +41,7 @@ export class KuCoinRestV1 {
         group?: number,
         limit?: number,
         direction?: KuCoinOrderType
-    }): Promise<KuCoinOrderBook>;
+    }): Promise<KuCoinOrderBook | KuCoinErrorResponseResult>;
     async getOrderBooks<T extends FieldsSelector<KuCoinOrderBook>>(
         parameters: {
             symbol: CurrencyPair,
@@ -41,7 +50,7 @@ export class KuCoinRestV1 {
             direction?: KuCoinOrderType
         },
         checkFields?: T
-    ): Promise<FieldsSelectorResult<KuCoinOrderBook, T>>;
+    ): Promise<FieldsSelectorResult<KuCoinOrderBook, T> | KuCoinErrorResponseResult>;
     async getOrderBooks<T>(
         parameters: {
             symbol: CurrencyPair,
@@ -50,8 +59,8 @@ export class KuCoinRestV1 {
             direction?: KuCoinOrderType
         },
         checkFields?: T
-    ): Promise<KuCoinOrderBook | FieldsSelectorResult<KuCoinOrderBook, T>> {
-        await request.get(KuCoinConstants.orderBooksUri, {
+    ): Promise<KuCoinOrderBook | FieldsSelectorResult<KuCoinOrderBook, T> | KuCoinErrorResponseResult> {
+        const rawResponseResult = await request.get(KuCoinConstants.orderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol),
@@ -60,8 +69,20 @@ export class KuCoinRestV1 {
                 direction: parameters.direction
             }
         });
-        if (checkFields)
-            throw new Error('Not implemented.');
-        throw new Error('Not implemented.');
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinOrderBook, T>(responseResult, kuCoinOrderBookGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin order book type.`);
+        return rawResponseResult;
+    }
+
+    protected parseRawResponseResult<T>(rawResponseResult: string, checkFields: T) {
+        const obj = JSON.parse(rawResponseResult);
+        if (is(obj, kuCoinResponseResultGuardsMap, checkFields))
+            return obj;
+        throw new Error(`The result ${rawResponseResult} isn't a KuCoin response result.`);
     }
 }
