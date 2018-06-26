@@ -31,8 +31,10 @@ interface YobitBalance {
     funds_incl_orders: any;
 }
 
-interface YobitCreateOrderInfo {
-    order_id: number;
+interface YobitResponseResultWithOrderId extends YobitSuccessResponseResult {
+    return: {
+        order_id: number;
+    };
 }
 
 const Guards = {
@@ -66,7 +68,9 @@ const Guards = {
 
     isYobitBalance: (data: any): data is YobitBalance => data && data.funds && data.funds_incl_orders,
 
-    isYobitCreateOrderInfo: (data: any): data is YobitCreateOrderInfo => data && isNumber(data.order_id)
+    isYobitResponseResultWithOrderId: (data: YobitSuccessResponseResult): data is YobitResponseResultWithOrderId => {
+        return data && data.return && typeof data.return.order_id === 'number';
+    }
 };
 
 export class YobitResponseParser {
@@ -111,10 +115,14 @@ export class YobitResponseParser {
     }
 
     parseCreateOrder(data: string, order: Order): Identified<Order> {
-        const dataObject = this.getYobitResponseResult(JSON.parse(data));
-        if (!Guards.isYobitCreateOrderInfo(dataObject.return))
-            throw new Error('Data object does not contain the \'order_id\' property');
+        const dataObject = this.getYobitResponseResultWithOrderId(data);
         return { ...order, id: dataObject.return.order_id.toString() };
+    }
+
+    parseDeleteOrder(data: string, orderId: string): void {
+        const dataObject = this.getYobitResponseResultWithOrderId(data);
+        if (dataObject.return.order_id.toString() !== orderId)
+            throw new Error('Data object contains incorrect order id');
     }
 
     parseBalance(data: string, currency: string): CurrencyBalance {
@@ -156,5 +164,12 @@ export class YobitResponseParser {
         if (!Guards.isYobitSuccessResponseResult(dataObject))
             throw new Error('Data object does not contain the \'return\' property');
         return dataObject;
+    }
+
+    private getYobitResponseResultWithOrderId(dataObject: any): YobitResponseResultWithOrderId {
+        const result = this.getYobitResponseResult(JSON.parse(dataObject));
+        if (!Guards.isYobitResponseResultWithOrderId(result))
+            throw new Error('Data object does not contain the \'order_id\' property');
+        return result;
     }
 }

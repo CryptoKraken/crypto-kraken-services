@@ -1,13 +1,16 @@
 import { expect } from 'chai';
 import { Order, OrderType } from '../../../src';
 import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
+import { Identified } from '../../../src/utils/identifier';
 import {
     balanceCases,
     createOrderCases,
+    deleteOrderCases,
     orderBookCases,
     tradesCases,
     wrongBalanceCases,
     wrongCreateOrderCases,
+    wrongDeleteOrderCases,
     yobitGeneralError
 } from './data';
 
@@ -20,6 +23,7 @@ describe('Yobit Response Parser', () => {
 
     it('should parse an order book', () => {
         const result = parser.parseOrderBook(JSON.stringify(orderBookCases.default.data), ['ltc', 'btc']);
+
         expect(result).to.eql(orderBookCases.default.expected);
 
         expect(() => parser.parseOrderBook(JSON.stringify(yobitGeneralError), ['aaa', 'bbb']))
@@ -43,6 +47,7 @@ describe('Yobit Response Parser', () => {
 
     it('should parse trades', () => {
         const result = parser.parseTrades(JSON.stringify(tradesCases.default.data), ['ltc', 'btc']);
+
         expect(result).to.eql(tradesCases.default.expected);
 
         expect(() => parser.parseTrades(JSON.stringify(yobitGeneralError), ['aaa', 'bbb']))
@@ -55,6 +60,7 @@ describe('Yobit Response Parser', () => {
 
     it('should parse balance', () => {
         let result = parser.parseBalance(JSON.stringify(balanceCases.defaultLtcBalance.data), 'ltc');
+
         expect(result).to.eql(balanceCases.defaultLtcBalance.expect);
 
         result = parser.parseBalance(JSON.stringify(balanceCases.zeroLtcBalance.data), 'ltc');
@@ -84,6 +90,7 @@ describe('Yobit Response Parser', () => {
 
     it('should parse create order result', () => {
         const order: Order = { amount: 12, orderType: OrderType.Sell, pair: ['ltc', 'btc'], price: 100 };
+
         const result = parser.parseCreateOrder(
             JSON.stringify(createOrderCases.defaultSellLtcBtcWithPrice100Order.data),
             order);
@@ -97,5 +104,35 @@ describe('Yobit Response Parser', () => {
             .to.throw(/.*return.*/);
         expect(() => parser.parseCreateOrder(JSON.stringify(wrongCreateOrderCases.dataWithoutOrderIdField), order))
             .to.throw(/.*order_id.*/);
+    });
+
+    it('should parse delete order result', () => {
+        const order: Identified<Order> = {
+            id: '100025362',
+            amount: 12,
+            orderType: OrderType.Sell,
+            pair: ['ltc', 'btc'],
+            price: 100,
+        };
+
+        const orderWithInvalidID: Identified<Order> = {
+            ...order,
+            id: '111111111'
+        };
+
+        parser.parseDeleteOrder(
+            JSON.stringify(deleteOrderCases.defaultWithId100025362.data),
+            order.id);
+
+        expect(() => parser.parseDeleteOrder(JSON.stringify(yobitGeneralError), order.id))
+            .to.throw(/Yobit error text/);
+        expect(() => parser.parseDeleteOrder(
+            JSON.stringify(deleteOrderCases.defaultWithId100025362.data), orderWithInvalidID.id
+        ))
+            .to.throw(/id/);
+        expect(() => parser.parseDeleteOrder(
+            JSON.stringify(wrongDeleteOrderCases.dataWithoutOrderIdField), orderWithInvalidID.id
+        ))
+            .to.throw(/id/);
     });
 });
