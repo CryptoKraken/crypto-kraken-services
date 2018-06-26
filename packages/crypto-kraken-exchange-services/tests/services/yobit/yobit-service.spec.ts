@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
-import { Order, OrderType } from '../../../src';
+import { Identified, Order, OrderType } from '../../../src';
 import { YobitService } from '../../../src/services/yobit';
 import { YobitConstants } from '../../../src/services/yobit/constants';
 import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-signature-maker';
-import { balanceCases, createOrderCases, orderBookCases, tradesCases } from './data';
+import { balanceCases, createOrderCases, deleteOrderCases, orderBookCases, tradesCases } from './data';
 
 describe('Yobit Exchange Service', () => {
     const defaultRootPublicApiUrl = YobitConstants.getRootPublicApiUrl(YobitConstants.rootServerUrl);
@@ -192,5 +192,31 @@ describe('Yobit Exchange Service', () => {
             secret: 'BBB'
         });
         expect(result).to.eql(createOrderCases.defaultSellLtcBtcWithPrice100Order.expect);
+    });
+
+    it('should delete an order', async () => {
+        nock(defaultRootPrivateApiUrl, {
+            // tslint:disable-next-line:max-line-length
+            reqheaders: getAuthRequestHeaders('AAA', '2cc588d08a096c5ebc1c5b255129dd99dfd852cfd1054af94ca14486971d874a0d0adfcbc926b930edaf1dafb753daf7d762c27833f596030ef032819f922da3')
+        })
+            .post('/', {
+                method: YobitConstants.deleteOrderMethod,
+                nonce: 1,
+                order_id: 100025362,
+            })
+            .reply(200, JSON.stringify(deleteOrderCases.defaultWithId100025362.data));
+
+        exchangeService.nonceFactory = () => 1;
+        const order: Identified<Order> = {
+            id: '100025362',
+            amount: 12,
+            orderType: OrderType.Sell,
+            pair: ['ltc', 'btc'],
+            price: 100
+        };
+        await exchangeService.deleteOrder(order, {
+            apiKey: 'AAA',
+            secret: 'BBB'
+        });
     });
 });
