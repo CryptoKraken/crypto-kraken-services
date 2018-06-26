@@ -14,10 +14,10 @@
     "url": "https://github.com/CryptoKraken/crypto-kraken-services/issues"
   },
   "scripts": {
-    "environment": "cross-env NODE_PATH=\"./\" TS_NODE_PROJECT=\"./tests/tsconfig.json\"",
+    "environment": "cross-env TS_NODE_PROJECT=\"./tests/tsconfig.json\"",
     "build": "tsc -p ./tsconfig-build.json",
     "build-watch": "npm run build -- -w",
-    "test": "npm run environment -- mocha -r ts-node/register \"./tests/{,!(functional)/**/}/*.spec.ts\"",
+    "test": "npm run environment -- mocha -r ts-node/register -r tsconfig-paths/register \"./tests/{,!(functional)/**/}/*.spec.ts\"",
     "test-functional": "npm run environment -- mocha -r ts-node/register \"./tests/functional/**/*.spec.ts\" --timeout 10000",
     "coverage": "npm run coverage-without-clear",
     "postcoverage": "rimraf coverage",
