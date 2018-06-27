@@ -8,7 +8,8 @@ const constants = {
     getOrderBookUri: (pair: CurrencyPair) => `/depth/${YobitUtils.getPairSymbol(pair)}`,
     getTradesUri: (pair: CurrencyPair) => `/trades/${YobitUtils.getPairSymbol(pair)}`,
     balanceMethod: 'getInfo',
-    createOrderMethod: 'Trade'
+    createOrderMethod: 'Trade',
+    deleteOrderMethod: 'CancelOrder'
 };
 
 export const YobitConstants: Readonly<typeof constants> = constants;

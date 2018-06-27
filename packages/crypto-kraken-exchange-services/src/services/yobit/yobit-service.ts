@@ -96,8 +96,24 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
         return this.responseParser.parseCreateOrder(response, order);
     }
 
-    deleteOrder(identifiedOrder: Identified<Order>, exchangeCredentials: YobitExchangeCredentials): Promise<void> {
-        throw new Error('Method not implemented.');
+    async deleteOrder(
+        identifiedOrder: Identified<Order>,
+        exchangeCredentials: YobitExchangeCredentials
+    ): Promise<void> {
+        const params = {
+            method: YobitConstants.deleteOrderMethod,
+            nonce: await this.nonceFactory(),
+            order_id: identifiedOrder.id
+        };
+
+        const authHeaders = await this.getAuthHeaders(exchangeCredentials, params);
+        const response = await request.post('/', {
+            baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
+            headers: authHeaders,
+            form: params
+        });
+
+        this.responseParser.parseDeleteOrder(response, identifiedOrder.id);
     }
     getOrderInfo(
         identifiedOrder: Identified<Order>,
