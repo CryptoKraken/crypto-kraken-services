@@ -18,7 +18,7 @@
     "build": "tsc -p ./tsconfig-build.json",
     "build-watch": "npm run build -- -w",
     "test": "npm run environment -- mocha -r ts-node/register -r tsconfig-paths/register \"./tests/{,!(functional)/**/}/*.spec.ts\"",
-    "test-functional": "npm run environment -- mocha -r ts-node/register \"./tests/functional/**/*.spec.ts\" --timeout 10000",
+    "test-functional": "npm run environment -- mocha -r ts-node/register -r tsconfig-paths/register \"./tests/functional/**/*.spec.ts\" --timeout 10000",
     "coverage": "npm run coverage-without-clear",
     "postcoverage": "rimraf coverage",
     "coverage-without-clear": "npm run environment -- nyc mocha \"./tests/{,!(functional)/**/}/*.spec.ts\"",
