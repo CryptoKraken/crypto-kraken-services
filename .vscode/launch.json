@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Current Test File (Core)",
+            "name": "Core: Launch Current Test File",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
             "env": {
                 "TS_NODE_PROJECT": "./packages/crypto-kraken-core/tests/tsconfig.json",
