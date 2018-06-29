@@ -32,29 +32,32 @@ interface RawFieldsSelector {
 }
 
 const isThisOwnerFieldsGuardsMap = (data: any): data is { this: (value: any) => boolean } => data.this;
-const isRawArrayFieldsGuardsMap = (data: any): data is RawArrayFieldsGuardsMap => data && data.every;
+const isArrayFieldsGuardsMap = (data: any): data is RawArrayFieldsGuardsMap => data && data.every;
 const checkObject = (
     obj: any, fieldGuardMap: RawFieldGuardsMap, checkFields: RawFieldsSelector | boolean = true
 ): boolean => {
+    if (!checkFields || (checkFields !== true && !Object.keys(checkFields).length))
+        return true;
     return Object.getOwnPropertyNames(fieldGuardMap)
-        .filter(fieldName => fieldName !== 'this')
+        .filter(fieldName => {
+            return fieldName !== 'this' && (
+                checkFields === true || checkFields[fieldName] === true || typeof checkFields[fieldName] === 'object'
+            );
+        })
         .every(fieldName => {
             const fieldValue = obj[fieldName];
             const guard = fieldGuardMap[fieldName];
-            const thisTrue = !isThisOwnerFieldsGuardsMap(guard) || guard.this(fieldValue);
-            if (!thisTrue)
-                return false;
-
-            if (isRawArrayFieldsGuardsMap(guard))
-                return (fieldValue as any[])
-                    // TODO: replace true
-                    .every(element => checkObject(element, guard.every, true));
-
             if (typeof guard === 'function')
                 return guard(fieldValue);
-            return checkObject(
-                fieldValue, guard, typeof checkFields === 'boolean' ? checkFields : checkFields[fieldName]
-            );
+
+            const isThisGuardTrue = !isThisOwnerFieldsGuardsMap(guard) || guard.this(fieldValue);
+            if (!isThisGuardTrue)
+                return false;
+            const nextCheckFields = typeof checkFields === 'boolean' ? checkFields : checkFields[fieldName];
+            if (isArrayFieldsGuardsMap(guard))
+                return (fieldValue as any[])
+                    .every(element => checkObject(element, guard.every, nextCheckFields));
+            return checkObject(fieldValue, guard, nextCheckFields);
         });
 };
 
