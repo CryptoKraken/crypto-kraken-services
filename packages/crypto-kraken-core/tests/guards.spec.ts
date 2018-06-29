@@ -282,4 +282,150 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.arrayField.every.arrayField.every.stringField1).to.have.not.been.called;
         expect(guardsMap.arrayField.every.arrayField.every.stringField2).to.have.not.been.called;
     });
+
+    // tslint:disable-next-line:max-line-length
+    it(`should be executed without a field checking when the checkFields argument is passed like an empty object`, () => {
+        const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
+        if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
+            || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            expect.fail(`Wrong guards map`);
+            return;
+        }
+        spy(guardsMap);
+
+        expect(is(testObj, guardsMap, {})).to.be.true;
+        expect(guardsMap.numberField).to.have.not.been.called;
+        expect(guardsMap.stringField).to.have.not.been.called;
+        expect(guardsMap.booleanField).to.have.not.been.called;
+        expect(guardsMap.objectField.numberField).to.have.not.been.called;
+        expect(guardsMap.objectField.stringField).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField1.stringField1).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField1.stringField2).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField2.stringField1).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField2.stringField2).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.numberField1).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.numberField2).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.arrayField.every.stringField1).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.arrayField.every.stringField2).to.have.not.been.called;
+    });
+
+    it('should check only specific fields of primitive types', () => {
+        const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
+        if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
+            || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            expect.fail(`Wrong guards map`);
+            return;
+        }
+        spy(guardsMap);
+
+        expect(is(testObj, guardsMap, {
+            numberField: true,
+            booleanField: true
+        })).to.be.true;
+        expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
+        expect(guardsMap.stringField).to.have.not.been.called;
+        expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.objectField.numberField).to.have.not.been.called;
+        expect(guardsMap.objectField.stringField).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField1.stringField1).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField1.stringField2).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField2.stringField1).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField2.stringField2).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.numberField1).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.numberField2).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.arrayField.every.stringField1).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.arrayField.every.stringField2).to.have.not.been.called;
+    });
+
+    it('should check only specific fields of primitive types and object types', () => {
+        const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
+        if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
+            || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            expect.fail(`Wrong guards map`);
+            return;
+        }
+        spy(guardsMap);
+
+        expect(is(testObj, guardsMap, {
+            numberField: true,
+            booleanField: true,
+            objectField: {
+                numberField: true,
+                objectField1: {
+                    stringField1: true
+                },
+                objectField2: true
+            }
+        })).to.be.true;
+        expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
+        expect(guardsMap.stringField).to.have.not.been.called;
+        expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.objectField.numberField).to.have.been.calledOnceWith(testObj.objectField.numberField);
+        expect(guardsMap.objectField.stringField).to.have.not.been;
+        expect(guardsMap.objectField.objectField1.stringField1)
+            .to.have.been.calledOnceWith(testObj.objectField.objectField1.stringField1);
+        expect(guardsMap.objectField.objectField1.stringField2).to.have.not.been;
+        expect(guardsMap.objectField.objectField2.stringField1)
+            .to.have.been.calledOnceWith(testObj.objectField.objectField2.stringField1);
+        expect(guardsMap.objectField.objectField2.stringField2)
+            .to.have.been.calledOnceWith(testObj.objectField.objectField2.stringField2);
+        expect(guardsMap.arrayField.every.numberField1).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.numberField2).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.arrayField.every.stringField1).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.arrayField.every.stringField2).to.have.not.been.called;
+    });
+
+    it('should check only specific fields of primitive types and array types', () => {
+        const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
+        if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
+            || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            expect.fail(`Wrong guards map`);
+            return;
+        }
+        spy(guardsMap);
+
+        expect(is(testObj, guardsMap, {
+            numberField: true,
+            booleanField: true,
+            arrayField: {
+                numberField1: true,
+                arrayField: true
+            }
+        })).to.be.true;
+        expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
+        expect(guardsMap.stringField).to.have.not.been.called;
+        expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.objectField.numberField).to.have.not.been.called;
+        expect(guardsMap.objectField.stringField).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField1.stringField1).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField1.stringField2).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField2.stringField1).to.have.not.been.called;
+        expect(guardsMap.objectField.objectField2.stringField2).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.numberField1)
+            .to.have.been.callCount(3)
+            .calledWith(testObj.arrayField[0].numberField1)
+            .calledWith(testObj.arrayField[1].numberField1)
+            .calledWith(testObj.arrayField[2].numberField1);
+        expect(guardsMap.arrayField.every.numberField2).to.have.not.been.called;
+        expect(guardsMap.arrayField.every.arrayField.every.stringField1)
+            .to.have.been.callCount(3 * 2)
+            .calledWith(testObj.arrayField[0].arrayField[0].stringField1)
+            .calledWith(testObj.arrayField[0].arrayField[1].stringField1)
+            .calledWith(testObj.arrayField[1].arrayField[0].stringField1)
+            .calledWith(testObj.arrayField[1].arrayField[1].stringField1)
+            .calledWith(testObj.arrayField[2].arrayField[0].stringField1)
+            .calledWith(testObj.arrayField[2].arrayField[1].stringField1);
+        expect(guardsMap.arrayField.every.arrayField.every.stringField2)
+            .to.have.been.callCount(3 * 2)
+            .calledWith(testObj.arrayField[0].arrayField[0].stringField2)
+            .calledWith(testObj.arrayField[0].arrayField[1].stringField2)
+            .calledWith(testObj.arrayField[1].arrayField[0].stringField2)
+            .calledWith(testObj.arrayField[1].arrayField[1].stringField2)
+            .calledWith(testObj.arrayField[2].arrayField[0].stringField2)
+            .calledWith(testObj.arrayField[2].arrayField[1].stringField2);
+    });
 });
