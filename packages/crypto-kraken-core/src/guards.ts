@@ -3,7 +3,7 @@ import { FieldsSelector, FieldsSelectorResult } from './types';
 export type FieldGuardsMap<T> = {
     [P in keyof T]: ((value: any) => value is T[P]) | (
         T[P] extends Array<infer U> ? (
-            { this?: ((value: any) => value is T[P]), every: FieldGuardsMap<U> }
+            { this?: ((value: any) => value is T[P]), every: FieldGuardsMap<U> | ((value: any) => value is U) }
         ) : (
             T[P] extends object ? (
                 { this?: ((value: any) => value is T[P]) } & FieldGuardsMap<T[P]>
@@ -22,9 +22,7 @@ type RawObjectFieldsGuardsMap = RawFieldGuardsMap & {
 
 interface RawArrayFieldsGuardsMap {
     this?: (value: any) => boolean;
-    every: {
-        [fieldName: string]: RawFieldGuardsMap;
-    };
+    every: ((value: any) => boolean) | RawFieldGuardsMap;
 }
 
 interface RawFieldsSelector {
@@ -56,7 +54,11 @@ const checkObject = (
             const nextCheckFields = typeof checkFields === 'boolean' ? checkFields : checkFields[fieldName];
             if (isArrayFieldsGuardsMap(guard))
                 return (fieldValue as any[])
-                    .every(element => checkObject(element, guard.every, nextCheckFields));
+                    .every(element => {
+                        if (typeof guard.every === 'function')
+                            return guard.every(element);
+                        return checkObject(element, guard.every, nextCheckFields);
+                    });
             return checkObject(fieldValue, guard, nextCheckFields);
         });
 };

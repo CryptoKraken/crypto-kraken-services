@@ -21,16 +21,22 @@ export const kuCoinSuccessResponseResultGuardsMap: FieldGuardsMap<KuCoinSuccessR
     msg: (value): value is KuCoinSuccessResponseResult['msg'] => typeof value === 'string'
 };
 
-const orderBookOrdersGuard = <T>(value: any): value is T => {
-    return Array.isArray(value) && value.length === 3 && typeof value[0] === 'number'
-        && typeof value[1] === 'number' && typeof value[2] === 'number';
+const isArray = (value: any): value is any[] => Array.isArray(value);
+const orderBookOrderGuard = <T>(value: any): value is T => {
+    return typeof value[0] === 'number' && typeof value[1] === 'number' && typeof value[2] === 'number';
 };
 export const kuCoinOrderBookGuardsMap: FieldGuardsMap<KuCoinOrderBook> = {
     ...kuCoinSuccessResponseResultGuardsMap,
     data: {
         _comment: (value): value is KuCoinOrderBook['data']['_comment'] => typeof value === 'string',
-        BUY: orderBookOrdersGuard as (value: any) => value is KuCoinOrderBook['data']['BUY'],
-        SELL: orderBookOrdersGuard as (value: any) => value is KuCoinOrderBook['data']['SELL'],
+        BUY: {
+            this: isArray as (value: any) => value is KuCoinOrderBook['data']['BUY'],
+            every: orderBookOrderGuard as (value: any) => value is KuCoinOrderBook['data']['BUY'][0]
+        },
+        SELL: {
+            this: isArray as (value: any) => value is KuCoinOrderBook['data']['SELL'],
+            every: orderBookOrderGuard as (value: any) => value is KuCoinOrderBook['data']['SELL'][0]
+        },
         timestamp: (value): value is KuCoinOrderBook['data']['timestamp'] => typeof value === 'number'
     }
 };

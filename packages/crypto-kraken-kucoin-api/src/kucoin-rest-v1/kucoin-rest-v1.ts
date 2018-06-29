@@ -76,7 +76,7 @@ export class KuCoinRestV1 {
 
         if (!(is<KuCoinOrderBook, T>(responseResult, kuCoinOrderBookGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin order book type.`);
-        return rawResponseResult;
+        return responseResult;
     }
 
     protected parseRawResponseResult<T>(rawResponseResult: string, checkFields: T) {

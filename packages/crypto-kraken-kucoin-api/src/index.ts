@@ -3,6 +3,7 @@ export {
     KuCoinOrderType,
     KuCoinOrderBook,
     KuCoinResponseResult,
+    KuCoinErrorResponseResult,
     KuCoinSuccessResponseResult,
     KuCoinConstants
 } from './kucoin-rest-v1/index';
