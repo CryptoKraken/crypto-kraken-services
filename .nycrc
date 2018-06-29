@@ -3,7 +3,8 @@
         "src/**/*.ts"
     ],
     "exclude": [
-        "src/types"
+        "src/types",
+        "dist"
     ],
     "extension": [
         ".ts"
@@ -13,7 +14,8 @@
         "text"
     ],
     "require": [
-        "../../environment/plugins/remove-empty-module-init-ts-node"
+        "../../environment/plugins/remove-empty-module-init-ts-node",
+        "tsconfig-paths/register"
     ],
     "temp-directory": "./coverage/.nyc_output",
     "all": true
