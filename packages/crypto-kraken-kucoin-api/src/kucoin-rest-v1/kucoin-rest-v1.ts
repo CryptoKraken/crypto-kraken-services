@@ -20,7 +20,10 @@ export interface KuCoinRestV1Options {
 
 const defaultKuCoinRestV1Options: KuCoinRestV1Options = {
     serverUri: KuCoinConstants.serverProductionUrl,
-    nonceFactory: () => { throw new Error('Not implemented.'); }
+    nonceFactory: () => {
+        /* istanbul ignore next */
+        throw new Error('Not implemented.');
+    }
 };
 
 export class KuCoinRestV1 {

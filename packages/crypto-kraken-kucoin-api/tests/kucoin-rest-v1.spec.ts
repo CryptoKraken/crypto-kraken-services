@@ -15,6 +15,21 @@ describe('The KuCoin REST service of the V1 version', () => {
         kuCoin = new KuCoinRestV1();
     });
 
+    it('should take a partial object of options and set default values for undefined options', () => {
+        kuCoin = new KuCoinRestV1();
+        expect(kuCoin.serverUri).to.eql(KuCoinConstants.serverProductionUrl);
+        expect(kuCoin.nonceFactory).to.not.be.undefined;
+
+        kuCoin = new KuCoinRestV1({ serverUri: 'customUrl' });
+        expect(kuCoin.serverUri).to.eql('customUrl');
+        expect(kuCoin.nonceFactory).to.not.be.undefined;
+
+        const customNonceFactory = () => 100;
+        kuCoin = new KuCoinRestV1({ nonceFactory: customNonceFactory });
+        expect(kuCoin.serverUri).to.eql(KuCoinConstants.serverProductionUrl);
+        expect(kuCoin.nonceFactory).to.eql(customNonceFactory);
+    });
+
     it('should get an order book correctly', async () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
         nock(KuCoinConstants.serverProductionUrl)

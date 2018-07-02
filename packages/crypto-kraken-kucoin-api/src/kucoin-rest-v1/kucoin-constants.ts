@@ -5,8 +5,7 @@ const constants = {
     createOrderUri: '/v1/order',
     deleteOrderUri: '/v1/cancel-order',
     activeOrdersUri: '/v1/order/active',
-    orderInfoUri: '/v1/order/detail',
-    getBalanceOfCoinUri: (coin: string) => `/v1/account/${coin}/balance`,
+    orderInfoUri: '/v1/order/detail'
 };
 
 export const KuCoinConstants: Readonly<typeof constants> = constants;
