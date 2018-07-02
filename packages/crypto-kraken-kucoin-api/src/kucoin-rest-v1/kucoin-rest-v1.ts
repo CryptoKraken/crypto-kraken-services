@@ -4,12 +4,14 @@ import { KuCoinConstants } from './kucoin-constants';
 import {
     kuCoinErrorResponseResultGuardsMap,
     kuCoinOrderBookGuardsMap,
-    kuCoinResponseResultGuardsMap
+    kuCoinResponseResultGuardsMap,
+    kuCoinTickGuardsMap
 } from './kucoin-guards';
 import {
     KuCoinErrorResponseResult,
     KuCoinOrderBook,
-    KuCoinOrderType
+    KuCoinOrderType,
+    KuCoinTick
 } from './kucoin-types';
 import { KuCoinUtils } from './kucoin-utils';
 
@@ -37,6 +39,29 @@ export class KuCoinRestV1 {
 
         this.serverUri = serverUri;
         this.nonceFactory = nonceFactory;
+    }
+
+    async tick(parameters: { symbol: CurrencyPair }): Promise<KuCoinTick | KuCoinErrorResponseResult>;
+    async tick<T extends FieldsSelector<KuCoinTick>>(
+        parameters: { symbol: CurrencyPair }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinTick, T> | KuCoinErrorResponseResult>;
+    async tick<T>(
+        parameters: { symbol: CurrencyPair }, checkFields?: T
+    ): Promise<KuCoinTick | FieldsSelectorResult<KuCoinTick, T> | KuCoinErrorResponseResult> {
+        const rawResponseResult = await request.get(KuCoinConstants.tickUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                symbol: KuCoinUtils.getSymbol(parameters.symbol)
+            }
+        });
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinTick, T>(responseResult, kuCoinTickGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin tick type.`);
+        return responseResult;
     }
 
     async orderBooks(parameters: {

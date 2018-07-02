@@ -1,7 +1,7 @@
 import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
 import {
     KuCoinErrorResponseResult, KuCoinOrderBook, KuCoinOrderType,
-    KuCoinResponseResult, KuCoinSuccessResponseResult
+    KuCoinResponseResult, KuCoinSuccessResponseResult, KuCoinTick
 } from './kucoin-types';
 
 export const kuCoinResponseResultGuardsMap: FieldGuardsMap<KuCoinResponseResult> = {
@@ -19,6 +19,26 @@ export const kuCoinSuccessResponseResultGuardsMap: FieldGuardsMap<KuCoinSuccessR
     success: (value): value is KuCoinSuccessResponseResult['success'] => value === true,
     code: (value): value is KuCoinSuccessResponseResult['code'] => value === 'OK',
     msg: isString
+};
+
+export const kuCoinTickGuardsMap: FieldGuardsMap<KuCoinTick> = {
+    ...kuCoinSuccessResponseResultGuardsMap,
+    data: {
+        coinType: isString,
+        trading: isBoolean,
+        lastDealPrice: isNumber,
+        buy: isNumber,
+        sell: isNumber,
+        coinTypePair: isString,
+        sort: isNumber,
+        feeRate: isNumber,
+        volValue: isNumber,
+        high: isNumber,
+        datetime: isNumber,
+        vol: isNumber,
+        low: isNumber,
+        changeRate: isNumber
+    }
 };
 
 const orderBookOrderGuard = <T>(value: any): value is T => {

@@ -4,7 +4,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { CurrencyPair } from 'crypto-kraken-core';
 import * as nock from 'nock';
 import { KuCoinConstants, KuCoinRestV1 } from 'src';
-import { commonCases, orderBookCases, wrongCommonCases, wrongOrderBookCases } from './data';
+import { commonCases, orderBookCases, tickCases, wrongCommonCases, wrongOrderBookCases, wrongTickCases } from './data';
 
 chai.use(chaiAsPromised);
 
@@ -30,6 +30,40 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(kuCoin.nonceFactory).to.eql(customNonceFactory);
     });
 
+    it('should get a tick correctly', async () => {
+        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .reply(200, tickCases.default);
+
+        const tick = await kuCoin.tick({ symbol: currencyPair });
+
+        expect(tick).to.eql(tickCases.default);
+    });
+
+    it('should throw an exception when a response contained wrong data in the get tick operation', async () => {
+        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .reply(200, wrongTickCases.withoutCoinType);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .reply(200, wrongTickCases.withoutDateTime);
+
+        const expectedExceptionMessage = /isn't the KuCoin tick type/;
+        expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should get an order book correctly', async () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
         nock(KuCoinConstants.serverProductionUrl)
@@ -41,11 +75,10 @@ describe('The KuCoin REST service of the V1 version', () => {
 
         const orderBook = await kuCoin.orderBooks({ symbol: currencyPair });
 
-        expect(orderBook)
-            .to.eql(orderBookCases.default);
+        expect(orderBook).to.eql(orderBookCases.default);
     });
 
-    it('should throw an exception when a response contained wrong data', async () => {
+    it('should throw an exception when a response contained wrong data in the get order book operation', async () => {
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.orderBooksUri)
@@ -79,8 +112,10 @@ describe('The KuCoin REST service of the V1 version', () => {
             .query(true)
             .reply(200, wrongCommonCases.wrongResponse);
 
+        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
         const expectedExceptionMessage = /isn't a KuCoin response result/;
-        expect(kuCoin.orderBooks({ symbol: ['AAA', 'BBB'] })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         nockScope.persist(false);
     });
 
@@ -90,8 +125,10 @@ describe('The KuCoin REST service of the V1 version', () => {
             .get(() => true)
             .query(true)
             .reply(200, commonCases.commonError);
+        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
 
-        expect(await kuCoin.orderBooks({ symbol: ['AAA', 'BBB'] })).to.eql(commonCases.commonError);
+        expect(await kuCoin.tick({ symbol: currencyPair })).to.eql(commonCases.commonError);
+        expect(await kuCoin.orderBooks({ symbol: currencyPair})).to.eql(commonCases.commonError);
         nockScope.persist(false);
     });
 });

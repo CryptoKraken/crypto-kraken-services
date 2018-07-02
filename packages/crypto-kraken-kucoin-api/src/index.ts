@@ -1,6 +1,7 @@
 export {
     KuCoinRestV1,
     KuCoinOrderType,
+    KuCoinTick,
     KuCoinOrderBook,
     KuCoinResponseResult,
     KuCoinErrorResponseResult,
