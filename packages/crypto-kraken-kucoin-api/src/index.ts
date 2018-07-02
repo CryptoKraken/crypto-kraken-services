@@ -3,6 +3,8 @@ export {
     KuCoinOrderType,
     KuCoinTick,
     KuCoinOrderBook,
+    KuCoinBuyOrderBook,
+    KuCoinSellOrderBook,
     KuCoinResponseResult,
     KuCoinErrorResponseResult,
     KuCoinSuccessResponseResult,

@@ -55,3 +55,19 @@ export interface KuCoinOrderBook extends KuCoinSuccessResponseResult {
         ]>;
     };
 }
+
+export interface KuCoinBuyOrderBook extends KuCoinSuccessResponseResult {
+    data: Array<[
+        /*Price*/ number,
+        /*Amount*/ number,
+        /*Volume*/ number
+    ]>;
+}
+
+export interface KuCoinSellOrderBook extends KuCoinSuccessResponseResult {
+    data: Array<[
+        /*Price*/ number,
+        /*Amount*/ number,
+        /*Volume*/ number
+    ]>;
+}

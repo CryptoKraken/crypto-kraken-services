@@ -1,6 +1,6 @@
 import { KuCoinOrderBook } from 'src';
 
-export const orderBookCases = {
+export const orderBooksCases = {
     /*
         This case from the KuCoin documentation
         https://kucoinapidocs.docs.apiary.io/#reference/0/market/order-books(open)
@@ -24,7 +24,7 @@ export const orderBookCases = {
     } as KuCoinOrderBook
 };
 
-export const wrongOrderBookCases = {
+export const wrongOrderBooksCases = {
     sellOrderWithMissingPrice: {
         success: true,
         code: 'OK',

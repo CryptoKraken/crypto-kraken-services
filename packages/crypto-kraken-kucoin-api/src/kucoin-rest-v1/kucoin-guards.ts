@@ -1,7 +1,7 @@
 import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
 import {
-    KuCoinErrorResponseResult, KuCoinOrderBook, KuCoinOrderType,
-    KuCoinResponseResult, KuCoinSuccessResponseResult, KuCoinTick
+    KuCoinBuyOrderBook, KuCoinErrorResponseResult, KuCoinOrderBook,
+    KuCoinOrderType, KuCoinResponseResult, KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
 } from './kucoin-types';
 
 export const kuCoinResponseResultGuardsMap: FieldGuardsMap<KuCoinResponseResult> = {
@@ -57,6 +57,22 @@ export const kuCoinOrderBookGuardsMap: FieldGuardsMap<KuCoinOrderBook> = {
             every: orderBookOrderGuard as (value: any) => value is KuCoinOrderBook['data']['SELL'][0]
         },
         timestamp: isNumber
+    }
+};
+
+export const kuCoinBuyOrderBookGuardsMap: FieldGuardsMap<KuCoinBuyOrderBook> = {
+    ...kuCoinSuccessResponseResultGuardsMap,
+    data: {
+        this: isArray as (value: any) => value is KuCoinBuyOrderBook['data'],
+        every: orderBookOrderGuard as (value: any) => value is KuCoinBuyOrderBook['data'][0]
+    }
+};
+
+export const kuCoinSellOrderBookGuardsMap: FieldGuardsMap<KuCoinSellOrderBook> = {
+    ...kuCoinSuccessResponseResultGuardsMap,
+    data: {
+        this: isArray as (value: any) => value is KuCoinSellOrderBook['data'],
+        every: orderBookOrderGuard as (value: any) => value is KuCoinSellOrderBook['data'][0]
     }
 };
 
