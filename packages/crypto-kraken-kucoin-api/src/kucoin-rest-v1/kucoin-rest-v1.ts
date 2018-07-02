@@ -39,13 +39,13 @@ export class KuCoinRestV1 {
         this.nonceFactory = nonceFactory;
     }
 
-    async getOrderBooks(parameters: {
+    async orderBooks(parameters: {
         symbol: CurrencyPair,
         group?: number,
         limit?: number,
         direction?: KuCoinOrderType
     }): Promise<KuCoinOrderBook | KuCoinErrorResponseResult>;
-    async getOrderBooks<T extends FieldsSelector<KuCoinOrderBook>>(
+    async orderBooks<T extends FieldsSelector<KuCoinOrderBook>>(
         parameters: {
             symbol: CurrencyPair,
             group?: number,
@@ -54,7 +54,7 @@ export class KuCoinRestV1 {
         },
         checkFields?: T
     ): Promise<FieldsSelectorResult<KuCoinOrderBook, T> | KuCoinErrorResponseResult>;
-    async getOrderBooks<T>(
+    async orderBooks<T>(
         parameters: {
             symbol: CurrencyPair,
             group?: number,

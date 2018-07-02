@@ -39,7 +39,7 @@ describe('The KuCoin REST service of the V1 version', () => {
             })
             .reply(200, orderBookCases.default);
 
-        const orderBook = await kuCoin.getOrderBooks({ symbol: currencyPair });
+        const orderBook = await kuCoin.orderBooks({ symbol: currencyPair });
 
         expect(orderBook)
             .to.eql(orderBookCases.default);
@@ -67,9 +67,9 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongOrderBookCases.dataWithWrongOrderTypeName);
 
         const expectedExceptionMessage = /isn't the KuCoin order book type/;
-        expect(kuCoin.getOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.getOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.getOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should throw an exception when a response is wrong', async () => {
@@ -80,7 +80,7 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongCommonCases.wrongResponse);
 
         const expectedExceptionMessage = /isn't a KuCoin response result/;
-        expect(kuCoin.getOrderBooks({ symbol: ['AAA', 'BBB'] })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.orderBooks({ symbol: ['AAA', 'BBB'] })).to.be.rejectedWith(expectedExceptionMessage);
         nockScope.persist(false);
     });
 
@@ -91,7 +91,7 @@ describe('The KuCoin REST service of the V1 version', () => {
             .query(true)
             .reply(200, commonCases.commonError);
 
-        expect(await kuCoin.getOrderBooks({ symbol: ['AAA', 'BBB'] })).to.eql(commonCases.commonError);
+        expect(await kuCoin.orderBooks({ symbol: ['AAA', 'BBB'] })).to.eql(commonCases.commonError);
         nockScope.persist(false);
     });
 });
