@@ -1,6 +1,12 @@
 export {
     FieldGuardsMap,
-    is
+    is,
+    isArray,
+    isBoolean,
+    isFunction,
+    isNumber,
+    isString,
+    isSymbol
 } from './guards';
 
 export {

@@ -131,6 +131,7 @@ export const orderBookCases = {
     }
 };
 
+// TODO: remove, because these cases are described in the crypto-kraken-kucoin-api package
 export const wrongOrderBookCases = {
     sellOrderWithMissingPrice: {
         field1: 'otherData',

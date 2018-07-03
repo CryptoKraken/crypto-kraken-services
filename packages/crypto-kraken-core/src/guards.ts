@@ -3,7 +3,7 @@ import { FieldsSelector, FieldsSelectorResult } from './types';
 export type FieldGuardsMap<T> = {
     [P in keyof T]: ((value: any) => value is T[P]) | (
         T[P] extends Array<infer U> ? (
-            { this?: ((value: any) => value is T[P]), every: FieldGuardsMap<U> }
+            { this?: ((value: any) => value is T[P]), every: FieldGuardsMap<U> | ((value: any) => value is U) }
         ) : (
             T[P] extends object ? (
                 { this?: ((value: any) => value is T[P]) } & FieldGuardsMap<T[P]>
@@ -22,9 +22,7 @@ type RawObjectFieldsGuardsMap = RawFieldGuardsMap & {
 
 interface RawArrayFieldsGuardsMap {
     this?: (value: any) => boolean;
-    every: {
-        [fieldName: string]: RawFieldGuardsMap;
-    };
+    every: ((value: any) => boolean) | RawFieldGuardsMap;
 }
 
 interface RawFieldsSelector {
@@ -56,7 +54,11 @@ const checkObject = (
             const nextCheckFields = typeof checkFields === 'boolean' ? checkFields : checkFields[fieldName];
             if (isArrayFieldsGuardsMap(guard))
                 return (fieldValue as any[])
-                    .every(element => checkObject(element, guard.every, nextCheckFields));
+                    .every(element => {
+                        if (typeof guard.every === 'function')
+                            return guard.every(element);
+                        return checkObject(element, guard.every, nextCheckFields);
+                    });
             return checkObject(fieldValue, guard, nextCheckFields);
         });
 };
@@ -70,3 +72,40 @@ export function is<T, S extends FieldsSelector<T>>(
 ): data is T | FieldsSelectorResult<T, S> {
     return checkObject(data, fieldGuardMap as any, checkFields as any);
 }
+
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isArray = (value: any): value is any[] => Array.isArray(value);
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isBoolean = (value: any): value is boolean => typeof value === 'boolean';
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isFunction = (value: any): value is 'function' => typeof value === 'function';
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isNumber = (value: any): value is number => typeof value === 'number';
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isString = (value: any): value is string => typeof value === 'string';
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isSymbol = (value: any): value is 'symbol' => typeof value === 'symbol';

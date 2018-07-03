@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import { is } from 'src';
+import { is, isArray, isBoolean, isFunction, isNumber, isString, isSymbol } from 'src';
 import { FieldGuardsMap } from 'src/guards';
 import { TestType } from './test-types';
 chai.use(sinonChai);
@@ -80,8 +80,10 @@ describe(`The generic 'is' guard`, () => {
     it('should check an instance type by a guards map', () => {
         const guardsMap = commonTestTypeGuardsMap;
         if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
-            || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
-            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            || typeof guardsMap.objectField.objectField1 === 'function'
+            || typeof guardsMap.arrayField === 'function' || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -132,11 +134,58 @@ describe(`The generic 'is' guard`, () => {
             .calledWith(testObj.arrayField[2].arrayField[1].stringField2);
     });
 
+    it('should check an instance type when some of non-primitive fields guards are functions', () => {
+        const guardsMap = commonTestTypeGuardsMap;
+        if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
+            || typeof guardsMap.arrayField === 'function' || typeof guardsMap.arrayField.every === 'function') {
+            expect.fail(`Wrong guards map`);
+            return;
+        }
+
+        guardsMap.objectField.objectField1 = (value: any): value is TestType['objectField']['objectField1'] => !!value;
+        guardsMap.arrayField.every.arrayField = (value: any): value is TestType['arrayField'][0]['arrayField'] => {
+            return !!value;
+        };
+        spy(guardsMap);
+
+        expect(is<TestType>(testObj, guardsMap)).to.be.true;
+        // Check that the guards of fields of primitive types should be called
+        expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
+        expect(guardsMap.stringField).to.have.been.calledOnceWith(testObj.stringField);
+        expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        // Check that the guards of fields of object types should be called
+        expect(guardsMap.objectField.numberField).to.have.been.calledOnceWith(testObj.objectField.numberField);
+        expect(guardsMap.objectField.stringField).to.have.been.calledOnceWith(testObj.objectField.stringField);
+        expect(guardsMap.objectField.objectField1).to.have.been.calledOnceWith(testObj.objectField.objectField1);
+        expect(guardsMap.objectField.objectField2.stringField1)
+            .to.have.been.calledOnceWith(testObj.objectField.objectField2.stringField1);
+        expect(guardsMap.objectField.objectField2.stringField2)
+            .to.have.been.calledOnceWith(testObj.objectField.objectField2.stringField2);
+        // Check that the guards of fields of array types should be called
+        expect(guardsMap.arrayField.every.numberField1)
+            .to.have.been.callCount(3)
+            .calledWith(testObj.arrayField[0].numberField1)
+            .calledWith(testObj.arrayField[1].numberField1)
+            .calledWith(testObj.arrayField[2].numberField1);
+        expect(guardsMap.arrayField.every.numberField2)
+            .to.have.been.callCount(3)
+            .calledWith(testObj.arrayField[0].numberField2)
+            .calledWith(testObj.arrayField[1].numberField2)
+            .calledWith(testObj.arrayField[2].numberField2);
+        expect(guardsMap.arrayField.every.arrayField)
+            .to.have.been.callCount(3)
+            .calledWith(testObj.arrayField[0].arrayField)
+            .calledWith(testObj.arrayField[1].arrayField)
+            .calledWith(testObj.arrayField[2].arrayField);
+    });
+
     it('should not check a whole instance when one of fields guards returns false', () => {
         const guardsMap = commonTestTypeGuardsMap;
         if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
-            || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
-            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            || typeof guardsMap.objectField.objectField1 === 'function'
+            || typeof guardsMap.arrayField === 'function' || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -217,7 +266,9 @@ describe(`The generic 'is' guard`, () => {
 
     it(`should check an instance type by a guards map with 'this' guard of the array type`, () => {
         const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
-        if (typeof guardsMap.arrayField === 'function' || typeof guardsMap.arrayField.every.arrayField === 'function') {
+        if (typeof guardsMap.arrayField === 'function' || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -262,9 +313,29 @@ describe(`The generic 'is' guard`, () => {
             .calledWith(testObj.arrayField[2].arrayField[1].stringField2);
     });
 
+    it(`should check an instance type by a guards map with 'every' guard of the array type`, () => {
+        const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
+        if (typeof guardsMap.arrayField === 'function') {
+            expect.fail(`Wrong guards map`);
+            return;
+        }
+
+        guardsMap.arrayField.every = (value: any): value is TestType['arrayField'][0] => !!value;
+        spy(guardsMap);
+
+        expect(is<TestType>(testObj, guardsMap)).to.be.true;
+        expect(guardsMap.arrayField.every)
+            .to.have.been.callCount(3)
+            .calledWith(testObj.arrayField[0])
+            .calledWith(testObj.arrayField[1])
+            .calledWith(testObj.arrayField[2]);
+    });
+
     it(`should not call array field guards when a 'this' guard returns false`, () => {
         const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
-        if (typeof guardsMap.arrayField === 'function' || typeof guardsMap.arrayField.every.arrayField === 'function') {
+        if (typeof guardsMap.arrayField === 'function' || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -288,7 +359,9 @@ describe(`The generic 'is' guard`, () => {
         const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
         if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
             || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
-            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -314,7 +387,9 @@ describe(`The generic 'is' guard`, () => {
         const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
         if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
             || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
-            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -343,7 +418,9 @@ describe(`The generic 'is' guard`, () => {
         const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
         if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
             || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
-            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -382,7 +459,9 @@ describe(`The generic 'is' guard`, () => {
         const guardsMap: FieldGuardsMap<TestType> = commonTestTypeGuardsMap;
         if (typeof guardsMap.objectField === 'function' || typeof guardsMap.objectField.objectField2 === 'function'
             || typeof guardsMap.objectField.objectField1 === 'function' || typeof guardsMap.arrayField === 'function'
-            || typeof guardsMap.arrayField.every.arrayField === 'function') {
+            || typeof guardsMap.arrayField.every === 'function'
+            || typeof guardsMap.arrayField.every.arrayField === 'function'
+            || typeof guardsMap.arrayField.every.arrayField.every === 'function') {
             expect.fail(`Wrong guards map`);
             return;
         }
@@ -427,5 +506,26 @@ describe(`The generic 'is' guard`, () => {
             .calledWith(testObj.arrayField[1].arrayField[1].stringField2)
             .calledWith(testObj.arrayField[2].arrayField[0].stringField2)
             .calledWith(testObj.arrayField[2].arrayField[1].stringField2);
+    });
+});
+
+describe('The simple guards', () => {
+    it('should work like native guards', () => {
+        const arrayValue = [0, 1, 2];
+        const booleanValue = true;
+        const functionValue = (arg1: string, arg2: number) => arg1 + arg2;
+        const numberValue = 100;
+        const stringValue = 'string 0';
+        const symbolValue = Symbol('A custom symbol');
+        const values = [arrayValue, booleanValue, functionValue, numberValue, stringValue, symbolValue];
+
+        values.forEach(value => {
+            expect(isArray(value)).to.eql(Array.isArray(value));
+            expect(isBoolean(value)).to.eql(typeof value === 'boolean');
+            expect(isFunction(value)).to.eql(typeof value === 'function');
+            expect(isNumber(value)).to.eql(typeof value === 'number');
+            expect(isString(value)).to.eql(typeof value === 'string');
+            expect(isSymbol(value)).to.eql(typeof value === 'symbol');
+        });
     });
 });
