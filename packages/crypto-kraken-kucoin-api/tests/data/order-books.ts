@@ -9,9 +9,9 @@ export const orderBooksCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1526450937000,
         data: {
             _comment: 'arr[0]   Price arr[1]   Amount arr[2]   Volume',
-            timestamp: 1526450937000,
             SELL: [
                 [20, 5, 100],
                 [19, 5, 95]
@@ -29,9 +29,9 @@ export const wrongOrderBooksCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1526450937000,
         data: {
             _comment: 'arr[0]   Price arr[1]   Amount arr[2]   Volume',
-            timestamp: 1526450937000,
             SELL: [
                 [/* Missing required element */ 5, 100],
                 [19, 5, 95]
@@ -46,9 +46,9 @@ export const wrongOrderBooksCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1526450937000,
         data: {
             _comment: 'arr[0]   Price arr[1]   Amount arr[2]   Volume',
-            timestamp: 1526450937000,
             SELL: [
                 [20, 5, 100],
                 [19, 5, 95]
@@ -63,9 +63,9 @@ export const wrongOrderBooksCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1526450937000,
         data: {
             _comment: 'arr[0]   Price arr[1]   Amount arr[2]   Volume',
-            timestamp: 1526450937000,
             SELL: [
                 [20, 5, 100],
                 [19, 5, 95]

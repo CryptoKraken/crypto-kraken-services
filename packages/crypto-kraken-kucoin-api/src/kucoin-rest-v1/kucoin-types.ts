@@ -6,6 +6,7 @@ export enum KuCoinOrderType {
 export interface KuCoinResponseResult {
     success: boolean;
     code: string;
+    timestamp: number;
 }
 
 export interface KuCoinErrorResponseResult extends KuCoinResponseResult {
@@ -20,24 +21,20 @@ export interface KuCoinSuccessResponseResult extends KuCoinResponseResult {
     msg: string;
 }
 
-export interface KuCoinResponseResultWithTimeStamp extends KuCoinResponseResult {
-    timestamp: number;
-}
-
-export type KuCoinListExchangeRateOfCoins<K extends keyof any = string> = KuCoinSuccessResponseResult &
-    KuCoinResponseResultWithTimeStamp & {
+export interface KuCoinListExchangeRateOfCoins<K extends keyof any = string> extends KuCoinSuccessResponseResult {
     data: {
         currencies: Array<[
-            /*Currency name*/ string,
-            /*Currency symbol*/ string
+            /* Currency name */ string,
+            /* Currency symbol */ string
         ]>,
         rates: {
             [P in K]: {
                 [currencyName: string]: number
             }
         }
-    }
-};
+    };
+}
+
 
 interface CoinTick {
     coinType: string;
@@ -67,33 +64,32 @@ export interface KuCoinAllCoinsTick extends KuCoinSuccessResponseResult {
 
 export interface KuCoinOrderBook extends KuCoinSuccessResponseResult {
     data: {
-        _comment: string,
-        timestamp: number,
+        _comment: string | undefined;
         SELL: Array<[
-            /*Price*/ number,
-            /*Amount*/ number,
-            /*Volume*/ number
+            /* Price */ number,
+            /* Amount */ number,
+            /* Volume */ number
         ]>;
         BUY: Array<[
-            /*Price*/ number,
-            /*Amount*/ number,
-            /*Volume*/ number
+            /* Price */ number,
+            /* Amount */ number,
+            /* Volume */ number
         ]>;
     };
 }
 
 export interface KuCoinBuyOrderBook extends KuCoinSuccessResponseResult {
     data: Array<[
-        /*Price*/ number,
-        /*Amount*/ number,
-        /*Volume*/ number
+        /* Price */ number,
+        /* Amount */ number,
+        /* Volume */ number
     ]>;
 }
 
 export interface KuCoinSellOrderBook extends KuCoinSuccessResponseResult {
     data: Array<[
-        /*Price*/ number,
-        /*Amount*/ number,
-        /*Volume*/ number
+        /* Price */ number,
+        /* Amount */ number,
+        /* Volume */ number
     ]>;
 }

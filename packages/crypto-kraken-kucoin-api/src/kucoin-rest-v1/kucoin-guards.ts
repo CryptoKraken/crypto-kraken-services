@@ -1,34 +1,35 @@
 import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
 import {
     KuCoinAllCoinsTick, KuCoinBuyOrderBook, KuCoinErrorResponseResult,
-    KuCoinListExchangeRateOfCoins, KuCoinOrderBook, KuCoinOrderType, KuCoinResponseResult,
-    KuCoinResponseResultWithTimeStamp, KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
+    KuCoinListExchangeRateOfCoins, KuCoinOrderBook, KuCoinOrderType,
+    KuCoinResponseResult, KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
 } from './kucoin-types';
 
 export const kuCoinResponseResultGuardsMap: FieldGuardsMap<KuCoinResponseResult> = {
     success: isBoolean,
-    code: isString
+    code: isString,
+    timestamp: isNumber
 };
 
 export const kuCoinErrorResponseResultGuardsMap: FieldGuardsMap<KuCoinErrorResponseResult> = {
     success: (value): value is KuCoinErrorResponseResult['success'] => value === false,
     code: isString,
-    msg: isString
+    msg: isString,
+    timestamp: isNumber
 };
 
 export const kuCoinSuccessResponseResultGuardsMap: FieldGuardsMap<KuCoinSuccessResponseResult> = {
     success: (value): value is KuCoinSuccessResponseResult['success'] => value === true,
     code: (value): value is KuCoinSuccessResponseResult['code'] => value === 'OK',
-    msg: isString
-};
-
-export const kuCoinResponseResultWithTimeStampGuardsMap: FieldGuardsMap<KuCoinResponseResultWithTimeStamp> = {
-    ...kuCoinResponseResultGuardsMap,
+    msg: isString,
     timestamp: isNumber
 };
 
+const kuCoinCommentGuard = (value: any): value is string | undefined => {
+    return value === undefined || typeof value === 'string';
+};
+
 export const kuCoinListExchangeRateOfCoinsGuardsMap: FieldGuardsMap<KuCoinListExchangeRateOfCoins> = {
-    ...kuCoinResponseResultWithTimeStampGuardsMap,
     ...kuCoinSuccessResponseResultGuardsMap,
     data: {
         currencies: {
@@ -91,7 +92,7 @@ const orderBookOrderGuard = (value: any): value is [number, number, number] => {
 export const kuCoinOrderBookGuardsMap: FieldGuardsMap<KuCoinOrderBook> = {
     ...kuCoinSuccessResponseResultGuardsMap,
     data: {
-        _comment: isString,
+        _comment: kuCoinCommentGuard,
         BUY: {
             this: isArray,
             every: orderBookOrderGuard
@@ -99,8 +100,7 @@ export const kuCoinOrderBookGuardsMap: FieldGuardsMap<KuCoinOrderBook> = {
         SELL: {
             this: isArray,
             every: orderBookOrderGuard
-        },
-        timestamp: isNumber
+        }
     }
 };
 

@@ -9,6 +9,7 @@ export const tickCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1530718094413,
         data: {
             coinType: 'KCS',
             trading: true,
@@ -98,6 +99,7 @@ export const wrongTickCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1530718094413,
         data: {
             /* There isn't the coinType field */
             trading: true,
@@ -121,6 +123,7 @@ export const wrongTickCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1530718094413,
         data: {
             coinType: 'KCS',
             trading: true,

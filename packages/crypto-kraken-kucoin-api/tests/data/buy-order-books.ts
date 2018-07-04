@@ -9,6 +9,7 @@ export const buyOrderBooksCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1530718094413,
         data: [
             [18, 5, 90],
             [17, 5, 85]
@@ -21,6 +22,7 @@ export const wrongBuyOrderBooksCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1530718094413,
         data: [
             [/* Missing required element */ 5, 90],
             [17, 5, 85]
@@ -30,6 +32,7 @@ export const wrongBuyOrderBooksCases = {
         success: true,
         code: 'OK',
         msg: 'Operation succeeded.',
+        timestamp: 1530718094413,
         data: [
             [18, 5, 90],
             [17, /* Missing required element */ 85]
