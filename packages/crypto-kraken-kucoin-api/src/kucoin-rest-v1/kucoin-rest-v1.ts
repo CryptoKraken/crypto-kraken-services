@@ -6,6 +6,7 @@ import {
     kuCoinBuyOrderBookGuardsMap,
     kuCoinErrorResponseResultGuardsMap,
     kuCoinListExchangeRateOfCoinsGuardsMap,
+    kuCoinListLanguagesGuardsMap,
     kuCoinOrderBookGuardsMap,
     kuCoinResponseResultGuardsMap,
     kuCoinSellOrderBookGuardsMap,
@@ -16,6 +17,7 @@ import {
     KuCoinBuyOrderBook,
     KuCoinErrorResponseResult,
     KuCoinListExchangeRateOfCoins,
+    KuCoinListLanguages,
     KuCoinOrderBook,
     KuCoinOrderType,
     KuCoinSellOrderBook,
@@ -76,6 +78,26 @@ export class KuCoinRestV1 {
             responseResult, kuCoinListExchangeRateOfCoinsGuardsMap, checkFields
         )))
             throw new Error(`The result ${responseResult} isn't the KuCoin list exchange rate of coins type.`);
+        return responseResult;
+    }
+
+    async listLanguages(): Promise<KuCoinListLanguages | KuCoinErrorResponseResult>;
+    async listLanguages<T extends FieldsSelector<KuCoinListLanguages>>(
+        checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListLanguages, T> | KuCoinErrorResponseResult>;
+    async listLanguages<T extends FieldsSelector<KuCoinListLanguages>>(
+        checkFields?: T
+    ): Promise<KuCoinListLanguages | FieldsSelectorResult<KuCoinListLanguages, T> | KuCoinErrorResponseResult> {
+        const rawResponseResult = await request.get(KuCoinConstants.listLanguages, {
+            baseUrl: this.serverUri
+        });
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListLanguages, T>(responseResult, kuCoinListLanguagesGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin language list type.`);
         return responseResult;
     }
 

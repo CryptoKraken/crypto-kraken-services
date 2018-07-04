@@ -2,6 +2,7 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { CurrencyPair } from 'crypto-kraken-core';
+import { listLanguagesCases, wrongListLanguagesCases } from 'data/list-languages';
 import * as nock from 'nock';
 import { KuCoinConstants, KuCoinRestV1 } from 'src';
 import {
@@ -126,6 +127,26 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get a languages list correctly', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listLanguages)
+            .reply(200, listLanguagesCases.default);
+
+        const listLanguages = await kuCoin.listLanguages();
+
+        expect(listLanguages).to.eql(listLanguagesCases.default);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get languages list operation', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listLanguages)
+            .reply(200, wrongListLanguagesCases.withoutLanguageCode);
+
+        const expectedExceptionMessage = /isn't the KuCoin language list type/;
+        expect(kuCoin.listLanguages()).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should get an order book correctly', async () => {
         const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         nock(KuCoinConstants.serverProductionUrl)
@@ -248,6 +269,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         const expectedExceptionMessage = /isn't a KuCoin response result/;
         expect(kuCoin.listExchangeRateOfCoins()).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.listLanguages()).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
@@ -267,6 +289,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.tick()).to.eql(commonCases.commonError);
         expect(await kuCoin.listExchangeRateOfCoins()).to.eql(commonCases.commonError);
         expect(await kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] })).to.eql(commonCases.commonError);
+        expect(await kuCoin.listLanguages()).to.eql(commonCases.commonError);
         expect(await kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.eql(commonCases.commonError);
         expect(await kuCoin.orderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.buyOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);

@@ -35,6 +35,14 @@ export interface KuCoinListExchangeRateOfCoins<K extends keyof any = string> ext
     };
 }
 
+export interface KuCoinListLanguages extends KuCoinSuccessResponseResult {
+    _comment: string | undefined;
+    data: Array<[
+        /* Language code */ string,
+        /* Language symbol */ string,
+        /* Is language available */ boolean
+    ]>;
+}
 
 interface CoinTick {
     coinType: string;

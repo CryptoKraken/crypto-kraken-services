@@ -1,7 +1,7 @@
 import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
 import {
     KuCoinAllCoinsTick, KuCoinBuyOrderBook, KuCoinErrorResponseResult,
-    KuCoinListExchangeRateOfCoins, KuCoinOrderBook, KuCoinOrderType,
+    KuCoinListExchangeRateOfCoins, KuCoinListLanguages, KuCoinOrderBook, KuCoinOrderType,
     KuCoinResponseResult, KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
 } from './kucoin-types';
 
@@ -33,7 +33,7 @@ export const kuCoinListExchangeRateOfCoinsGuardsMap: FieldGuardsMap<KuCoinListEx
     ...kuCoinSuccessResponseResultGuardsMap,
     data: {
         currencies: {
-            this: isArray as (value: any) => value is KuCoinListExchangeRateOfCoins['data']['currencies'],
+            this: isArray,
             every: (value: any): value is KuCoinListExchangeRateOfCoins['data']['currencies'][0] => {
                 return typeof value[0] === 'string' && typeof value[1] === 'string';
             }
@@ -51,6 +51,17 @@ export const kuCoinListExchangeRateOfCoinsGuardsMap: FieldGuardsMap<KuCoinListEx
                     return typeof value[cryptoName][currencyName] === 'number';
                 });
             });
+        }
+    }
+};
+
+export const kuCoinListLanguagesGuardsMap: FieldGuardsMap<KuCoinListLanguages> = {
+    ...kuCoinSuccessResponseResultGuardsMap,
+    _comment: kuCoinCommentGuard,
+    data: {
+        this: isArray,
+        every: (value: any): value is KuCoinListLanguages['data'][0] => {
+            return typeof value[0] === 'string' && typeof value[1] === 'string' && typeof value[2] === 'boolean';
         }
     }
 };
