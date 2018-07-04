@@ -2,14 +2,14 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { CurrencyPair } from 'crypto-kraken-core';
-import { listLanguagesCases, wrongListLanguagesCases } from 'data/list-languages';
 import * as nock from 'nock';
 import { KuCoinConstants, KuCoinRestV1 } from 'src';
 import {
     buyOrderBooksCases, commonCases,
-    listExchangeRateOfCoinsCases, orderBooksCases,
-    sellOrderBooksCases, tickCases, wrongBuyOrderBooksCases,
-    wrongCommonCases, wrongListExchangeRateOfCoinsCases, wrongOrderBooksCases,
+    listExchangeRateOfCoinsCases, listLanguagesCases,
+    orderBooksCases, sellOrderBooksCases, tickCases,
+    wrongBuyOrderBooksCases, wrongCommonCases, wrongListExchangeRateOfCoinsCases,
+    wrongListLanguagesCases, wrongOrderBooksCases,
     wrongSellOrderBooksCases, wrongTickCases
 } from './data';
 
@@ -129,7 +129,7 @@ describe('The KuCoin REST service of the V1 version', () => {
 
     it('should get a languages list correctly', async () => {
         nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.listLanguages)
+            .get(KuCoinConstants.listLanguagesUri)
             .reply(200, listLanguagesCases.default);
 
         const listLanguages = await kuCoin.listLanguages();
@@ -140,7 +140,7 @@ describe('The KuCoin REST service of the V1 version', () => {
     // tslint:disable-next-line:max-line-length
     it('should throw an exception when a response contained wrong data in the get languages list operation', async () => {
         nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.listLanguages)
+            .get(KuCoinConstants.listLanguagesUri)
             .reply(200, wrongListLanguagesCases.withoutLanguageCode);
 
         const expectedExceptionMessage = /isn't the KuCoin language list type/;

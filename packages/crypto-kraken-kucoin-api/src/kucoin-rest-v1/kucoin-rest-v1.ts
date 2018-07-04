@@ -38,6 +38,21 @@ const defaultKuCoinRestV1Options: KuCoinRestV1Options = {
     }
 };
 
+interface OrderBooksParameters {
+    symbol: CurrencyPair;
+    group?: number;
+    limit?: number;
+    direction?: KuCoinOrderType;
+}
+
+interface BuyOrderBooksParameters {
+    symbol: CurrencyPair;
+    group?: number;
+    limit?: number;
+}
+
+type SellOrderBooksParameters = BuyOrderBooksParameters;
+
 export class KuCoinRestV1 {
     readonly serverUri: string;
     readonly nonceFactory: () => Promise<number> | number;
@@ -88,7 +103,7 @@ export class KuCoinRestV1 {
     async listLanguages<T extends FieldsSelector<KuCoinListLanguages>>(
         checkFields?: T
     ): Promise<KuCoinListLanguages | FieldsSelectorResult<KuCoinListLanguages, T> | KuCoinErrorResponseResult> {
-        const rawResponseResult = await request.get(KuCoinConstants.listLanguages, {
+        const rawResponseResult = await request.get(KuCoinConstants.listLanguagesUri, {
             baseUrl: this.serverUri
         });
 
@@ -142,29 +157,12 @@ export class KuCoinRestV1 {
         throw new Error(`The result ${responseResult} isn't the KuCoin tick type.`);
     }
 
-    async orderBooks(parameters: {
-        symbol: CurrencyPair,
-        group?: number,
-        limit?: number,
-        direction?: KuCoinOrderType
-    }): Promise<KuCoinOrderBook | KuCoinErrorResponseResult>;
+    async orderBooks(parameters: OrderBooksParameters): Promise<KuCoinOrderBook | KuCoinErrorResponseResult>;
     async orderBooks<T extends FieldsSelector<KuCoinOrderBook>>(
-        parameters: {
-            symbol: CurrencyPair,
-            group?: number,
-            limit?: number,
-            direction?: KuCoinOrderType
-        },
-        checkFields?: T
+        parameters: OrderBooksParameters, checkFields?: T
     ): Promise<FieldsSelectorResult<KuCoinOrderBook, T> | KuCoinErrorResponseResult>;
     async orderBooks<T>(
-        parameters: {
-            symbol: CurrencyPair,
-            group?: number,
-            limit?: number,
-            direction?: KuCoinOrderType
-        },
-        checkFields?: T
+        parameters: OrderBooksParameters, checkFields?: T
     ): Promise<KuCoinOrderBook | FieldsSelectorResult<KuCoinOrderBook, T> | KuCoinErrorResponseResult> {
         const rawResponseResult = await request.get(KuCoinConstants.orderBooksUri, {
             baseUrl: this.serverUri,
@@ -185,26 +183,12 @@ export class KuCoinRestV1 {
         return responseResult;
     }
 
-    async buyOrderBooks(parameters: {
-        symbol: CurrencyPair,
-        group?: number,
-        limit?: number
-    }): Promise<KuCoinBuyOrderBook | KuCoinErrorResponseResult>;
+    async buyOrderBooks(parameters: BuyOrderBooksParameters): Promise<KuCoinBuyOrderBook | KuCoinErrorResponseResult>;
     async buyOrderBooks<T extends FieldsSelector<KuCoinBuyOrderBook>>(
-        parameters: {
-            symbol: CurrencyPair,
-            group?: number,
-            limit?: number
-        },
-        checkFields?: T
+        parameters: BuyOrderBooksParameters, checkFields?: T
     ): Promise<FieldsSelectorResult<KuCoinBuyOrderBook, T> | KuCoinErrorResponseResult>;
     async buyOrderBooks<T>(
-        parameters: {
-            symbol: CurrencyPair,
-            group?: number,
-            limit?: number
-        },
-        checkFields?: T
+        parameters: BuyOrderBooksParameters, checkFields?: T
     ): Promise<KuCoinBuyOrderBook | FieldsSelectorResult<KuCoinBuyOrderBook, T> | KuCoinErrorResponseResult> {
         const rawResponseResult = await request.get(KuCoinConstants.buyOrderBooksUri, {
             baseUrl: this.serverUri,
@@ -224,26 +208,14 @@ export class KuCoinRestV1 {
         return responseResult;
     }
 
-    async sellOrderBooks(parameters: {
-        symbol: CurrencyPair,
-        group?: number,
-        limit?: number
-    }): Promise<KuCoinSellOrderBook | KuCoinErrorResponseResult>;
+    async sellOrderBooks(
+        parameters: SellOrderBooksParameters
+    ): Promise<KuCoinSellOrderBook | KuCoinErrorResponseResult>;
     async sellOrderBooks<T extends FieldsSelector<KuCoinSellOrderBook>>(
-        parameters: {
-            symbol: CurrencyPair,
-            group?: number,
-            limit?: number
-        },
-        checkFields?: T
+        parameters: SellOrderBooksParameters, checkFields?: T
     ): Promise<FieldsSelectorResult<KuCoinSellOrderBook, T> | KuCoinErrorResponseResult>;
     async sellOrderBooks<T>(
-        parameters: {
-            symbol: CurrencyPair,
-            group?: number,
-            limit?: number
-        },
-        checkFields?: T
+        parameters: SellOrderBooksParameters, checkFields?: T
     ): Promise<KuCoinSellOrderBook | FieldsSelectorResult<KuCoinSellOrderBook, T> | KuCoinErrorResponseResult> {
         const rawResponseResult = await request.get(KuCoinConstants.sellOrderBooksUri, {
             baseUrl: this.serverUri,
