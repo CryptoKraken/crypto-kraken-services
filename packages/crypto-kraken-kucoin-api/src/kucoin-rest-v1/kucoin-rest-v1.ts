@@ -2,6 +2,7 @@ import { CurrencyPair, FieldsSelector, FieldsSelectorResult, is } from 'crypto-k
 import * as request from 'request-promise-native';
 import { KuCoinConstants } from './kucoin-constants';
 import {
+    kuCoinAllCoinsTickGuardsMap,
     kuCoinBuyOrderBookGuardsMap,
     kuCoinErrorResponseResultGuardsMap,
     kuCoinOrderBookGuardsMap,
@@ -10,6 +11,7 @@ import {
     kuCoinTickGuardsMap
 } from './kucoin-guards';
 import {
+    KuCoinAllCoinsTick,
     KuCoinBuyOrderBook,
     KuCoinErrorResponseResult,
     KuCoinOrderBook,
@@ -45,27 +47,45 @@ export class KuCoinRestV1 {
         this.nonceFactory = nonceFactory;
     }
 
+    async tick(): Promise<KuCoinAllCoinsTick | KuCoinErrorResponseResult>;
     async tick(parameters: { symbol: CurrencyPair }): Promise<KuCoinTick | KuCoinErrorResponseResult>;
+    async tick(
+        parameters: { symbol?: CurrencyPair }
+    ): Promise<KuCoinAllCoinsTick | KuCoinTick | KuCoinErrorResponseResult>;
+    async tick<T extends FieldsSelector<KuCoinAllCoinsTick>>(
+        parameters: undefined, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinAllCoinsTick, T> | KuCoinErrorResponseResult>;
     async tick<T extends FieldsSelector<KuCoinTick>>(
         parameters: { symbol: CurrencyPair }, checkFields?: T
     ): Promise<FieldsSelectorResult<KuCoinTick, T> | KuCoinErrorResponseResult>;
+    async tick<T extends FieldsSelector<KuCoinTick>>(
+        parameters: { symbol?: CurrencyPair }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinAllCoinsTick | KuCoinTick, T> | KuCoinErrorResponseResult>;
     async tick<T>(
-        parameters: { symbol: CurrencyPair }, checkFields?: T
-    ): Promise<KuCoinTick | FieldsSelectorResult<KuCoinTick, T> | KuCoinErrorResponseResult> {
-        const rawResponseResult = await request.get(KuCoinConstants.tickUri, {
-            baseUrl: this.serverUri,
-            qs: {
-                symbol: KuCoinUtils.getSymbol(parameters.symbol)
-            }
-        });
+        parameters?: { symbol?: CurrencyPair }, checkFields?: T
+    ): Promise<
+    KuCoinAllCoinsTick | KuCoinTick | FieldsSelectorResult<KuCoinAllCoinsTick, T> |
+    FieldsSelectorResult<KuCoinTick, T> | KuCoinErrorResponseResult
+    > {
+        const isAllCoins = !(parameters && parameters.symbol);
+        const requestOptions: request.RequestPromiseOptions = {
+            baseUrl: this.serverUri
+        };
+        if (!isAllCoins)
+            requestOptions.qs = {
+                // The result of checking of parameters and symbol fields is saved in the isAllCoins constant above
+                symbol: KuCoinUtils.getSymbol(parameters!.symbol!)
+            };
+        const rawResponseResult = await request.get(KuCoinConstants.tickUri, requestOptions);
 
         const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
-        if (!(is<KuCoinTick, T>(responseResult, kuCoinTickGuardsMap, checkFields)))
-            throw new Error(`The result ${responseResult} isn't the KuCoin tick type.`);
-        return responseResult;
+        if ((isAllCoins && is<KuCoinAllCoinsTick, T>(responseResult, kuCoinAllCoinsTickGuardsMap, checkFields)) ||
+            (!isAllCoins && is<KuCoinTick, T>(responseResult, kuCoinTickGuardsMap, checkFields)))
+            return responseResult;
+        throw new Error(`The result ${responseResult} isn't the KuCoin tick type.`);
     }
 
     async orderBooks(parameters: {

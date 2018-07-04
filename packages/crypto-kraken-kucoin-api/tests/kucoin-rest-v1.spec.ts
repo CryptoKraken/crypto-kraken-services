@@ -35,21 +35,33 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should get a tick correctly', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'KCS', 1: 'BTC' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.tickUri)
             .query({
                 symbol: `${currencyPair[0]}-${currencyPair[1]}`
             })
             .reply(200, tickCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .twice()
+            .reply(200, tickCases.allCoins);
 
         const tick = await kuCoin.tick({ symbol: currencyPair });
+        const allCoinsTick = await kuCoin.tick();
+        const allCoinsTickWithEmptyParams = await kuCoin.tick({});
 
         expect(tick).to.eql(tickCases.default);
+        expect(allCoinsTick)
+            .to.eql(allCoinsTickWithEmptyParams)
+            .to.eql(tickCases.allCoins);
     });
 
     it('should throw an exception when a response contained wrong data in the get tick operation', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .reply(200, wrongTickCases.allCoinsWithDataObj);
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.tickUri)
             .query({
@@ -64,12 +76,13 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongTickCases.withoutDateTime);
 
         const expectedExceptionMessage = /isn't the KuCoin tick type/;
+        expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should get an order book correctly', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.orderBooksUri)
             .query({
@@ -83,7 +96,7 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should throw an exception when a response contained wrong data in the get order book operation', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.orderBooksUri)
             .query({
@@ -110,7 +123,7 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should get a buy order book correctly', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.buyOrderBooksUri)
             .query({
@@ -125,7 +138,7 @@ describe('The KuCoin REST service of the V1 version', () => {
 
     // tslint:disable-next-line:max-line-length
     it('should throw an exception when a response contained wrong data in the get buy order book operation', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.buyOrderBooksUri)
             .query({
@@ -145,7 +158,7 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should get a sell order book correctly', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.sellOrderBooksUri)
             .query({
@@ -160,7 +173,7 @@ describe('The KuCoin REST service of the V1 version', () => {
 
     // tslint:disable-next-line:max-line-length
     it('should throw an exception when a response contained wrong data in the get sell order book operation', async () => {
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.sellOrderBooksUri)
             .query({
@@ -186,9 +199,10 @@ describe('The KuCoin REST service of the V1 version', () => {
             .query(true)
             .reply(200, wrongCommonCases.wrongResponse);
 
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         const expectedExceptionMessage = /isn't a KuCoin response result/;
-        expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
@@ -201,9 +215,10 @@ describe('The KuCoin REST service of the V1 version', () => {
             .get(() => true)
             .query(true)
             .reply(200, commonCases.commonError);
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
+        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
 
-        expect(await kuCoin.tick({ symbol: currencyPair })).to.eql(commonCases.commonError);
+        expect(await kuCoin.tick()).to.eql(commonCases.commonError);
+        expect(await kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.eql(commonCases.commonError);
         expect(await kuCoin.orderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.buyOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.sellOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);

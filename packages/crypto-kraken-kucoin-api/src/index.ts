@@ -2,6 +2,7 @@ export {
     KuCoinRestV1,
     KuCoinOrderType,
     KuCoinTick,
+    KuCoinAllCoinsTick,
     KuCoinOrderBook,
     KuCoinBuyOrderBook,
     KuCoinSellOrderBook,

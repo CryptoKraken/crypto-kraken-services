@@ -20,23 +20,30 @@ export interface KuCoinSuccessResponseResult extends KuCoinResponseResult {
     msg: string;
 }
 
+interface CoinTick {
+    coinType: string;
+    trading: boolean;
+    symbol: string;
+    lastDealPrice: number;
+    buy: number;
+    sell: number;
+    change: number;
+    coinTypePair: string;
+    sort: number;
+    feeRate: number;
+    volValue: number;
+    high: number;
+    datetime: number;
+    vol: number;
+    low: number;
+    changeRate: number;
+}
 export interface KuCoinTick extends KuCoinSuccessResponseResult {
-    data: {
-        coinType: string;
-        trading: boolean;
-        lastDealPrice: number;
-        buy: number;
-        sell: number;
-        coinTypePair: string;
-        sort: number;
-        feeRate: number;
-        volValue: number;
-        high: number;
-        datetime: number;
-        vol: number;
-        low: number;
-        changeRate: number;
-    };
+    data: CoinTick;
+}
+
+export interface KuCoinAllCoinsTick extends KuCoinSuccessResponseResult {
+    data: CoinTick[];
 }
 
 export interface KuCoinOrderBook extends KuCoinSuccessResponseResult {

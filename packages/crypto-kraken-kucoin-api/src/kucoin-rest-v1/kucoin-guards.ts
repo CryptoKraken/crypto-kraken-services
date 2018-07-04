@@ -1,7 +1,8 @@
 import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
 import {
-    KuCoinBuyOrderBook, KuCoinErrorResponseResult, KuCoinOrderBook,
-    KuCoinOrderType, KuCoinResponseResult, KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
+    KuCoinAllCoinsTick, KuCoinBuyOrderBook, KuCoinErrorResponseResult,
+    KuCoinOrderBook, KuCoinOrderType, KuCoinResponseResult,
+    KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
 } from './kucoin-types';
 
 export const kuCoinResponseResultGuardsMap: FieldGuardsMap<KuCoinResponseResult> = {
@@ -21,27 +22,38 @@ export const kuCoinSuccessResponseResultGuardsMap: FieldGuardsMap<KuCoinSuccessR
     msg: isString
 };
 
+const coinTickGuardsMap = {
+    coinType: isString,
+    trading: isBoolean,
+    symbol: isString,
+    lastDealPrice: isNumber,
+    buy: isNumber,
+    sell: isNumber,
+    change: isNumber,
+    coinTypePair: isString,
+    sort: isNumber,
+    feeRate: isNumber,
+    volValue: isNumber,
+    high: isNumber,
+    datetime: isNumber,
+    vol: isNumber,
+    low: isNumber,
+    changeRate: isNumber
+};
 export const kuCoinTickGuardsMap: FieldGuardsMap<KuCoinTick> = {
     ...kuCoinSuccessResponseResultGuardsMap,
+    data: coinTickGuardsMap
+};
+
+export const kuCoinAllCoinsTickGuardsMap: FieldGuardsMap<KuCoinAllCoinsTick> = {
+    ...kuCoinSuccessResponseResultGuardsMap,
     data: {
-        coinType: isString,
-        trading: isBoolean,
-        lastDealPrice: isNumber,
-        buy: isNumber,
-        sell: isNumber,
-        coinTypePair: isString,
-        sort: isNumber,
-        feeRate: isNumber,
-        volValue: isNumber,
-        high: isNumber,
-        datetime: isNumber,
-        vol: isNumber,
-        low: isNumber,
-        changeRate: isNumber
+        this: isArray,
+        every: coinTickGuardsMap
     }
 };
 
-const orderBookOrderGuard = <T>(value: any): value is T => {
+const orderBookOrderGuard = (value: any): value is [number, number, number] => {
     return typeof value[0] === 'number' && typeof value[1] === 'number' && typeof value[2] === 'number';
 };
 export const kuCoinOrderBookGuardsMap: FieldGuardsMap<KuCoinOrderBook> = {
@@ -49,12 +61,12 @@ export const kuCoinOrderBookGuardsMap: FieldGuardsMap<KuCoinOrderBook> = {
     data: {
         _comment: isString,
         BUY: {
-            this: isArray as (value: any) => value is KuCoinOrderBook['data']['BUY'],
-            every: orderBookOrderGuard as (value: any) => value is KuCoinOrderBook['data']['BUY'][0]
+            this: isArray,
+            every: orderBookOrderGuard
         },
         SELL: {
-            this: isArray as (value: any) => value is KuCoinOrderBook['data']['SELL'],
-            every: orderBookOrderGuard as (value: any) => value is KuCoinOrderBook['data']['SELL'][0]
+            this: isArray,
+            every: orderBookOrderGuard
         },
         timestamp: isNumber
     }
@@ -63,16 +75,16 @@ export const kuCoinOrderBookGuardsMap: FieldGuardsMap<KuCoinOrderBook> = {
 export const kuCoinBuyOrderBookGuardsMap: FieldGuardsMap<KuCoinBuyOrderBook> = {
     ...kuCoinSuccessResponseResultGuardsMap,
     data: {
-        this: isArray as (value: any) => value is KuCoinBuyOrderBook['data'],
-        every: orderBookOrderGuard as (value: any) => value is KuCoinBuyOrderBook['data'][0]
+        this: isArray,
+        every: orderBookOrderGuard
     }
 };
 
 export const kuCoinSellOrderBookGuardsMap: FieldGuardsMap<KuCoinSellOrderBook> = {
     ...kuCoinSuccessResponseResultGuardsMap,
     data: {
-        this: isArray as (value: any) => value is KuCoinSellOrderBook['data'],
-        every: orderBookOrderGuard as (value: any) => value is KuCoinSellOrderBook['data'][0]
+        this: isArray,
+        every: orderBookOrderGuard
     }
 };
 
