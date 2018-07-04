@@ -1,8 +1,8 @@
 import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
 import {
     KuCoinAllCoinsTick, KuCoinBuyOrderBook, KuCoinErrorResponseResult,
-    KuCoinOrderBook, KuCoinOrderType, KuCoinResponseResult,
-    KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
+    KuCoinListExchangeRateOfCoins, KuCoinOrderBook, KuCoinOrderType, KuCoinResponseResult,
+    KuCoinResponseResultWithTimeStamp, KuCoinSellOrderBook, KuCoinSuccessResponseResult, KuCoinTick
 } from './kucoin-types';
 
 export const kuCoinResponseResultGuardsMap: FieldGuardsMap<KuCoinResponseResult> = {
@@ -20,6 +20,38 @@ export const kuCoinSuccessResponseResultGuardsMap: FieldGuardsMap<KuCoinSuccessR
     success: (value): value is KuCoinSuccessResponseResult['success'] => value === true,
     code: (value): value is KuCoinSuccessResponseResult['code'] => value === 'OK',
     msg: isString
+};
+
+export const kuCoinResponseResultWithTimeStampGuardsMap: FieldGuardsMap<KuCoinResponseResultWithTimeStamp> = {
+    ...kuCoinResponseResultGuardsMap,
+    timestamp: isNumber
+};
+
+export const kuCoinListExchangeRateOfCoinsGuardsMap: FieldGuardsMap<KuCoinListExchangeRateOfCoins> = {
+    ...kuCoinResponseResultWithTimeStampGuardsMap,
+    ...kuCoinSuccessResponseResultGuardsMap,
+    data: {
+        currencies: {
+            this: isArray as (value: any) => value is KuCoinListExchangeRateOfCoins['data']['currencies'],
+            every: (value: any): value is KuCoinListExchangeRateOfCoins['data']['currencies'][0] => {
+                return typeof value[0] === 'string' && typeof value[1] === 'string';
+            }
+        },
+        rates: (value: any): value is KuCoinListExchangeRateOfCoins['data']['rates'] => {
+            /*
+                When we request a rate of an unknown/wrong coin, KuCoin gives us a data with the empty 'rates' field,
+                whose type is array, that is, the 'rates' field is an empty array.
+                So we check a value here for an empty array, and if so, then we return true.
+            */
+            if (Array.isArray(value) && !value.length)
+                return true;
+            return value && Object.getOwnPropertyNames(value).every(cryptoName => {
+                return value[cryptoName] && Object.getOwnPropertyNames(value[cryptoName]).every(currencyName => {
+                    return typeof value[cryptoName][currencyName] === 'number';
+                });
+            });
+        }
+    }
 };
 
 const coinTickGuardsMap = {

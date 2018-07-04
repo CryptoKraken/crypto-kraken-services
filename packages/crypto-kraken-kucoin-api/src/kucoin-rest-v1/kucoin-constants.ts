@@ -1,5 +1,6 @@
 const constants = {
     serverProductionUrl: 'https://api.kucoin.com',
+    listExchangeRateOfCoinsUri: '/v1/open/currencies',
     tradesUri: '/v1/open/deal-orders',
     tickUri: '/v1/open/tick',
     orderBooksUri: '/v1/open/orders',

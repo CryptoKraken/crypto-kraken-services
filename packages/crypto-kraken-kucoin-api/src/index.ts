@@ -9,5 +9,6 @@ export {
     KuCoinResponseResult,
     KuCoinErrorResponseResult,
     KuCoinSuccessResponseResult,
+    KuCoinListExchangeRateOfCoins,
     KuCoinConstants
 } from './kucoin-rest-v1/index';

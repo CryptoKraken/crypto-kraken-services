@@ -20,6 +20,25 @@ export interface KuCoinSuccessResponseResult extends KuCoinResponseResult {
     msg: string;
 }
 
+export interface KuCoinResponseResultWithTimeStamp extends KuCoinResponseResult {
+    timestamp: number;
+}
+
+export type KuCoinListExchangeRateOfCoins<K extends keyof any = string> = KuCoinSuccessResponseResult &
+    KuCoinResponseResultWithTimeStamp & {
+    data: {
+        currencies: Array<[
+            /*Currency name*/ string,
+            /*Currency symbol*/ string
+        ]>,
+        rates: {
+            [P in K]: {
+                [currencyName: string]: number
+            }
+        }
+    }
+};
+
 interface CoinTick {
     coinType: string;
     trading: boolean;

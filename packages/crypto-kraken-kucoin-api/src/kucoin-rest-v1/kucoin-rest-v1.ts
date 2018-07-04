@@ -5,6 +5,7 @@ import {
     kuCoinAllCoinsTickGuardsMap,
     kuCoinBuyOrderBookGuardsMap,
     kuCoinErrorResponseResultGuardsMap,
+    kuCoinListExchangeRateOfCoinsGuardsMap,
     kuCoinOrderBookGuardsMap,
     kuCoinResponseResultGuardsMap,
     kuCoinSellOrderBookGuardsMap,
@@ -14,6 +15,7 @@ import {
     KuCoinAllCoinsTick,
     KuCoinBuyOrderBook,
     KuCoinErrorResponseResult,
+    KuCoinListExchangeRateOfCoins,
     KuCoinOrderBook,
     KuCoinOrderType,
     KuCoinSellOrderBook,
@@ -45,6 +47,36 @@ export class KuCoinRestV1 {
 
         this.serverUri = serverUri;
         this.nonceFactory = nonceFactory;
+    }
+
+    async listExchangeRateOfCoins(parameters?: {
+        coins?: string[]
+    }): Promise<KuCoinListExchangeRateOfCoins | KuCoinErrorResponseResult>;
+    async listExchangeRateOfCoins<T extends FieldsSelector<KuCoinListExchangeRateOfCoins>>(
+        parameters?: { coins?: string[] }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListExchangeRateOfCoins, T> | KuCoinErrorResponseResult>;
+    async listExchangeRateOfCoins<T>(
+        parameters?: { coins?: string[] }, checkFields?: T
+    ): Promise<KuCoinListExchangeRateOfCoins | FieldsSelectorResult<KuCoinListExchangeRateOfCoins, T> |
+    KuCoinErrorResponseResult> {
+        const requestOptions: request.RequestPromiseOptions = {
+            baseUrl: this.serverUri
+        };
+        if (parameters && parameters.coins && parameters.coins.length > 0)
+            requestOptions.qs = {
+                coins: parameters.coins.join(',')
+            };
+        const rawResponseResult = await request.get(KuCoinConstants.listExchangeRateOfCoinsUri, requestOptions);
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListExchangeRateOfCoins, T>(
+            responseResult, kuCoinListExchangeRateOfCoinsGuardsMap, checkFields
+        )))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list exchange rate of coins type.`);
+        return responseResult;
     }
 
     async tick(): Promise<KuCoinAllCoinsTick | KuCoinErrorResponseResult>;
