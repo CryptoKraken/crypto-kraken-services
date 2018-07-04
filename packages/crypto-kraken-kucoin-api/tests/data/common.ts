@@ -4,7 +4,8 @@ export const commonCases = {
     commonError: {
         success: false,
         code: 'ERROR',
-        msg: 'This is a fake error for tests'
+        msg: 'This is a fake error for tests',
+        timestamp: 1530718094413
     } as KuCoinErrorResponseResult
 };
 
