@@ -1,29 +1,27 @@
 import { CurrencyPair, FieldsSelector, FieldsSelectorResult, is } from 'crypto-kraken-core';
 import * as request from 'request-promise-native';
 import { KuCoinConstants } from './kucoin-constants';
-import {
-    kuCoinAllCoinsTickGuardsMap,
-    kuCoinBuyOrderBookGuardsMap,
-    kuCoinErrorResponseResultGuardsMap,
-    kuCoinListExchangeRateOfCoinsGuardsMap,
-    kuCoinListLanguagesGuardsMap,
-    kuCoinOrderBookGuardsMap,
-    kuCoinResponseResultGuardsMap,
-    kuCoinSellOrderBookGuardsMap,
-    kuCoinTickGuardsMap
-} from './kucoin-guards';
+import { KuCoinUtils } from './kucoin-utils';
 import {
     KuCoinAllCoinsTick,
-    KuCoinBuyOrderBook,
+    kuCoinAllCoinsTickGuardsMap,
+    KuCoinBuyOrderBooks,
+    kuCoinBuyOrderBooksGuardsMap,
     KuCoinErrorResponseResult,
+    kuCoinErrorResponseResultGuardsMap,
     KuCoinListExchangeRateOfCoins,
+    kuCoinListExchangeRateOfCoinsGuardsMap,
     KuCoinListLanguages,
-    KuCoinOrderBook,
+    kuCoinListLanguagesGuardsMap,
+    KuCoinOrderBooks,
+    kuCoinOrderBooksGuardsMap,
     KuCoinOrderType,
-    KuCoinSellOrderBook,
-    KuCoinTick
-} from './kucoin-types';
-import { KuCoinUtils } from './kucoin-utils';
+    kuCoinResponseResultGuardsMap,
+    KuCoinSellOrderBooks,
+    kuCoinSellOrderBooksGuardsMap,
+    KuCoinTick,
+    kuCoinTickGuardsMap
+} from './types';
 
 export interface KuCoinRestV1Options {
     serverUri: string;
@@ -157,13 +155,13 @@ export class KuCoinRestV1 {
         throw new Error(`The result ${responseResult} isn't the KuCoin tick type.`);
     }
 
-    async orderBooks(parameters: OrderBooksParameters): Promise<KuCoinOrderBook | KuCoinErrorResponseResult>;
-    async orderBooks<T extends FieldsSelector<KuCoinOrderBook>>(
+    async orderBooks(parameters: OrderBooksParameters): Promise<KuCoinOrderBooks | KuCoinErrorResponseResult>;
+    async orderBooks<T extends FieldsSelector<KuCoinOrderBooks>>(
         parameters: OrderBooksParameters, checkFields?: T
-    ): Promise<FieldsSelectorResult<KuCoinOrderBook, T> | KuCoinErrorResponseResult>;
+    ): Promise<FieldsSelectorResult<KuCoinOrderBooks, T> | KuCoinErrorResponseResult>;
     async orderBooks<T>(
         parameters: OrderBooksParameters, checkFields?: T
-    ): Promise<KuCoinOrderBook | FieldsSelectorResult<KuCoinOrderBook, T> | KuCoinErrorResponseResult> {
+    ): Promise<KuCoinOrderBooks | FieldsSelectorResult<KuCoinOrderBooks, T> | KuCoinErrorResponseResult> {
         const rawResponseResult = await request.get(KuCoinConstants.orderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
@@ -178,18 +176,18 @@ export class KuCoinRestV1 {
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
-        if (!(is<KuCoinOrderBook, T>(responseResult, kuCoinOrderBookGuardsMap, checkFields)))
+        if (!(is<KuCoinOrderBooks, T>(responseResult, kuCoinOrderBooksGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin order book type.`);
         return responseResult;
     }
 
-    async buyOrderBooks(parameters: BuyOrderBooksParameters): Promise<KuCoinBuyOrderBook | KuCoinErrorResponseResult>;
-    async buyOrderBooks<T extends FieldsSelector<KuCoinBuyOrderBook>>(
+    async buyOrderBooks(parameters: BuyOrderBooksParameters): Promise<KuCoinBuyOrderBooks | KuCoinErrorResponseResult>;
+    async buyOrderBooks<T extends FieldsSelector<KuCoinBuyOrderBooks>>(
         parameters: BuyOrderBooksParameters, checkFields?: T
-    ): Promise<FieldsSelectorResult<KuCoinBuyOrderBook, T> | KuCoinErrorResponseResult>;
+    ): Promise<FieldsSelectorResult<KuCoinBuyOrderBooks, T> | KuCoinErrorResponseResult>;
     async buyOrderBooks<T>(
         parameters: BuyOrderBooksParameters, checkFields?: T
-    ): Promise<KuCoinBuyOrderBook | FieldsSelectorResult<KuCoinBuyOrderBook, T> | KuCoinErrorResponseResult> {
+    ): Promise<KuCoinBuyOrderBooks | FieldsSelectorResult<KuCoinBuyOrderBooks, T> | KuCoinErrorResponseResult> {
         const rawResponseResult = await request.get(KuCoinConstants.buyOrderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
@@ -203,20 +201,20 @@ export class KuCoinRestV1 {
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
-        if (!(is<KuCoinBuyOrderBook, T>(responseResult, kuCoinBuyOrderBookGuardsMap, checkFields)))
+        if (!(is<KuCoinBuyOrderBooks, T>(responseResult, kuCoinBuyOrderBooksGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin buy order book type.`);
         return responseResult;
     }
 
     async sellOrderBooks(
         parameters: SellOrderBooksParameters
-    ): Promise<KuCoinSellOrderBook | KuCoinErrorResponseResult>;
-    async sellOrderBooks<T extends FieldsSelector<KuCoinSellOrderBook>>(
+    ): Promise<KuCoinSellOrderBooks | KuCoinErrorResponseResult>;
+    async sellOrderBooks<T extends FieldsSelector<KuCoinSellOrderBooks>>(
         parameters: SellOrderBooksParameters, checkFields?: T
-    ): Promise<FieldsSelectorResult<KuCoinSellOrderBook, T> | KuCoinErrorResponseResult>;
+    ): Promise<FieldsSelectorResult<KuCoinSellOrderBooks, T> | KuCoinErrorResponseResult>;
     async sellOrderBooks<T>(
         parameters: SellOrderBooksParameters, checkFields?: T
-    ): Promise<KuCoinSellOrderBook | FieldsSelectorResult<KuCoinSellOrderBook, T> | KuCoinErrorResponseResult> {
+    ): Promise<KuCoinSellOrderBooks | FieldsSelectorResult<KuCoinSellOrderBooks, T> | KuCoinErrorResponseResult> {
         const rawResponseResult = await request.get(KuCoinConstants.sellOrderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
@@ -230,7 +228,7 @@ export class KuCoinRestV1 {
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
-        if (!(is<KuCoinSellOrderBook, T>(responseResult, kuCoinSellOrderBookGuardsMap, checkFields)))
+        if (!(is<KuCoinSellOrderBooks, T>(responseResult, kuCoinSellOrderBooksGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin sell order book type.`);
         return responseResult;
     }
