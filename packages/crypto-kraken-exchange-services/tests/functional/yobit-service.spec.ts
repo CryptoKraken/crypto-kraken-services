@@ -8,7 +8,6 @@ describe('The Yobit service', () => {
 
     before(() => {
         service = new YobitService();
-        service.requestTryCount = 0;
         credentials = {
             apiKey: testsConfig.exchangeCredentials.yobit.apiKey,
             secret: testsConfig.exchangeCredentials.yobit.secret
