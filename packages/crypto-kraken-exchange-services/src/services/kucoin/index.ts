@@ -1,2 +1,1 @@
-export { KuCoinService } from './kucoin-service';
-export { KuCoinExchangeCredentials } from './kucoin-exchange-credentials';
+export * from './kucoin-rest-v1';

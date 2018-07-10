@@ -1,6 +1,6 @@
 import { isArray, isBoolean, isNumber, isString } from 'util';
-import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderInfo, OrderType } from '../../core';
-import { Identified } from '../../utils';
+import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderInfo, OrderType } from '../../../core';
+import { Identified } from '../../../utils';
 import {
     KuCoinActiveOrder, KuCoinActiveOrders, KuCoinCreatedOrder,
     KuCoinCurrencyBalance, KuCoinOrder, KuCoinOrderBook, KuCoinOrderInfo, KuCoinOrderType, KuCoinTrade

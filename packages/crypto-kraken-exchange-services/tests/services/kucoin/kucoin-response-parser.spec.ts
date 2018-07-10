@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
-import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-response-parser';
+import { KuCoinResponseParser } from '../../../src/services/kucoin/kucoin-rest-v1/kucoin-response-parser';
 import {
     activeOrderCases, createOrderCases, currencyBalancesCases,
     deleteOrderCases, orderBookCases, orderInfoCases,
