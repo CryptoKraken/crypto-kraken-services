@@ -244,7 +244,7 @@ export class KuCoinRestV1 {
     ): Promise<
     KuCoinListTradingMarkets | FieldsSelectorResult<KuCoinListTradingMarkets, T> | KuCoinErrorResponseResult
     > {
-        const rawResponseResult = await request.get(KuCoinConstants.listTradingMarkets, {
+        const rawResponseResult = await request.get(KuCoinConstants.listTradingMarketsUri, {
             baseUrl: this.serverUri
         });
 

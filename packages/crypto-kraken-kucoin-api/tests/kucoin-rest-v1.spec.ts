@@ -262,7 +262,7 @@ describe('The KuCoin REST service of the V1 version', () => {
 
     it('should get a list of trading markets correctly', async () => {
         nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.listTradingMarkets)
+            .get(KuCoinConstants.listTradingMarketsUri)
             .reply(200, listTradingMarketsCases.default);
 
         const listTradingMarkets = await kuCoin.listTradingMarkets();
@@ -273,7 +273,7 @@ describe('The KuCoin REST service of the V1 version', () => {
     // tslint:disable-next-line:max-line-length
     it('should throw an exception when a response container wrong data in the get a list of trading markets operation', async () => {
         nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.listTradingMarkets)
+            .get(KuCoinConstants.listTradingMarketsUri)
             .reply(200, wrongListTradingMarketsCases.withWrongCoinName);
 
         const expectedExceptionMessage = /isn't the KuCoin list of trading markets/;
@@ -281,7 +281,7 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should throw an exception when a response is wrong', async () => {
-        const nockScope = nock(KuCoinConstants.serverProductionUrl)
+        nock(KuCoinConstants.serverProductionUrl)
             .persist()
             .get(() => true)
             .query(true)
@@ -302,7 +302,7 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should return an error object when a response contained an error', async () => {
-        const nockScope = nock(KuCoinConstants.serverProductionUrl)
+        nock(KuCoinConstants.serverProductionUrl)
             .persist()
             .get(() => true)
             .query(true)
