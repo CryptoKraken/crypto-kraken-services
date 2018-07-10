@@ -7,10 +7,10 @@ import { KuCoinConstants, KuCoinRestV1 } from 'src';
 import {
     buyOrderBooksCases, commonCases,
     listExchangeRateOfCoinsCases, listLanguagesCases,
-    orderBooksCases, sellOrderBooksCases, tickCases,
-    wrongBuyOrderBooksCases, wrongCommonCases, wrongListExchangeRateOfCoinsCases,
-    wrongListLanguagesCases, wrongOrderBooksCases,
-    wrongSellOrderBooksCases, wrongTickCases
+    listTradingMarketsCases, orderBooksCases, sellOrderBooksCases,
+    tickCases, wrongBuyOrderBooksCases, wrongCommonCases,
+    wrongListExchangeRateOfCoinsCases, wrongListLanguagesCases,
+    wrongListTradingMarketsCases, wrongOrderBooksCases, wrongSellOrderBooksCases, wrongTickCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -258,6 +258,26 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get a list of trading markets correctly', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingMarkets)
+            .reply(200, listTradingMarketsCases.default);
+
+        const listTradingMarkets = await kuCoin.listTradingMarkets();
+
+        expect(listTradingMarkets).to.eql(listTradingMarketsCases.default);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response container wrong data in the get a list of trading markets operation', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingMarkets)
+            .reply(200, wrongListTradingMarketsCases.withWrongCoinName);
+
+        const expectedExceptionMessage = /isn't the KuCoin list of trading markets/;
+        expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should throw an exception when a response is wrong', async () => {
         const nockScope = nock(KuCoinConstants.serverProductionUrl)
             .persist()
@@ -275,6 +295,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
         nockScope.persist(false);
     });
 
@@ -294,6 +315,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.orderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.buyOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.sellOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
+        expect(await kuCoin.listTradingMarkets()).to.eql(commonCases.commonError);
         nockScope.persist(false);
     });
 });

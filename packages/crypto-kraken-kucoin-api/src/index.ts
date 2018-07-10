@@ -1,5 +1,6 @@
 export {
     KuCoinRestV1,
+    KuCoinRestV1Options,
     KuCoinOrderType,
     KuCoinTick,
     KuCoinListLanguages,
@@ -11,5 +12,6 @@ export {
     KuCoinErrorResponseResult,
     KuCoinSuccessResponseResult,
     KuCoinListExchangeRateOfCoins,
+    KuCoinListTradingMarkets,
     KuCoinConstants
 } from './kucoin-rest-v1';

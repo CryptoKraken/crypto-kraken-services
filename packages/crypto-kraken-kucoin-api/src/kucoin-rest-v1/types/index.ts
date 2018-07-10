@@ -7,4 +7,5 @@ export { KuCoinTick, kuCoinTickGuardsMap, KuCoinAllCoinsTick, kuCoinAllCoinsTick
 export { KuCoinOrderBooks, kuCoinOrderBooksGuardsMap } from './order-books';
 export { KuCoinBuyOrderBooks, kuCoinBuyOrderBooksGuardsMap } from './buy-order-books';
 export { KuCoinSellOrderBooks, kuCoinSellOrderBooksGuardsMap } from './sell-order-books';
+export { KuCoinListTradingMarkets, kuCoinListTradingMarketsGuardsMap } from './list-trading-markets';
 export { KuCoinOrderType, isKuCoinOrderType } from './order-type';
