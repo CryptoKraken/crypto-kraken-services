@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
-import { KuCoinService } from '../../../src/services/kucoin';
-import { KuCoinConstants } from '../../../src/services/kucoin/constants';
-import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-exchange-credentials';
+import { KuCoinRestV1 } from '../../../src/services/kucoin';
+import { KuCoinConstants } from '../../../src/services/kucoin/kucoin-rest-v1/constants';
+import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-rest-v1/kucoin-exchange-credentials';
 import {
     activeOrderCases, createOrderCases,
     currencyBalancesCases, deleteOrderCases,
@@ -11,7 +11,7 @@ import {
 } from './data';
 
 describe('KuCoin Exchange Service', () => {
-    let kuCoinService: KuCoinService;
+    let kuCoinService: KuCoinRestV1;
 
     const isHeaderHasValueRegEx = /./;
     const getNockAuthHeaders = (expectedAuthHeaderValues?: Partial<KuCoinAuthRequestHeaders>): {
@@ -25,7 +25,7 @@ describe('KuCoin Exchange Service', () => {
     });
 
     beforeEach(() => {
-        kuCoinService = new KuCoinService();
+        kuCoinService = new KuCoinRestV1();
     });
 
     it('should get trades correctly', async () => {

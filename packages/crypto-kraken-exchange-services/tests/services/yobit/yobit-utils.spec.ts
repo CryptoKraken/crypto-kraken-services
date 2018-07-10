@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { YobitUtils } from '../../../src/services/yobit/yobit-utils';
+import { YobitUtils } from '../../../src/services/yobit/yobit-rest-v3/yobit-utils';
 
 describe('YobitUtils', () => {
     it('should generate a pair symbol correctly', () => {

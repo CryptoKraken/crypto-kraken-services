@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
 import { Identified, Order, OrderType } from '../../../src';
-import { YobitService } from '../../../src/services/yobit';
-import { YobitConstants } from '../../../src/services/yobit/constants';
-import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-signature-maker';
+import { YobitRestV3 } from '../../../src/services/yobit';
+import { YobitConstants } from '../../../src/services/yobit/yobit-rest-v3/constants';
+import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-rest-v3/yobit-signature-maker';
 import { balanceCases, createOrderCases, deleteOrderCases, orderBookCases, tradesCases } from './data';
 
 describe('Yobit Exchange Service', () => {
@@ -11,10 +11,10 @@ describe('Yobit Exchange Service', () => {
     const defaultRootPrivateApiUrl = YobitConstants.getRootPrivateApiUrl(YobitConstants.rootServerUrl);
     const orderBookPostfix = YobitConstants.getOrderBookUri(['ltc', 'btc']);
     const tradesUrlPostfix = YobitConstants.getTradesUri(['ltc', 'btc']);
-    let exchangeService: YobitService;
+    let exchangeService: YobitRestV3;
 
     beforeEach(() => {
-        exchangeService = new YobitService();
+        exchangeService = new YobitRestV3();
     });
 
     it('should allow changing the exchange server url', async () => {

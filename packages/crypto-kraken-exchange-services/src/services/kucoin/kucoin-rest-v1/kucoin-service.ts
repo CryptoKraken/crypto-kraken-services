@@ -2,8 +2,8 @@ import * as request from 'request-promise-native';
 import {
     AuthenticatedRestExchangeService, CurrencyBalance, CurrencyPair,
     Order, OrderBook, OrderInfo, RestExchangeService
-} from '../../core';
-import { Identified } from '../../utils';
+} from '../../../core';
+import { Identified } from '../../../utils';
 import { KuCoinConstants } from './constants';
 import { KuCoinAuthRequestHeaders, KuCoinExchangeCredentials } from './kucoin-exchange-credentials';
 import { kuCoinNonceFactory } from './kucoin-nonce-factory';
@@ -11,7 +11,7 @@ import { KuCoinResponseParser } from './kucoin-response-parser';
 import { KuCoinSignatureMaker } from './kucoin-signature-maker';
 import { KuCoinUtils } from './kucoin-utils';
 
-export class KuCoinService implements RestExchangeService, AuthenticatedRestExchangeService {
+export class KuCoinRestV1 implements RestExchangeService, AuthenticatedRestExchangeService {
     private _kuCoinSignatureMaker: KuCoinSignatureMaker = new KuCoinSignatureMaker();
     private _kuCoinResponseParser: KuCoinResponseParser = new KuCoinResponseParser();
     private _kuCoinNonceFactory: () => Promise<number> | number = kuCoinNonceFactory;

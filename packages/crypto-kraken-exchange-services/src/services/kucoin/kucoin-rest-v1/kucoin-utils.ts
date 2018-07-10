@@ -1,4 +1,4 @@
-import { OrderType } from '../../core';
+import { OrderType } from '../../../core';
 import { KuCoinOrderType } from './kucoin-types';
 
 export const KuCoinUtils = {

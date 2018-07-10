@@ -1,6 +1,6 @@
 import { isArray, isNumber } from 'util';
-import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../core';
-import { Identified } from '../../utils/identifier';
+import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../../core';
+import { Identified } from '../../../utils/identifier';
 import { YobitUtils } from './yobit-utils';
 
 interface YobitTrade {

@@ -2,8 +2,8 @@ import * as request from 'request-promise-native';
 import {
     AuthenticatedRestExchangeService, CurrencyBalance, CurrencyPair,
     Order, OrderBook, OrderInfo, RestExchangeService
-} from '../../core';
-import { Identified } from '../../utils';
+} from '../../../core';
+import { Identified } from '../../../utils';
 import { YobitConstants } from './constants';
 import { YobitExchangeCredentials } from './yobit-exchange-credentials';
 import { yobitNonceFactory } from './yobit-nonce-factory';
@@ -11,7 +11,7 @@ import { YobitResponseParser } from './yobit-response-parser';
 import { YobitSignatureMaker } from './yobit-signature-maker';
 import { YobitUtils } from './yobit-utils';
 
-export class YobitService implements RestExchangeService, AuthenticatedRestExchangeService {
+export class YobitRestV3 implements RestExchangeService, AuthenticatedRestExchangeService {
     private responseParser: YobitResponseParser = new YobitResponseParser();
     private _signatureMaker: YobitSignatureMaker = new YobitSignatureMaker();
     private _nonceFactory: () => Promise<number> | number = yobitNonceFactory;

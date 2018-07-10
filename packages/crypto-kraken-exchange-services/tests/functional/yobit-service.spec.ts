@@ -1,13 +1,13 @@
 import { expect } from 'chai';
-import { Identified, Order, OrderType, YobitExchangeCredentials, YobitService } from '../../src';
+import { Identified, Order, OrderType, YobitExchangeCredentials, YobitRestV3 } from '../../src';
 import { testsConfig } from './tests.config';
 
 describe('The Yobit service', () => {
-    let service: YobitService;
+    let service: YobitRestV3;
     let credentials: YobitExchangeCredentials;
 
     before(() => {
-        service = new YobitService();
+        service = new YobitRestV3();
         credentials = {
             apiKey: testsConfig.exchangeCredentials.yobit.apiKey,
             secret: testsConfig.exchangeCredentials.yobit.secret

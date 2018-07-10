@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { KuCoinSignatureMaker } from '../../../src/services/kucoin/kucoin-signature-maker';
+import { KuCoinSignatureMaker } from '../../../src/services/kucoin/kucoin-rest-v1/kucoin-signature-maker';
 import { exchangeCredentialsCases } from './data/exchange-credentials';
 
 describe('KuCoin Signature Maker', () => {
