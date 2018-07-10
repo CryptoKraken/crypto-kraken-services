@@ -20,6 +20,7 @@ describe('The KuCoin REST service of the V1 version', () => {
 
     beforeEach(() => {
         kuCoin = new KuCoinRestV1();
+        nock.cleanAll();
     });
 
     it('should take a partial object of options and set default values for undefined options', () => {
@@ -76,8 +77,9 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongListExchangeRateOfCoinsCases.currencyWithMissingSymbol);
 
         const expectedExceptionMessage = /isn't the KuCoin list exchange rate of coins type/;
-        expect(kuCoin.listExchangeRateOfCoins()).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listExchangeRateOfCoins()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] }))
+            .to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should get a tick correctly', async () => {
@@ -122,9 +124,9 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongTickCases.withoutDateTime);
 
         const expectedExceptionMessage = /isn't the KuCoin tick type/;
-        expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should get a languages list correctly', async () => {
@@ -144,7 +146,7 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongListLanguagesCases.withoutLanguageCode);
 
         const expectedExceptionMessage = /isn't the KuCoin language list type/;
-        expect(kuCoin.listLanguages()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listLanguages()).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should get an order book correctly', async () => {
@@ -183,9 +185,9 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongOrderBooksCases.dataWithWrongOrderTypeName);
 
         const expectedExceptionMessage = /isn't the KuCoin order book type/;
-        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should get a buy order book correctly', async () => {
@@ -219,8 +221,8 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongBuyOrderBooksCases.orderWithMissingAmount);
 
         const expectedExceptionMessage = /isn't the KuCoin buy order book type/;
-        expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should get a sell order book correctly', async () => {
@@ -254,8 +256,8 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongSellOrderBooksCases.orderWithMissingAmount);
 
         const expectedExceptionMessage = /isn't the KuCoin sell order book type/;
-        expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should get a list of trading markets correctly', async () => {
@@ -275,7 +277,7 @@ describe('The KuCoin REST service of the V1 version', () => {
             .reply(200, wrongListTradingMarketsCases.withWrongCoinName);
 
         const expectedExceptionMessage = /isn't the KuCoin list of trading markets/;
-        expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should throw an exception when a response is wrong', async () => {
@@ -287,16 +289,16 @@ describe('The KuCoin REST service of the V1 version', () => {
 
         const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         const expectedExceptionMessage = /isn't a KuCoin response result/;
-        expect(kuCoin.listExchangeRateOfCoins()).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.listLanguages()).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
-        nockScope.persist(false);
+        await expect(kuCoin.listExchangeRateOfCoins()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] }))
+            .to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listLanguages()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should return an error object when a response contained an error', async () => {
@@ -316,6 +318,5 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.buyOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.sellOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.listTradingMarkets()).to.eql(commonCases.commonError);
-        nockScope.persist(false);
     });
 });
