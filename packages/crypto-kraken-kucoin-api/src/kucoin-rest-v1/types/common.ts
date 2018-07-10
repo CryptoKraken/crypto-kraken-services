@@ -4,6 +4,10 @@ export type OrderBookOrder = [
     /* Volume */ number
 ];
 
+export const isNullOrNumber = (value: any): value is number | null => {
+    return value === null || typeof value === 'number';
+};
+
 export const kuCoinCommentGuard = (value: any): value is string | undefined => {
     return value === undefined || typeof value === 'string';
 };

@@ -7,10 +7,12 @@ import { KuCoinConstants, KuCoinRestV1 } from 'src';
 import {
     buyOrderBooksCases, commonCases,
     listExchangeRateOfCoinsCases, listLanguagesCases,
-    listTradingMarketsCases, orderBooksCases, sellOrderBooksCases,
-    tickCases, wrongBuyOrderBooksCases, wrongCommonCases,
-    wrongListExchangeRateOfCoinsCases, wrongListLanguagesCases,
-    wrongListTradingMarketsCases, wrongOrderBooksCases, wrongSellOrderBooksCases, wrongTickCases
+    listTradingMarketsCases, listTradingSymbolsTickCases, orderBooksCases,
+    sellOrderBooksCases, tickCases, wrongBuyOrderBooksCases,
+    wrongCommonCases, wrongListExchangeRateOfCoinsCases,
+    wrongListLanguagesCases, wrongListTradingMarketsCases,
+    wrongListTradingSymbolsTickCases, wrongOrderBooksCases,
+    wrongSellOrderBooksCases, wrongTickCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -271,13 +273,82 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     // tslint:disable-next-line:max-line-length
-    it('should throw an exception when a response container wrong data in the get a list of trading markets operation', async () => {
+    it('should throw an exception when a response contained wrong data in the get a list of trading markets operation', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.listTradingMarketsUri)
             .reply(200, wrongListTradingMarketsCases.withWrongCoinName);
 
         const expectedExceptionMessage = /isn't the KuCoin list of trading markets/;
         await expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
+    it('should get a list of trading symbols tick correctly', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .query({
+                market: 'BTC'
+            })
+            .reply(200, listTradingSymbolsTickCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .query({
+                market: 'AAA'
+            })
+            .reply(200, listTradingSymbolsTickCases.withEmptyData);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .reply(200, listTradingSymbolsTickCases.default);
+
+        const tickAllMarkets = await kuCoin.listTradingSymbolsTick();
+        const tickBtcMarket = await kuCoin.listTradingSymbolsTick({ market: 'BTC' });
+        const emptyMarket = await kuCoin.listTradingSymbolsTick({ market: 'AAA' });
+
+        expect(tickAllMarkets).to.eql(listTradingSymbolsTickCases.default);
+        expect(tickBtcMarket).to.eql(listTradingSymbolsTickCases.default);
+        expect(emptyMarket).to.eql(listTradingSymbolsTickCases.withEmptyData);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get a list of trading symbols tick operation', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .query({
+                market: 'BTC'
+            })
+            .reply(200, wrongListTradingSymbolsTickCases.withoutCoinType);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .query({
+                market: 'AAA'
+            })
+            .reply(200, wrongListTradingSymbolsTickCases.withoutCoinType);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .reply(200, wrongListTradingSymbolsTickCases.withoutCoinType);
+
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .query({
+                market: 'BTC'
+            })
+            .reply(200, wrongListTradingSymbolsTickCases.withoutSymbol);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .query({
+                market: 'AAA'
+            })
+            .reply(200, wrongListTradingSymbolsTickCases.withoutSymbol);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTradingSymbolsTickUri)
+            .reply(200, wrongListTradingSymbolsTickCases.withoutSymbol);
+
+        const expectedExceptionMessage = /isn't the KuCoin list of trading symbols tick/;
+        await expect(kuCoin.listTradingSymbolsTick()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingSymbolsTick({ market: 'AAA' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingSymbolsTick()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingSymbolsTick({ market: 'AAA' })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should throw an exception when a response is wrong', async () => {
@@ -299,6 +370,8 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingSymbolsTick()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should return an error object when a response contained an error', async () => {
@@ -318,5 +391,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.buyOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.sellOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.listTradingMarkets()).to.eql(commonCases.commonError);
+        expect(await kuCoin.listTradingSymbolsTick()).to.eql(commonCases.commonError);
+        expect(await kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.eql(commonCases.commonError);
     });
 });

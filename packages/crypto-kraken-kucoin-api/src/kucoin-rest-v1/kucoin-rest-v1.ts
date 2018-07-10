@@ -15,6 +15,8 @@ import {
     kuCoinListLanguagesGuardsMap,
     KuCoinListTradingMarkets,
     kuCoinListTradingMarketsGuardsMap,
+    KuCoinListTradingSymbolsTick,
+    kuCoinListTradingSymbolsTickGuardsMap,
     KuCoinOrderBooks,
     kuCoinOrderBooksGuardsMap,
     KuCoinOrderType,
@@ -254,6 +256,35 @@ export class KuCoinRestV1 {
 
         if (!(is<KuCoinListTradingMarkets, T>(responseResult, kuCoinListTradingMarketsGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trading markets.`);
+        return responseResult;
+    }
+
+    async listTradingSymbolsTick(
+        parameters?: { market?: string }
+    ): Promise<KuCoinListTradingSymbolsTick | KuCoinErrorResponseResult>;
+    async listTradingSymbolsTick<T extends FieldsSelector<KuCoinListTradingSymbolsTick>>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListTradingSymbolsTick, T> | KuCoinErrorResponseResult>;
+    async listTradingSymbolsTick<T>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<
+    KuCoinListTradingSymbolsTick | FieldsSelectorResult<KuCoinListTradingSymbolsTick, T> | KuCoinErrorResponseResult
+    > {
+        const requestOptions: request.RequestPromiseOptions = {
+            baseUrl: this.serverUri
+        };
+        if (parameters && parameters.market)
+            requestOptions.qs = {
+                market: parameters.market
+            };
+        const rawResponseResult = await request.get(KuCoinConstants.listTradingSymbolsTickUri, requestOptions);
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListTradingSymbolsTick, T>(responseResult, kuCoinListTradingSymbolsTickGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of trading symbols tick.`);
         return responseResult;
     }
 

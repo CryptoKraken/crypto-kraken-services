@@ -13,5 +13,6 @@ export {
     KuCoinSuccessResponseResult,
     KuCoinListExchangeRateOfCoins,
     KuCoinListTradingMarkets,
+    KuCoinListTradingSymbolsTick,
     KuCoinConstants
 } from './kucoin-rest-v1';

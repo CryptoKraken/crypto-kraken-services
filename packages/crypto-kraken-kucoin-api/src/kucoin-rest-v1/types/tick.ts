@@ -1,23 +1,24 @@
 import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
+import { isNullOrNumber } from 'src/kucoin-rest-v1/types/common';
 import { KuCoinSuccessResponseResult, kuCoinSuccessResponseResultGuardsMap } from './success-response-result';
 
-interface CoinTick {
+export interface CoinTick {
     coinType: string;
     trading: boolean;
     symbol: string;
-    lastDealPrice: number;
-    buy: number;
-    sell: number;
+    lastDealPrice: number | null;
+    buy: number | null;
+    sell: number | null;
     change: number;
     coinTypePair: string;
     sort: number;
     feeRate: number;
     volValue: number;
-    high: number;
+    high: number | null;
     datetime: number;
     vol: number;
-    low: number;
-    changeRate: number;
+    low: number | null;
+    changeRate: number | null;
 }
 export interface KuCoinTick extends KuCoinSuccessResponseResult {
     data: CoinTick;
@@ -27,23 +28,23 @@ export interface KuCoinAllCoinsTick extends KuCoinSuccessResponseResult {
     data: CoinTick[];
 }
 
-const coinTickGuardsMap = {
+export const coinTickGuardsMap = {
     coinType: isString,
     trading: isBoolean,
     symbol: isString,
-    lastDealPrice: isNumber,
-    buy: isNumber,
-    sell: isNumber,
+    lastDealPrice: isNullOrNumber,
+    buy: isNullOrNumber,
+    sell: isNullOrNumber,
     change: isNumber,
     coinTypePair: isString,
     sort: isNumber,
     feeRate: isNumber,
     volValue: isNumber,
-    high: isNumber,
+    high: isNullOrNumber,
     datetime: isNumber,
     vol: isNumber,
-    low: isNumber,
-    changeRate: isNumber
+    low: isNullOrNumber,
+    changeRate: isNullOrNumber
 };
 export const kuCoinTickGuardsMap: FieldGuardsMap<KuCoinTick> = {
     ...kuCoinSuccessResponseResultGuardsMap,
