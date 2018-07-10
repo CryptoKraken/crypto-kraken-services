@@ -10,7 +10,6 @@ describe('The KuCoin service', () => {
 
     before(() => {
         kuCoinService = new KuCoinService();
-        kuCoinService.requestTryCount = 0;
         kuCoinExchangeCredentials = {
             apiKey: testsConfig.exchangeCredentials.kuCoin.apiKey,
             secret: testsConfig.exchangeCredentials.kuCoin.secret

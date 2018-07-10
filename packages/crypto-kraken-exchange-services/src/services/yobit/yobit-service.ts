@@ -3,7 +3,7 @@ import {
     AuthenticatedRestExchangeService, CurrencyBalance, CurrencyPair,
     Order, OrderBook, OrderInfo, RestExchangeService
 } from '../../core';
-import { Identified, RepeatPromise } from '../../utils';
+import { Identified } from '../../utils';
 import { YobitConstants } from './constants';
 import { YobitExchangeCredentials } from './yobit-exchange-credentials';
 import { yobitNonceFactory } from './yobit-nonce-factory';
@@ -16,11 +16,6 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
     private _signatureMaker: YobitSignatureMaker = new YobitSignatureMaker();
     private _nonceFactory: () => Promise<number> | number = yobitNonceFactory;
     private _rootServerUrl: string = YobitConstants.rootServerUrl;
-    private _requestTryCount: number;
-
-    constructor(requestTryCount: number = 3) {
-        this._requestTryCount = requestTryCount;
-    }
 
     get rootServerUrl(): string {
         return this._rootServerUrl;
@@ -46,34 +41,22 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
         this._nonceFactory = value;
     }
 
-    get requestTryCount() {
-        return this._requestTryCount;
+    async getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
+        const responseResult = await request.get(YobitConstants.getOrderBookUri(pair), {
+            baseUrl: YobitConstants.getRootPublicApiUrl(this.rootServerUrl),
+            qs: maxLimit ? { limit: maxLimit } : undefined
+        });
+
+        return this.responseParser.parseOrderBook(responseResult, pair);
     }
 
-    set requestTryCount(value: number) {
-        this._requestTryCount = value;
-    }
+    async getTrades(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
+        const responseResult = await request.get(YobitConstants.getTradesUri(pair), {
+            baseUrl: YobitConstants.getRootPublicApiUrl(this.rootServerUrl),
+            qs: maxLimit ? { limit: maxLimit } : undefined
+        });
 
-    getOrderBook(pair: CurrencyPair, maxLimit?: number): Promise<OrderBook> {
-        return new RepeatPromise((resolve, reject) => {
-            request.get(YobitConstants.getOrderBookUri(pair), {
-                baseUrl: YobitConstants.getRootPublicApiUrl(this.rootServerUrl),
-                qs: maxLimit ? { limit: maxLimit } : undefined
-            })
-                .then(value => resolve(this.responseParser.parseOrderBook(value, pair)))
-                .catch(reason => reject(reason));
-        }, this.requestTryCount);
-    }
-
-    getTrades(pair: CurrencyPair, maxLimit?: number): Promise<Order[]> {
-        return new RepeatPromise((resolve, reject) => {
-            request.get(YobitConstants.getTradesUri(pair), {
-                baseUrl: YobitConstants.getRootPublicApiUrl(this.rootServerUrl),
-                qs: maxLimit ? { limit: maxLimit } : undefined
-            })
-                .then(value => resolve(this.responseParser.parseTrades(value, pair)))
-                .catch(reason => reject(reason));
-        }, this.requestTryCount);
+        return this.responseParser.parseTrades(responseResult, pair);
     }
 
     async createOrder(order: Order, exchangeCredentials: YobitExchangeCredentials): Promise<Identified<Order>> {
@@ -87,13 +70,13 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
         };
 
         const authHeaders = await this.getAuthHeaders(exchangeCredentials, params);
-        const response = await request.post('/', {
+        const responseResult = await request.post('/', {
             baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
             headers: authHeaders,
             form: params
         });
 
-        return this.responseParser.parseCreateOrder(response, order);
+        return this.responseParser.parseCreateOrder(responseResult, order);
     }
 
     async deleteOrder(
@@ -107,43 +90,42 @@ export class YobitService implements RestExchangeService, AuthenticatedRestExcha
         };
 
         const authHeaders = await this.getAuthHeaders(exchangeCredentials, params);
-        const response = await request.post('/', {
+        const responseResult = await request.post('/', {
             baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
             headers: authHeaders,
             form: params
         });
 
-        this.responseParser.parseDeleteOrder(response, identifiedOrder.id);
+        this.responseParser.parseDeleteOrder(responseResult, identifiedOrder.id);
     }
-    getOrderInfo(
+
+    async getOrderInfo(
         identifiedOrder: Identified<Order>,
         exchangeCredentials: YobitExchangeCredentials
     ): Promise<OrderInfo> {
         throw new Error('Method not implemented.');
     }
-    getActiveOrders(
+
+    async getActiveOrders(
         pair: CurrencyPair,
         exchangeCredentials: YobitExchangeCredentials
     ): Promise<Array<Identified<Order>>> {
         throw new Error('Method not implemented.');
     }
 
-    getBalance(currency: string, exchangeCredentials: YobitExchangeCredentials): Promise<CurrencyBalance> {
-        return new RepeatPromise(async (resolve, reject) => {
-            const params = {
-                method: YobitConstants.balanceMethod,
-                nonce: await this.nonceFactory()
-            };
+    async getBalance(currency: string, exchangeCredentials: YobitExchangeCredentials): Promise<CurrencyBalance> {
+        const params = {
+            method: YobitConstants.balanceMethod,
+            nonce: await this.nonceFactory()
+        };
+        const authHeaders = this.getAuthHeaders(exchangeCredentials, params);
+        const responseResult = await request.post('/', {
+            baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
+            headers: authHeaders,
+            form: params
+        });
 
-            const authHeaders = this.getAuthHeaders(exchangeCredentials, params);
-            request.post('/', {
-                baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
-                headers: authHeaders,
-                form: params
-            })
-                .then(value => resolve(this.responseParser.parseBalance(value, currency)))
-                .catch(reason => reject(reason));
-        }, this.requestTryCount);
+        return this.responseParser.parseBalance(responseResult, currency);
     }
 
     private getAuthHeaders(
