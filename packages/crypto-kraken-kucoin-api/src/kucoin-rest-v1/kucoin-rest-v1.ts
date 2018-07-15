@@ -17,6 +17,8 @@ import {
     kuCoinListTradingMarketsGuardsMap,
     KuCoinListTradingSymbolsTick,
     kuCoinListTradingSymbolsTickGuardsMap,
+    KuCoinListTrendings,
+    kuCoinListTrendingsGuardsMap,
     KuCoinOrderBooks,
     kuCoinOrderBooksGuardsMap,
     KuCoinOrderType,
@@ -322,6 +324,35 @@ export class KuCoinRestV1 {
 
         if (!(is<KuCoinListTradingSymbolsTick, T>(responseResult, kuCoinListTradingSymbolsTickGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trading symbols tick.`);
+        return responseResult;
+    }
+
+    async listTrendings(
+        parameters?: { market?: string }
+    ): Promise<KuCoinListTrendings | KuCoinErrorResponseResult>;
+    async listTrendings<T extends FieldsSelector<KuCoinListTrendings>>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListTrendings, T> | KuCoinErrorResponseResult>;
+    async listTrendings<T>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<
+    KuCoinListTrendings | FieldsSelectorResult<KuCoinListTrendings, T> | KuCoinErrorResponseResult
+    > {
+        const requestOptions: request.RequestPromiseOptions = {
+            baseUrl: this.serverUri
+        };
+        if (parameters && parameters.market)
+            requestOptions.qs = {
+                market: parameters.market
+            };
+        const rawResponseResult = await request.get(KuCoinConstants.listTrendingsUri, requestOptions);
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListTrendings, T>(responseResult, kuCoinListTrendingsGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of trending.`);
         return responseResult;
     }
 

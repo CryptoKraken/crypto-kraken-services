@@ -10,6 +10,7 @@ const constants = {
     recentlyDealOrdersUri: '/v1/open/deal-orders',
     listTradingMarketsUri: '/v1/open/markets',
     listTradingSymbolsTickUri: '/v1/market/open/symbols',
+    listTrendingsUri: '/v1/market/open/coins-trending',
     createOrderUri: '/v1/order',
     deleteOrderUri: '/v1/cancel-order',
     activeOrdersUri: '/v1/order/active',

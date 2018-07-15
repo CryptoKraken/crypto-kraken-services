@@ -7,12 +7,14 @@ import { KuCoinConstants, KuCoinRestV1 } from 'src';
 import {
     buyOrderBooksCases, commonCases,
     listExchangeRateOfCoinsCases, listLanguagesCases,
-    listTradingMarketsCases, listTradingSymbolsTickCases, orderBooksCases,
-    recentlyDealOrdersCases, sellOrderBooksCases, tickCases,
-    wrongBuyOrderBooksCases, wrongCommonCases,
-    wrongListExchangeRateOfCoinsCases, wrongListLanguagesCases,
-    wrongListTradingMarketsCases, wrongListTradingSymbolsTickCases,
-    wrongOrderBooksCases, wrongRecentlyDealOrdersCases, wrongSellOrderBooksCases, wrongTickCases
+    listTradingMarketsCases, listTradingSymbolsTickCases, listTrendingsCases,
+    orderBooksCases, recentlyDealOrdersCases, sellOrderBooksCases,
+    tickCases, wrongBuyOrderBooksCases,
+    wrongCommonCases, wrongListExchangeRateOfCoinsCases,
+    wrongListLanguagesCases, wrongListTradingMarketsCases,
+    wrongListTradingSymbolsTickCases, wrongListTrendingsCases,
+    wrongOrderBooksCases, wrongRecentlyDealOrdersCases,
+    wrongSellOrderBooksCases, wrongTickCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -402,6 +404,64 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.listTradingSymbolsTick({ market: 'AAA' })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get a list of trending', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTrendingsUri)
+            .query({
+                market: 'BTC'
+            })
+            .reply(200, listTrendingsCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTrendingsUri)
+            .query({
+                market: 'BTC'
+            })
+            .reply(200, listTrendingsCases.ethNeoAndBtc);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTrendingsUri)
+            .query({
+                market: 'AAA'
+            })
+            .reply(200, listTrendingsCases.withEmptyData);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTrendingsUri)
+            .reply(200, listTrendingsCases.default);
+
+        const allMarketsTrending = await kuCoin.listTrendings();
+        const btcTrending1 = await kuCoin.listTrendings({ market: 'BTC' });
+        const btcTrending2 = await kuCoin.listTrendings({ market: 'BTC' });
+        const wrongMarketTrending = await kuCoin.listTrendings({ market: 'AAA' });
+
+        expect(allMarketsTrending).to.eql(listTrendingsCases.default);
+        expect(btcTrending1).to.eql(listTrendingsCases.default);
+        expect(btcTrending2).to.eql(listTrendingsCases.ethNeoAndBtc);
+        expect(wrongMarketTrending).to.eql(listTrendingsCases.withEmptyData);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get a list of trending operation', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTrendingsUri)
+            .query({
+                market: 'BTC'
+            })
+            .reply(200, wrongListTrendingsCases.withoutCoinPair);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTrendingsUri)
+            .query({
+                market: 'AAA'
+            })
+            .reply(200, wrongListTrendingsCases.withoutCoinPair);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listTrendingsUri)
+            .reply(200, wrongListTrendingsCases.withoutCoinPair);
+
+        const expectedExceptionMessage = /isn't the KuCoin list of trending/;
+        await expect(kuCoin.listTrendings()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTrendings({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTrendings({ market: 'AAA' })).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should throw an exception when a response is wrong', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .persist()
@@ -425,6 +485,8 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTradingSymbolsTick()).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTrendings()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listTrendings({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should return an error object when a response contained an error', async () => {
@@ -447,5 +509,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.listTradingMarkets()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTradingSymbolsTick()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.eql(commonCases.commonError);
+        expect(await kuCoin.listTrendings()).to.eql(commonCases.commonError);
+        expect(await kuCoin.listTrendings({ market: 'BTC' })).to.eql(commonCases.commonError);
     });
 });

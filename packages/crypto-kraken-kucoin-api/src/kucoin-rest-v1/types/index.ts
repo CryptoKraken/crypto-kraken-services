@@ -10,4 +10,5 @@ export { KuCoinSellOrderBooks, kuCoinSellOrderBooksGuardsMap } from './sell-orde
 export { KuCoinRecentlyDealOrders, kuCoinRecentlyDealOrdersGuardsMap } from './recently-deal-orders';
 export { KuCoinListTradingMarkets, kuCoinListTradingMarketsGuardsMap } from './list-trading-markets';
 export { KuCoinListTradingSymbolsTick, kuCoinListTradingSymbolsTickGuardsMap } from './list-trading-symbols-tick';
+export { KuCoinListTrendings, kuCoinListTrendingsGuardsMap } from './list-trendings';
 export { KuCoinOrderType, isKuCoinOrderType } from './order-type';
