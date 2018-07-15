@@ -8,11 +8,11 @@ import {
     buyOrderBooksCases, commonCases,
     listExchangeRateOfCoinsCases, listLanguagesCases,
     listTradingMarketsCases, listTradingSymbolsTickCases, orderBooksCases,
-    sellOrderBooksCases, tickCases, wrongBuyOrderBooksCases,
-    wrongCommonCases, wrongListExchangeRateOfCoinsCases,
-    wrongListLanguagesCases, wrongListTradingMarketsCases,
-    wrongListTradingSymbolsTickCases, wrongOrderBooksCases,
-    wrongSellOrderBooksCases, wrongTickCases
+    recentlyDealOrdersCases, sellOrderBooksCases, tickCases,
+    wrongBuyOrderBooksCases, wrongCommonCases,
+    wrongListExchangeRateOfCoinsCases, wrongListLanguagesCases,
+    wrongListTradingMarketsCases, wrongListTradingSymbolsTickCases,
+    wrongOrderBooksCases, wrongRecentlyDealOrdersCases, wrongSellOrderBooksCases, wrongTickCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -262,6 +262,57 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get recently deal orders correctly', async () => {
+        const defaultCurrencyPair: CurrencyPair = { 0: 'BTC', 1: 'USDT' };
+        const ethBtcCurrencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .query({
+                symbol: `${defaultCurrencyPair[0]}-${defaultCurrencyPair[1]}`
+            })
+            .reply(200, recentlyDealOrdersCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`
+            })
+            .reply(200, recentlyDealOrdersCases.ethAndBtc);
+
+        const defaultRecentlyDealOrders = await kuCoin.recentlyDealOrders({ symbol: defaultCurrencyPair });
+        const ethBtcDealOrders = await kuCoin.recentlyDealOrders({ symbol: ethBtcCurrencyPair });
+
+        expect(defaultRecentlyDealOrders).to.eql(recentlyDealOrdersCases.default);
+        expect(ethBtcDealOrders).to.eql(recentlyDealOrdersCases.ethAndBtc);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get recently deal orders operation', async () => {
+        const currencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .reply(200, wrongRecentlyDealOrdersCases.withWrongOrders);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .reply(200, wrongRecentlyDealOrdersCases.oneOrderWithoutOrderType);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.recentlyDealOrdersUri)
+            .query({
+                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+            })
+            .reply(200, wrongRecentlyDealOrdersCases.oneOrderWithoutPrice);
+
+        const expectedExceptionMessage = /isn't the KuCoin list of recently deal orders/;
+        await expect(kuCoin.recentlyDealOrders({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.recentlyDealOrders({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.recentlyDealOrders({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should get a list of trading markets correctly', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.listTradingMarketsUri)
@@ -369,6 +420,8 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.recentlyDealOrders({ symbol: { 0: 'ETH', 1: 'BTC' } }))
+            .to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTradingSymbolsTick()).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
@@ -390,6 +443,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.orderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.buyOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
         expect(await kuCoin.sellOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
+        expect(await kuCoin.recentlyDealOrders({ symbol: { 0: 'ETH', 1: 'BTC' } })).to.eql(commonCases.commonError);
         expect(await kuCoin.listTradingMarkets()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTradingSymbolsTick()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.eql(commonCases.commonError);

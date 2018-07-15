@@ -7,6 +7,7 @@ const constants = {
     orderBooksUri: '/v1/open/orders',
     buyOrderBooksUri: '/v1/open/orders-buy',
     sellOrderBooksUri: '/v1/open/orders-sell',
+    recentlyDealOrdersUri: '/v1/open/deal-orders',
     listTradingMarketsUri: '/v1/open/markets',
     listTradingSymbolsTickUri: '/v1/market/open/symbols',
     createOrderUri: '/v1/order',

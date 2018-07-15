@@ -20,6 +20,8 @@ import {
     KuCoinOrderBooks,
     kuCoinOrderBooksGuardsMap,
     KuCoinOrderType,
+    KuCoinRecentlyDealOrders,
+    kuCoinRecentlyDealOrdersGuardsMap,
     kuCoinResponseResultGuardsMap,
     KuCoinSellOrderBooks,
     kuCoinSellOrderBooksGuardsMap,
@@ -54,6 +56,12 @@ interface BuyOrderBooksParameters {
 }
 
 type SellOrderBooksParameters = BuyOrderBooksParameters;
+
+interface RecentlyDealOrdersParameters {
+    symbol: CurrencyPair;
+    limit?: number;
+    since?: number;
+}
 
 export class KuCoinRestV1 {
     readonly serverUri: string;
@@ -234,6 +242,35 @@ export class KuCoinRestV1 {
 
         if (!(is<KuCoinSellOrderBooks, T>(responseResult, kuCoinSellOrderBooksGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin sell order book type.`);
+        return responseResult;
+    }
+
+    async recentlyDealOrders(
+        parameters: RecentlyDealOrdersParameters
+    ): Promise<KuCoinRecentlyDealOrders | KuCoinErrorResponseResult>;
+    async recentlyDealOrders<T extends FieldsSelector<KuCoinRecentlyDealOrders>>(
+        parameters: RecentlyDealOrdersParameters, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinRecentlyDealOrders, T> | KuCoinErrorResponseResult>;
+    async recentlyDealOrders<T>(
+        parameters: RecentlyDealOrdersParameters, checkFields?: T
+    ): Promise<
+    KuCoinRecentlyDealOrders | FieldsSelectorResult<KuCoinRecentlyDealOrders, T> | KuCoinErrorResponseResult
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.recentlyDealOrdersUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                symbol: KuCoinUtils.getSymbol(parameters.symbol),
+                limit: parameters.limit,
+                since: parameters.since
+            }
+        });
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinRecentlyDealOrders, T>(responseResult, kuCoinRecentlyDealOrdersGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of recently deal orders.`);
         return responseResult;
     }
 

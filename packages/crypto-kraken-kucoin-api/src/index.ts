@@ -8,6 +8,7 @@ export {
     KuCoinOrderBooks,
     KuCoinBuyOrderBooks,
     KuCoinSellOrderBooks,
+    KuCoinRecentlyDealOrders,
     KuCoinResponseResult,
     KuCoinErrorResponseResult,
     KuCoinSuccessResponseResult,
