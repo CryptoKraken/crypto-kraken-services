@@ -11,6 +11,8 @@ export type DeepPartial<T> = {
     [P in keyof T]?: DeepPartial<T[P]>;
 };
 
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export type FieldsSelector<T> = {
     [P in keyof T]?: T[P] extends Array<infer U> ? (
         FieldsSelector<U> | true

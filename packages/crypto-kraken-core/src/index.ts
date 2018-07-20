@@ -19,6 +19,7 @@ export {
     CurrencyPair,
     DeepPartial,
     DeepReadonly,
+    Omit,
     FieldsSelector,
     FieldsSelectorResult
 } from './types';
