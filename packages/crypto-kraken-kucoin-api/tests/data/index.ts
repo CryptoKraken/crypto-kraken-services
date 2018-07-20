@@ -9,3 +9,5 @@ export * from './list-exchange-rate-of-coins';
 export * from './list-trading-markets';
 export * from './list-trading-symbols-tick';
 export * from './list-trendings';
+export * from './coin-info';
+export * from './list-coins';

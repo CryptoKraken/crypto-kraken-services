@@ -5,16 +5,17 @@ import { CurrencyPair } from 'crypto-kraken-core';
 import * as nock from 'nock';
 import { KuCoinConstants, KuCoinRestV1 } from 'src';
 import {
-    buyOrderBooksCases, commonCases,
-    listExchangeRateOfCoinsCases, listLanguagesCases,
-    listTradingMarketsCases, listTradingSymbolsTickCases, listTrendingsCases,
-    orderBooksCases, recentlyDealOrdersCases, sellOrderBooksCases,
+    buyOrderBooksCases, coinInfoCases,
+    commonCases, listCoinsCases,
+    listExchangeRateOfCoinsCases, listLanguagesCases, listTradingMarketsCases,
+    listTradingSymbolsTickCases, listTrendingsCases, orderBooksCases,
+    recentlyDealOrdersCases, sellOrderBooksCases,
     tickCases, wrongBuyOrderBooksCases,
-    wrongCommonCases, wrongListExchangeRateOfCoinsCases,
+    wrongCoinInfoCases, wrongCommonCases,
+    wrongListCoinsCases, wrongListExchangeRateOfCoinsCases,
     wrongListLanguagesCases, wrongListTradingMarketsCases,
     wrongListTradingSymbolsTickCases, wrongListTrendingsCases,
-    wrongOrderBooksCases, wrongRecentlyDealOrdersCases,
-    wrongSellOrderBooksCases, wrongTickCases
+    wrongOrderBooksCases, wrongRecentlyDealOrdersCases, wrongSellOrderBooksCases, wrongTickCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -462,6 +463,83 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.listTrendings({ market: 'AAA' })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get a coin info', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getCoinInfoUri)
+            .query({
+                coin: 'BTC'
+            })
+            .reply(200, coinInfoCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getCoinInfoUri)
+            .query({
+                coin: 'ETH'
+            })
+            .reply(200, coinInfoCases.ethInfo);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getCoinInfoUri)
+            .query({
+                coin: 'KCS'
+            })
+            .reply(200, coinInfoCases.kcsInfo);
+
+        const btcInfo = await kuCoin.getCoinInfo({ coin: 'BTC' });
+        const ethInfo = await kuCoin.getCoinInfo({ coin: 'ETH' });
+        const kcsInfo = await kuCoin.getCoinInfo({ coin: 'KCS' });
+
+        expect(btcInfo).to.eql(coinInfoCases.default);
+        expect(ethInfo).to.eql(coinInfoCases.ethInfo);
+        expect(kcsInfo).to.eql(coinInfoCases.kcsInfo);
+    });
+
+    it('should throw an exception when a response contained wrong data in the get a coin info operation', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getCoinInfoUri)
+            .query({
+                coin: 'ETH'
+            })
+            .reply(200, wrongCoinInfoCases.withoutCoinType);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getCoinInfoUri)
+            .query({
+                coin: 'KCS'
+            })
+            .reply(200, wrongCoinInfoCases.txUrlUndefined);
+
+        const expectedExceptionMessage = /isn't the KuCoin coin info type/;
+        await expect(kuCoin.getCoinInfo({ coin: 'ETH' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.getCoinInfo({ coin: 'KCS' })).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
+    it('should get a list of coin infos', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listCoinsUri)
+            .reply(200, listCoinsCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listCoinsUri)
+            .reply(200, listCoinsCases.btcAndEthAndKcs);
+
+        const defaultCoinInfos = await kuCoin.listCoins();
+        const btcAndEthAndKcsInfos = await kuCoin.listCoins();
+
+        expect(defaultCoinInfos).to.eql(listCoinsCases.default);
+        expect(btcAndEthAndKcsInfos).to.eql(listCoinsCases.btcAndEthAndKcs);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get a list of coin infos operation', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listCoinsUri)
+            .reply(200, wrongListCoinsCases.withoutCoinType);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.listCoinsUri)
+            .reply(200, wrongListCoinsCases.txUrlUndefined);
+
+        const expectedExceptionMessage = /isn't the KuCoin list of coin infos/;
+        await expect(kuCoin.listCoins()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listCoins()).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should throw an exception when a response is wrong', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .persist()
@@ -487,6 +565,8 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTrendings()).to.be.rejectedWith(expectedExceptionMessage);
         await expect(kuCoin.listTrendings({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.getCoinInfo({ coin: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.listCoins()).to.be.rejectedWith(expectedExceptionMessage);
     });
 
     it('should return an error object when a response contained an error', async () => {
@@ -511,5 +591,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.eql(commonCases.commonError);
         expect(await kuCoin.listTrendings()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTrendings({ market: 'BTC' })).to.eql(commonCases.commonError);
+        expect(await kuCoin.getCoinInfo({ coin: 'BTC' })).to.eql(commonCases.commonError);
+        expect(await kuCoin.listCoins()).to.eql(commonCases.commonError);
     });
 });

@@ -16,5 +16,7 @@ export {
     KuCoinListTradingMarkets,
     KuCoinListTradingSymbolsTick,
     KuCoinListTrendings,
+    KuCoinCoinInfo,
+    KuCoinListCoins,
     KuCoinConstants
 } from './kucoin-rest-v1';

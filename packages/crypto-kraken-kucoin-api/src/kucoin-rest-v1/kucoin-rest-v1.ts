@@ -7,8 +7,12 @@ import {
     kuCoinAllCoinsTickGuardsMap,
     KuCoinBuyOrderBooks,
     kuCoinBuyOrderBooksGuardsMap,
+    KuCoinCoinInfo,
+    kuCoinCoinInfoGuardsMap,
     KuCoinErrorResponseResult,
     kuCoinErrorResponseResultGuardsMap,
+    KuCoinListCoins,
+    kuCoinListCoinsGuardsMap,
     KuCoinListExchangeRateOfCoins,
     kuCoinListExchangeRateOfCoinsGuardsMap,
     KuCoinListLanguages,
@@ -353,6 +357,51 @@ export class KuCoinRestV1 {
 
         if (!(is<KuCoinListTrendings, T>(responseResult, kuCoinListTrendingsGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trending.`);
+        return responseResult;
+    }
+
+    async getCoinInfo(
+        parameters: { coin: string }
+    ): Promise<KuCoinCoinInfo | KuCoinErrorResponseResult>;
+    async getCoinInfo<T extends FieldsSelector<KuCoinCoinInfo>>(
+        parameters: { coin: string }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinCoinInfo, T> | KuCoinErrorResponseResult>;
+    async getCoinInfo<T>(
+        parameters: { coin: string }, checkFields?: T
+    ): Promise<KuCoinCoinInfo | FieldsSelectorResult<KuCoinCoinInfo, T> | KuCoinErrorResponseResult> {
+        const rawResponseResult = await request.get(KuCoinConstants.getCoinInfoUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                coin: parameters.coin,
+            }
+        });
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinCoinInfo, T>(responseResult, kuCoinCoinInfoGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin coin info type.`);
+        return responseResult;
+    }
+
+    async listCoins(): Promise<KuCoinListCoins | KuCoinErrorResponseResult>;
+    async listCoins<T extends FieldsSelector<KuCoinListCoins>>(
+        checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListCoins, T> | KuCoinErrorResponseResult>;
+    async listCoins<T>(
+        checkFields?: T
+    ): Promise<KuCoinListCoins | FieldsSelectorResult<KuCoinListCoins, T> | KuCoinErrorResponseResult> {
+        const rawResponseResult = await request.get(KuCoinConstants.listCoinsUri, {
+            baseUrl: this.serverUri
+        });
+
+        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListCoins, T>(responseResult, kuCoinListCoinsGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of coin infos.`);
         return responseResult;
     }
 
