@@ -4,10 +4,12 @@ export interface KuCoinResponseResult {
     success: boolean;
     code: string;
     timestamp: number;
+    msg: string;
 }
 
 export const kuCoinResponseResultGuardsMap: FieldGuardsMap<KuCoinResponseResult> = {
     success: isBoolean,
     code: isString,
-    timestamp: isNumber
+    timestamp: isNumber,
+    msg: isString
 };
