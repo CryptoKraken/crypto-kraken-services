@@ -1,5 +1,5 @@
 import {
-    CurrencyPair, FieldsSelector, FieldsSelectorResult, is, Omit,
+    CurrencyPair, FieldGuardsMap, FieldsSelector, FieldsSelectorResult, is, Omit,
     TradingViewBarsArrays, tradingViewBarsArraysGuardsMap,
     TradingViewError, tradingViewErrorGuardsMap
 } from 'crypto-kraken-core';
@@ -48,10 +48,12 @@ import {
 export interface KuCoinRestV1Options {
     serverUri: string;
     nonceFactory: () => Promise<number> | number;
+    typeChecking: boolean;
 }
 
 const defaultKuCoinRestV1Options: KuCoinRestV1Options = {
     serverUri: KuCoinConstants.serverProductionUrl,
+    typeChecking: true,
     nonceFactory: () => {
         /* istanbul ignore next */
         throw new Error('Not implemented.');
@@ -99,13 +101,24 @@ export class KuCoinRestV1 {
     readonly serverUri: string;
     readonly nonceFactory: () => Promise<number> | number;
 
+    private _typeChecking: boolean;
+
     constructor(options?: Partial<KuCoinRestV1Options>) {
         const {
-            serverUri, nonceFactory
+            serverUri, nonceFactory, typeChecking
         } = options ? { ...defaultKuCoinRestV1Options, ...options } : { ...defaultKuCoinRestV1Options };
 
         this.serverUri = serverUri;
         this.nonceFactory = nonceFactory;
+        this._typeChecking = typeChecking;
+    }
+
+    get typeChecking() {
+        return this._typeChecking;
+    }
+
+    set typeChecking(value: boolean) {
+        this._typeChecking = value;
     }
 
     async listExchangeRateOfCoins(parameters?: {
@@ -126,13 +139,13 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.listExchangeRateOfCoinsUri, requestOptions);
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinListExchangeRateOfCoins, T>(
+        if (!this.checkResponseResult(
             responseResult, kuCoinListExchangeRateOfCoinsGuardsMap, checkFields
-        )))
+        ))
             throw new Error(`The result ${responseResult} isn't the KuCoin list exchange rate of coins type.`);
         return responseResult;
     }
@@ -148,11 +161,11 @@ export class KuCoinRestV1 {
             baseUrl: this.serverUri
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinListLanguages, T>(responseResult, kuCoinListLanguagesGuardsMap, checkFields)))
+        if (!(this.checkResponseResult(responseResult, kuCoinListLanguagesGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin language list type.`);
         return responseResult;
     }
@@ -188,12 +201,12 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.tickUri, requestOptions);
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if ((isAllCoins && is<KuCoinAllCoinsTick, T>(responseResult, kuCoinAllCoinsTickGuardsMap, checkFields)) ||
-            (!isAllCoins && is<KuCoinTick, T>(responseResult, kuCoinTickGuardsMap, checkFields)))
+        if ((isAllCoins && this.checkResponseResult(responseResult, kuCoinAllCoinsTickGuardsMap, checkFields)) ||
+            (!isAllCoins && this.checkResponseResult(responseResult, kuCoinTickGuardsMap, checkFields)))
             return responseResult;
         throw new Error(`The result ${responseResult} isn't the KuCoin tick type.`);
     }
@@ -215,11 +228,11 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinOrderBooks, T>(responseResult, kuCoinOrderBooksGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinOrderBooksGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin order book type.`);
         return responseResult;
     }
@@ -240,11 +253,11 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinBuyOrderBooks, T>(responseResult, kuCoinBuyOrderBooksGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinBuyOrderBooksGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin buy order book type.`);
         return responseResult;
     }
@@ -267,11 +280,11 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinSellOrderBooks, T>(responseResult, kuCoinSellOrderBooksGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinSellOrderBooksGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin sell order book type.`);
         return responseResult;
     }
@@ -294,11 +307,11 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinRecentlyDealOrders, T>(responseResult, kuCoinRecentlyDealOrdersGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinRecentlyDealOrdersGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of recently deal orders.`);
         return responseResult;
     }
@@ -314,11 +327,11 @@ export class KuCoinRestV1 {
             baseUrl: this.serverUri
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinListTradingMarkets, T>(responseResult, kuCoinListTradingMarketsGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinListTradingMarketsGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trading markets.`);
         return responseResult;
     }
@@ -341,11 +354,11 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.listTradingSymbolsTickUri, requestOptions);
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinListTradingSymbolsTick, T>(responseResult, kuCoinListTradingSymbolsTickGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinListTradingSymbolsTickGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trading symbols tick.`);
         return responseResult;
     }
@@ -368,11 +381,11 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.listTrendingsUri, requestOptions);
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinListTrendings, T>(responseResult, kuCoinListTrendingsGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinListTrendingsGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trending.`);
         return responseResult;
     }
@@ -391,10 +404,10 @@ export class KuCoinRestV1 {
         });
 
         const responseResult = JSON.parse(rawResponseResult);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinTradingViewKLineConfig, T>(responseResult, kuCoinTradingViewKLineConfigGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinTradingViewKLineConfigGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin KLine config of the Trading View.`);
         return responseResult;
     }
@@ -419,12 +432,12 @@ export class KuCoinRestV1 {
         });
 
         const responseResult = JSON.parse(rawResponseResult);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields) ||
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap) ||
             is<TradingViewError>(responseResult, tradingViewErrorGuardsMap)
         )
             return responseResult;
 
-        if (!(is<KuCoinTradingViewSymbolTick, T>(responseResult, kuCoinTradingViewSymbolTickGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinTradingViewSymbolTickGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin tick of the Trading View.`);
         return responseResult;
     }
@@ -452,12 +465,12 @@ export class KuCoinRestV1 {
         });
 
         const responseResult = JSON.parse(rawResponseResult);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields) ||
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap) ||
             is<TradingViewError>(responseResult, tradingViewErrorGuardsMap)
         )
             return responseResult;
 
-        if (!(is<TradingViewBarsArrays, T>(responseResult, tradingViewBarsArraysGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, tradingViewBarsArraysGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin KLineData type of the Trading View.`);
         return responseResult;
     }
@@ -478,11 +491,11 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinCoinInfo, T>(responseResult, kuCoinCoinInfoGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinCoinInfoGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin coin info type.`);
         return responseResult;
     }
@@ -498,18 +511,24 @@ export class KuCoinRestV1 {
             baseUrl: this.serverUri
         });
 
-        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
-        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 
-        if (!(is<KuCoinListCoins, T>(responseResult, kuCoinListCoinsGuardsMap, checkFields)))
+        if (!this.checkResponseResult(responseResult, kuCoinListCoinsGuardsMap, checkFields))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of coin infos.`);
         return responseResult;
     }
 
-    protected parseKuCoinResponseResult<T>(rawResponseResult: string, checkFields: T) {
+    protected checkResponseResult<T, S extends FieldsSelector<T>>(
+        responseResult: KuCoinResponseResult, fieldGuardMap: FieldGuardsMap<T>, checkFields: S | undefined
+    ): responseResult is KuCoinErrorResponseResult {
+        return !this.typeChecking || is<T, S>(responseResult, fieldGuardMap, checkFields);
+    }
+
+    protected parseKuCoinResponseResult(rawResponseResult: string) {
         const obj = JSON.parse(rawResponseResult);
-        if (is(obj, kuCoinResponseResultGuardsMap, checkFields))
+        if (is<KuCoinResponseResult>(obj, kuCoinResponseResultGuardsMap))
             return obj;
         throw new Error(`The result ${rawResponseResult} isn't a KuCoin response result.`);
     }
