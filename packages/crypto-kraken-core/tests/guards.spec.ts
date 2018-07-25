@@ -2,8 +2,11 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import { is, isArray, isBoolean, isFunction, isNumber, isString, isSymbol } from 'src';
-import { FieldGuardsMap } from 'src/guards';
+import { is, isArray, isBoolean, isFunction, isNullOrArray, isNumber, isString, isSymbol } from 'src';
+import {
+    FieldGuardsMap, isNullOrBoolean, isNullOrFunction,
+    isNullOrNumber, isNullOrString, isNullOrSymbol
+} from 'src/guards';
 import { TestType } from './test-types';
 chai.use(sinonChai);
 
@@ -510,15 +513,15 @@ describe(`The generic 'is' guard`, () => {
 });
 
 describe('The simple guards', () => {
-    it('should work like native guards', () => {
-        const arrayValue = [0, 1, 2];
-        const booleanValue = true;
-        const functionValue = (arg1: string, arg2: number) => arg1 + arg2;
-        const numberValue = 100;
-        const stringValue = 'string 0';
-        const symbolValue = Symbol('A custom symbol');
-        const values = [arrayValue, booleanValue, functionValue, numberValue, stringValue, symbolValue];
+    const arrayValue = [0, 1, 2];
+    const booleanValue = true;
+    const functionValue = (arg1: string, arg2: number) => arg1 + arg2;
+    const numberValue = 100;
+    const stringValue = 'string 0';
+    const symbolValue = Symbol('A custom symbol');
+    const values = [arrayValue, booleanValue, functionValue, numberValue, stringValue, symbolValue];
 
+    it('should work like native guards', () => {
         values.forEach(value => {
             expect(isArray(value)).to.eql(Array.isArray(value));
             expect(isBoolean(value)).to.eql(typeof value === 'boolean');
@@ -526,6 +529,23 @@ describe('The simple guards', () => {
             expect(isNumber(value)).to.eql(typeof value === 'number');
             expect(isString(value)).to.eql(typeof value === 'string');
             expect(isSymbol(value)).to.eql(typeof value === 'symbol');
+        });
+    });
+
+    it(`having the 'isNullOr' prefix should check null values or work like corresponding not-null guards`, () => {
+        values.forEach(value => {
+            expect(isNullOrArray(value)).to.eql(Array.isArray(value));
+            expect(isNullOrArray(null)).to.true;
+            expect(isNullOrBoolean(value)).to.eql(typeof value === 'boolean');
+            expect(isNullOrBoolean(null)).to.true;
+            expect(isNullOrFunction(value)).to.eql(typeof value === 'function');
+            expect(isNullOrFunction(null)).to.true;
+            expect(isNullOrNumber(value)).to.eql(typeof value === 'number');
+            expect(isNullOrNumber(null)).to.true;
+            expect(isNullOrString(value)).to.eql(typeof value === 'string');
+            expect(isNullOrString(null)).to.true;
+            expect(isNullOrSymbol(value)).to.eql(typeof value === 'symbol');
+            expect(isNullOrSymbol(null)).to.true;
         });
     });
 });

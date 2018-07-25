@@ -109,3 +109,51 @@ export const isString = (value: any): value is string => typeof value === 'strin
  * You shouldn't use them inside other guards, you should use native guards instead of.
  */
 export const isSymbol = (value: any): value is 'symbol' => typeof value === 'symbol';
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isNullOrArray = (value: any): value is any[] => {
+    return value === null || Array.isArray(value);
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isNullOrBoolean = (value: any): value is boolean => {
+    return value === null || typeof value === 'boolean';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isNullOrFunction = (value: any): value is 'function' => {
+    return value === null || typeof value === 'function';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isNullOrNumber = (value: any): value is number | null => {
+    return value === null || typeof value === 'number';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isNullOrString = (value: any): value is string | null => {
+    return value === null || typeof value === 'string';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isNullOrSymbol = (value: any): value is 'symbol' => {
+    return value === null || typeof value === 'symbol';
+};
