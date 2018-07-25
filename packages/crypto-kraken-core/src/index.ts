@@ -6,7 +6,13 @@ export {
     isFunction,
     isNumber,
     isString,
-    isSymbol
+    isSymbol,
+    isNullOrArray,
+    isNullOrBoolean,
+    isNullOrFunction,
+    isNullOrNumber,
+    isNullOrString,
+    isNullOrSymbol
 } from './guards';
 
 export {
