@@ -1,5 +1,4 @@
-import { FieldGuardsMap, isArray, isBoolean, isNumber, isString } from 'crypto-kraken-core';
-import { isNullOrNumber } from 'src/kucoin-rest-v1/types/common';
+import { FieldGuardsMap, isArray, isBoolean, isNullOrNumber, isNumber, isString } from 'crypto-kraken-core';
 import { KuCoinSuccessResponseResult, kuCoinSuccessResponseResultGuardsMap } from './success-response-result';
 
 export interface CoinTick {

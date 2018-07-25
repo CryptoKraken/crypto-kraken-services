@@ -1,4 +1,4 @@
-import { FieldGuardsMap, isBoolean, isNumber, isString } from 'crypto-kraken-core';
+import { FieldGuardsMap, isBoolean, isNullOrString, isNumber, isString } from 'crypto-kraken-core';
 
 export type OrderBookOrder = [
     /* Price */ number,
@@ -25,14 +25,6 @@ export interface CoinInfo {
     withdrawMinFee: number;
     withdrawRemark: string | null;
 }
-
-export const isNullOrNumber = (value: any): value is number | null => {
-    return value === null || typeof value === 'number';
-};
-
-export const isNullOrString = (value: any): value is string | null => {
-    return value === null || typeof value === 'string';
-};
 
 export const kuCoinCommentGuard = (value: any): value is string | undefined => {
     return value === undefined || typeof value === 'string';
