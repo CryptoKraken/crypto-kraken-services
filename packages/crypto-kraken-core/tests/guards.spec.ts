@@ -53,6 +53,9 @@ describe(`The generic 'is' guard`, () => {
             numberField: (value: any): value is number => typeof value === 'number',
             stringField: (value: any): value is string => typeof value === 'string',
             booleanField: (value: any): value is boolean => typeof value === 'boolean',
+            optionalNumberField: (value: any): value is number | undefined => {
+                return value === undefined || typeof value === 'number';
+            },
             objectField: {
                 numberField: (value: any): value is number => typeof value === 'number',
                 stringField: (value: any): value is string => typeof value === 'string',
@@ -97,6 +100,7 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
         expect(guardsMap.stringField).to.have.been.calledOnceWith(testObj.stringField);
         expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.optionalNumberField).to.have.been.calledOnceWith(undefined);
         // Check that the guards of fields of object types should be called
         expect(guardsMap.objectField.numberField).to.have.been.calledOnceWith(testObj.objectField.numberField);
         expect(guardsMap.objectField.stringField).to.have.been.calledOnceWith(testObj.objectField.stringField);
@@ -156,6 +160,7 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
         expect(guardsMap.stringField).to.have.been.calledOnceWith(testObj.stringField);
         expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.optionalNumberField).to.have.been.calledOnceWith(undefined);
         // Check that the guards of fields of object types should be called
         expect(guardsMap.objectField.numberField).to.have.been.calledOnceWith(testObj.objectField.numberField);
         expect(guardsMap.objectField.stringField).to.have.been.calledOnceWith(testObj.objectField.stringField);
@@ -201,6 +206,7 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.stringField).to.have.been.calledOnceWith(testObj.stringField);
 
         expect(guardsMap.booleanField).to.have.not.been.called;
+        expect(guardsMap.optionalNumberField).to.have.not.been.called;
         expect(guardsMap.objectField.numberField).to.have.not.been.called;
         expect(guardsMap.objectField.stringField).to.have.not.been.called;
         expect(guardsMap.objectField.objectField1.stringField1).to.have.not.been.called;
@@ -374,6 +380,7 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.numberField).to.have.not.been.called;
         expect(guardsMap.stringField).to.have.not.been.called;
         expect(guardsMap.booleanField).to.have.not.been.called;
+        expect(guardsMap.optionalNumberField).to.have.not.been.called;
         expect(guardsMap.objectField.numberField).to.have.not.been.called;
         expect(guardsMap.objectField.stringField).to.have.not.been.called;
         expect(guardsMap.objectField.objectField1.stringField1).to.have.not.been.called;
@@ -405,6 +412,7 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
         expect(guardsMap.stringField).to.have.not.been.called;
         expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.optionalNumberField).to.have.not.been.called;
         expect(guardsMap.objectField.numberField).to.have.not.been.called;
         expect(guardsMap.objectField.stringField).to.have.not.been.called;
         expect(guardsMap.objectField.objectField1.stringField1).to.have.not.been.called;
@@ -443,6 +451,7 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
         expect(guardsMap.stringField).to.have.not.been.called;
         expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.optionalNumberField).to.have.not.been.called;
         expect(guardsMap.objectField.numberField).to.have.been.calledOnceWith(testObj.objectField.numberField);
         expect(guardsMap.objectField.stringField).to.have.not.been;
         expect(guardsMap.objectField.objectField1.stringField1)
@@ -481,6 +490,7 @@ describe(`The generic 'is' guard`, () => {
         expect(guardsMap.numberField).to.have.been.calledOnceWith(testObj.numberField);
         expect(guardsMap.stringField).to.have.not.been.called;
         expect(guardsMap.booleanField).to.have.been.calledOnceWith(testObj.booleanField);
+        expect(guardsMap.optionalNumberField).to.have.not.been.called;
         expect(guardsMap.objectField.numberField).to.have.not.been.called;
         expect(guardsMap.objectField.stringField).to.have.not.been.called;
         expect(guardsMap.objectField.objectField1.stringField1).to.have.not.been.called;

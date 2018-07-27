@@ -1,7 +1,7 @@
 import { FieldsSelector, FieldsSelectorResult } from './types';
 
 export type FieldGuardsMap<T> = {
-    [P in keyof T]: ((value: any) => value is T[P]) | (
+    [P in keyof T]-?: ((value: any) => value is T[P]) | (
         T[P] extends Array<infer U> ? (
             { this?: ((value: any) => value is T[P]), every: FieldGuardsMap<U> | ((value: any) => value is U) }
         ) : (
