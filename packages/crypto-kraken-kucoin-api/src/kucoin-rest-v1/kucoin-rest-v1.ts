@@ -1,4 +1,8 @@
-import { CurrencyPair, FieldsSelector, FieldsSelectorResult, is } from 'crypto-kraken-core';
+import {
+    CurrencyPair, FieldsSelector, FieldsSelectorResult, is,
+    TradingViewBarsArrays, TradingViewBarsArraysError,
+    tradingViewBarsArraysErrorGuardsMap, tradingViewBarsArraysGuardsMap
+} from 'crypto-kraken-core';
 import * as request from 'request-promise-native';
 import { KuCoinConstants } from './kucoin-constants';
 import { KuCoinUtils } from './kucoin-utils';
@@ -67,6 +71,13 @@ interface RecentlyDealOrdersParameters {
     symbol: CurrencyPair;
     limit?: number;
     since?: number;
+}
+
+interface TradingViewKLineDataParameters {
+    symbol: CurrencyPair;
+    resolution: 1 | 5 | 15 | 30 | 60 | 480 | '1' | '5' | '15' | '30' | '60' | '480' | 'D' | 'W';
+    from: number;
+    to: number;
 }
 
 export class KuCoinRestV1 {
@@ -357,6 +368,39 @@ export class KuCoinRestV1 {
 
         if (!(is<KuCoinListTrendings, T>(responseResult, kuCoinListTrendingsGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trending.`);
+        return responseResult;
+    }
+
+    async getTradingViewKLineData(
+        parameters: TradingViewKLineDataParameters
+    ): Promise<TradingViewBarsArrays | TradingViewBarsArraysError | KuCoinErrorResponseResult>;
+    async getTradingViewKLineData<T extends FieldsSelector<TradingViewBarsArrays>>(
+        parameters: TradingViewKLineDataParameters, checkFields?: T
+    ): Promise<FieldsSelectorResult<TradingViewBarsArrays, T> | TradingViewBarsArraysError | KuCoinErrorResponseResult>;
+    async getTradingViewKLineData<T>(
+        parameters: TradingViewKLineDataParameters, checkFields?: T
+    ): Promise<
+    TradingViewBarsArrays | TradingViewBarsArraysError |
+    FieldsSelectorResult<TradingViewBarsArrays, T> | KuCoinErrorResponseResult
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineDataUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                symbol: KuCoinUtils.getSymbol(parameters.symbol),
+                resolution: parameters.resolution,
+                from: parameters.from,
+                to: parameters.to
+            }
+        });
+
+        const responseResult = JSON.parse(rawResponseResult);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields) ||
+            is<TradingViewBarsArraysError>(responseResult, tradingViewBarsArraysErrorGuardsMap)
+        )
+            return responseResult;
+
+        if (!(is<TradingViewBarsArrays, T>(responseResult, tradingViewBarsArraysGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin KLineData type of the Trading View.`);
         return responseResult;
     }
 

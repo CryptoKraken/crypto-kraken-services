@@ -22,3 +22,10 @@ export {
     FieldsSelector,
     FieldsSelectorResult
 } from './types';
+
+export {
+    TradingViewBarsArrays,
+    tradingViewBarsArraysGuardsMap,
+    TradingViewBarsArraysError,
+    tradingViewBarsArraysErrorGuardsMap
+} from './trading-view';

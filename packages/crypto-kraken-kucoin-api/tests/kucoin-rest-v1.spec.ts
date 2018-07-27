@@ -10,12 +10,13 @@ import {
     listExchangeRateOfCoinsCases, listLanguagesCases, listTradingMarketsCases,
     listTradingSymbolsTickCases, listTrendingsCases, orderBooksCases,
     recentlyDealOrdersCases, sellOrderBooksCases,
-    tickCases, wrongBuyOrderBooksCases,
-    wrongCoinInfoCases, wrongCommonCases,
-    wrongListCoinsCases, wrongListExchangeRateOfCoinsCases,
-    wrongListLanguagesCases, wrongListTradingMarketsCases,
-    wrongListTradingSymbolsTickCases, wrongListTrendingsCases,
-    wrongOrderBooksCases, wrongRecentlyDealOrdersCases, wrongSellOrderBooksCases, wrongTickCases
+    tickCases, tradingViewKLineDataCases,
+    wrongBuyOrderBooksCases, wrongCoinInfoCases,
+    wrongCommonCases, wrongListCoinsCases,
+    wrongListExchangeRateOfCoinsCases, wrongListLanguagesCases,
+    wrongListTradingMarketsCases, wrongListTradingSymbolsTickCases,
+    wrongListTrendingsCases, wrongOrderBooksCases, wrongRecentlyDealOrdersCases, wrongSellOrderBooksCases,
+    wrongTickCases, wrongTradingViewKLineDataCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -463,6 +464,97 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.listTrendings({ market: 'AAA' })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get kline data (TradingView)', async () => {
+        const ethBtcCurrencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineDataUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`,
+                from: 1422018000,
+                to: 1532029207,
+                resolution: 'W'
+            })
+            .reply(200, tradingViewKLineDataCases.simple);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineDataUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`,
+                from: 1422018000,
+                to: 1532029207,
+                resolution: 'D'
+            })
+            .reply(200, tradingViewKLineDataCases.withNullValues);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineDataUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`,
+                from: 1532029207,
+                to: 1532029207,
+                resolution: '60'
+            })
+            .reply(200, tradingViewKLineDataCases.noData);
+
+        const weekKLineData = await kuCoin.getTradingViewKLineData({
+            symbol: ethBtcCurrencyPair,
+            from: 1422018000,
+            to: 1532029207,
+            resolution: 'W'
+        });
+        const dayKLineData = await kuCoin.getTradingViewKLineData({
+            symbol: ethBtcCurrencyPair,
+            from: 1422018000,
+            to: 1532029207,
+            resolution: 'D'
+        });
+        const emptyKLineData = await kuCoin.getTradingViewKLineData({
+            symbol: ethBtcCurrencyPair,
+            from: 1532029207,
+            to: 1532029207,
+            resolution: '60'
+        });
+
+        expect(weekKLineData).to.eql(tradingViewKLineDataCases.simple);
+        expect(dayKLineData).to.eql(tradingViewKLineDataCases.withNullValues);
+        expect(emptyKLineData).to.eql(tradingViewKLineDataCases.noData);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get kline data (TradingView)', async () => {
+        const ethBtcCurrencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineDataUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`,
+                from: 1422018000,
+                to: 1532029207,
+                resolution: 'W'
+            })
+            .reply(200, wrongTradingViewKLineDataCases.otherObject);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineDataUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`,
+                from: 1422018000,
+                to: 1532029207,
+                resolution: 'D'
+            })
+            .reply(200, wrongTradingViewKLineDataCases.withWrongStatus);
+
+        const expectedExceptionMessage = /isn't the KuCoin KLineData type of the Trading View/;
+        await expect(kuCoin.getTradingViewKLineData({
+            symbol: ethBtcCurrencyPair,
+            from: 1422018000,
+            to: 1532029207,
+            resolution: 'W'
+        })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.getTradingViewKLineData({
+            symbol: ethBtcCurrencyPair,
+            from: 1422018000,
+            to: 1532029207,
+            resolution: 'D'
+        })).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should get a coin info', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.getCoinInfoUri)
@@ -591,6 +683,12 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.eql(commonCases.commonError);
         expect(await kuCoin.listTrendings()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTrendings({ market: 'BTC' })).to.eql(commonCases.commonError);
+        expect(await kuCoin.getTradingViewKLineData({
+            symbol: { 0: 'ETH', 1: 'BTC' },
+            from: 1422018000,
+            to: 1532029207,
+            resolution: 'W'
+        })).to.eql(commonCases.commonError);
         expect(await kuCoin.getCoinInfo({ coin: 'BTC' })).to.eql(commonCases.commonError);
         expect(await kuCoin.listCoins()).to.eql(commonCases.commonError);
     });
