@@ -1,16 +1,15 @@
 import { expect } from 'chai';
-import { Identified, KuCoinExchangeCredentials, KuCoinService, Order, OrderType } from '../../src/index';
+import { Identified, KuCoinExchangeCredentials, KuCoinRestV1, Order, OrderType } from '../../src';
 import { testsConfig } from './tests.config';
 
 describe('The KuCoin service', () => {
-    let kuCoinService: KuCoinService;
+    let kuCoinService: KuCoinRestV1;
     let kuCoinExchangeCredentials: KuCoinExchangeCredentials;
     const minLimit = 0;
     const maxLimit = 1000;
 
     before(() => {
-        kuCoinService = new KuCoinService();
-        kuCoinService.requestTryCount = 0;
+        kuCoinService = new KuCoinRestV1();
         kuCoinExchangeCredentials = {
             apiKey: testsConfig.exchangeCredentials.kuCoin.apiKey,
             secret: testsConfig.exchangeCredentials.kuCoin.secret

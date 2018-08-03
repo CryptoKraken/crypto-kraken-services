@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-signature-maker';
+import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-rest-v3/yobit-signature-maker';
 
 describe('Yobit signature maker', () => {
     let signatureMaker: YobitSignatureMaker;

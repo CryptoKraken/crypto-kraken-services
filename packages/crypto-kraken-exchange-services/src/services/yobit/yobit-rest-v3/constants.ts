@@ -1,4 +1,4 @@
-import { CurrencyPair } from '../../core';
+import { CurrencyPair } from '../../../core';
 import { YobitUtils } from './yobit-utils';
 
 const constants = {

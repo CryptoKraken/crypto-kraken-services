@@ -1,4 +1,4 @@
-import { KuCoinSellOrderBook } from 'src';
+import { KuCoinSellOrderBooks } from 'src';
 
 export const sellOrderBooksCases = {
     /*
@@ -14,7 +14,7 @@ export const sellOrderBooksCases = {
             [18, 5, 90],
             [17, 5, 85]
         ]
-    } as KuCoinSellOrderBook
+    } as KuCoinSellOrderBooks
 };
 
 export const wrongSellOrderBooksCases = {
@@ -27,7 +27,7 @@ export const wrongSellOrderBooksCases = {
             [/* Missing required element */ 5, 90],
             [17, 5, 85]
         ]
-    } as KuCoinSellOrderBook,
+    } as KuCoinSellOrderBooks,
     orderWithMissingAmount: {
         success: true,
         code: 'OK',
@@ -37,5 +37,5 @@ export const wrongSellOrderBooksCases = {
             [18, 5, 90],
             [17, /* Missing required element */ 85]
         ]
-    } as KuCoinSellOrderBook
+    } as KuCoinSellOrderBooks
 };

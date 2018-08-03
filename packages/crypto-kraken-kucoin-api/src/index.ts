@@ -4,12 +4,12 @@ export {
     KuCoinTick,
     KuCoinListLanguages,
     KuCoinAllCoinsTick,
-    KuCoinOrderBook,
-    KuCoinBuyOrderBook,
-    KuCoinSellOrderBook,
+    KuCoinOrderBooks,
+    KuCoinBuyOrderBooks,
+    KuCoinSellOrderBooks,
     KuCoinResponseResult,
     KuCoinErrorResponseResult,
     KuCoinSuccessResponseResult,
     KuCoinListExchangeRateOfCoins,
     KuCoinConstants
-} from './kucoin-rest-v1/index';
+} from './kucoin-rest-v1';

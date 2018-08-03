@@ -1,4 +1,4 @@
-import { ExchangeCredentials } from '../../core';
+import { ExchangeCredentials } from '../../../core';
 
 export interface KuCoinExchangeCredentials extends ExchangeCredentials {
     apiKey: string;

@@ -1,4 +1,4 @@
-import { CurrencyPair, OrderType } from '../../core';
+import { CurrencyPair, OrderType } from '../../../core';
 
 export const YobitUtils = {
     getPairSymbol: (pair: CurrencyPair) => `${pair[0]}_${pair[1]}`.toLowerCase(),

@@ -1,2 +1,1 @@
-export { YobitService } from './yobit-service';
-export { YobitExchangeCredentials } from './yobit-exchange-credentials';
+export * from './yobit-rest-v3';

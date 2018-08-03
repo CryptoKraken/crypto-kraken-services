@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { generateYobitNonce, yobitNonceMaxValue } from '../../../src/services/yobit/yobit-nonce-factory';
+import { generateYobitNonce, yobitNonceMaxValue } from '../../../src/services/yobit/yobit-rest-v3/yobit-nonce-factory';
 
 describe('The generateYobitNonce', () => {
     it('should generate a nonce correctly', () => {

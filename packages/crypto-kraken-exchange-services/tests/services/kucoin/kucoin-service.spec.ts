@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import * as nock from 'nock';
 import { CurrencyPair, Order, OrderType } from '../../../src/core';
-import { KuCoinService } from '../../../src/services/kucoin';
-import { KuCoinConstants } from '../../../src/services/kucoin/constants';
-import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-exchange-credentials';
+import { KuCoinRestV1 } from '../../../src/services/kucoin';
+import { KuCoinConstants } from '../../../src/services/kucoin/kucoin-rest-v1/constants';
+import { KuCoinAuthRequestHeaders } from '../../../src/services/kucoin/kucoin-rest-v1/kucoin-exchange-credentials';
 import {
     activeOrderCases, createOrderCases,
     currencyBalancesCases, deleteOrderCases,
@@ -11,7 +11,7 @@ import {
 } from './data';
 
 describe('KuCoin Exchange Service', () => {
-    let kuCoinService: KuCoinService;
+    let kuCoinService: KuCoinRestV1;
 
     const isHeaderHasValueRegEx = /./;
     const getNockAuthHeaders = (expectedAuthHeaderValues?: Partial<KuCoinAuthRequestHeaders>): {
@@ -25,7 +25,7 @@ describe('KuCoin Exchange Service', () => {
     });
 
     beforeEach(() => {
-        kuCoinService = new KuCoinService();
+        kuCoinService = new KuCoinRestV1();
     });
 
     it('should get trades correctly', async () => {
@@ -48,29 +48,6 @@ describe('KuCoin Exchange Service', () => {
             .to.eql(currentCase.expected);
     });
 
-    it('should get trades despite the connection error', async () => {
-        const currentCase = tradesCases.default;
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
-
-        nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.tradesUri)
-            .query({
-                symbol: `${currencyPair[0]}-${currencyPair[1]}`
-            })
-            .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.tradesUri)
-            .query({
-                symbol: `${currencyPair[0]}-${currencyPair[1]}`
-            })
-            .reply(200, currentCase.data);
-
-        const orders = await kuCoinService.getTrades(currencyPair);
-
-        expect(orders)
-            .to.eql(currentCase.expected);
-    });
-
     it('should get a order book', async () => {
         const currentCase = orderBookCases.default;
         const currencyPair: CurrencyPair = ['AAA', 'BBB'];
@@ -88,29 +65,6 @@ describe('KuCoin Exchange Service', () => {
 
         expect(orderBook1)
             .to.eql(orderBook2)
-            .to.eql(currentCase.expected);
-    });
-
-    it('should get a full order book despite the connection error', async () => {
-        const currentCase = orderBookCases.default;
-        const currencyPair: CurrencyPair = ['AAA', 'BBB'];
-
-        nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.orderBooksUri)
-            .query({
-                symbol: `${currencyPair[0]}-${currencyPair[1]}`
-            })
-            .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.serverProductionUrl)
-            .get(KuCoinConstants.orderBooksUri)
-            .query({
-                symbol: `${currencyPair[0]}-${currencyPair[1]}`
-            })
-            .reply(200, currentCase.data);
-
-        const orderBook = await kuCoinService.getOrderBook(currencyPair);
-
-        expect(orderBook)
             .to.eql(currentCase.expected);
     });
 
@@ -136,19 +90,6 @@ describe('KuCoin Exchange Service', () => {
         expect('BBB').to.eql(currencyBalancesCases.zeroBalance.data.data.coinType);
         expect(await kuCoinService.getBalance('BBB', exchangeCredentialsCases[0]))
             .to.eql(currencyBalancesCases.zeroBalance.expected);
-    });
-
-    it('should get a balance of coin despite the connection error', async () => {
-        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.getBalanceOfCoinUri('BTC'))
-            .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .get(KuCoinConstants.getBalanceOfCoinUri('BTC'))
-            .reply(200, currencyBalancesCases.default.data);
-
-        expect('BTC').to.eql(currencyBalancesCases.default.data.data.coinType);
-        expect(await kuCoinService.getBalance('BTC', exchangeCredentialsCases[0]))
-            .to.eql(currencyBalancesCases.default.expected);
     });
 
     it('should create an order', async () => {
@@ -193,37 +134,6 @@ describe('KuCoin Exchange Service', () => {
         expect(createdOrder2).to.eql(createOrderCases.dataAndAnyOtherField.expected);
     });
 
-    it('should create an order despite the connection error', async () => {
-        const order: Order = {
-            pair: ['AAA', 'BBB'],
-            orderType: OrderType.Buy,
-            price: 0.5,
-            amount: 10
-        };
-
-        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .post(KuCoinConstants.createOrderUri)
-            .query({
-                symbol: `AAA-BBB`,
-                type: 'BUY',
-                price: order.price,
-                amount: order.amount
-            })
-            .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .post(KuCoinConstants.createOrderUri)
-            .query({
-                symbol: `AAA-BBB`,
-                type: 'BUY',
-                price: order.price,
-                amount: order.amount
-            })
-            .reply(200, createOrderCases.default.data);
-
-        expect(await kuCoinService.createOrder(order, exchangeCredentialsCases[0]))
-            .to.eql(createOrderCases.default.expected);
-    });
-
     it('should delete an order correctly', async () => {
         const order1 = createOrderCases.default.expected;
         const order2 = createOrderCases.dataAndAnyOtherField.expected;
@@ -247,29 +157,6 @@ describe('KuCoin Exchange Service', () => {
 
         await kuCoinService.deleteOrder(order1, exchangeCredentialsCases[0]);
         await kuCoinService.deleteOrder(order2, exchangeCredentialsCases[0]);
-    });
-
-    it('should delete an order correctly despite the connection error', async () => {
-        const order = createOrderCases.default.expected;
-
-        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .post(KuCoinConstants.deleteOrderUri)
-            .query({
-                orderOid: order.id,
-                symbol: 'AAA-BBB',
-                type: 'BUY'
-            })
-            .replyWithError('An connection error from the test');
-        nock(KuCoinConstants.serverProductionUrl, { reqheaders: getNockAuthHeaders() })
-            .post(KuCoinConstants.deleteOrderUri)
-            .query({
-                orderOid: order.id,
-                symbol: 'AAA-BBB',
-                type: 'BUY'
-            })
-            .reply(200, deleteOrderCases.default.data);
-
-        await kuCoinService.deleteOrder(order, exchangeCredentialsCases[0]);
     });
 
     it('should get active orders correctly', async () => {

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Order, OrderType } from '../../../src';
-import { YobitResponseParser } from '../../../src/services/yobit/yobit-response-parser';
+import { YobitResponseParser } from '../../../src/services/yobit/yobit-rest-v3/yobit-response-parser';
 import { Identified } from '../../../src/utils/identifier';
 import {
     balanceCases,
