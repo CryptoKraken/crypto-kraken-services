@@ -12,4 +12,4 @@ export {
     KuCoinSuccessResponseResult,
     KuCoinListExchangeRateOfCoins,
     KuCoinConstants
-} from './kucoin-rest-v1/index';
+} from './kucoin-rest-v1';
