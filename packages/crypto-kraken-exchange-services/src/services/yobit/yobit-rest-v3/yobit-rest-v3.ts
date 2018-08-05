@@ -103,7 +103,20 @@ export class YobitRestV3 implements RestExchangeService, AuthenticatedRestExchan
         identifiedOrder: Identified<Order>,
         exchangeCredentials: YobitExchangeCredentials
     ): Promise<OrderInfo> {
-        throw new Error('Method not implemented.');
+        const params = {
+            method: YobitConstants.orderInfoMethod,
+            nonce: await this.nonceFactory(),
+            order_id: identifiedOrder.id
+        };
+
+        const authHeaders = await this.getAuthHeaders(exchangeCredentials, params);
+        const responseResult = await request.post('/', {
+            baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
+            headers: authHeaders,
+            form: params
+        });
+
+        return this.responseParser.parseOrderInfo(responseResult, identifiedOrder);
     }
 
     async getActiveOrders(

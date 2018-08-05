@@ -4,7 +4,7 @@ import { Identified, Order, OrderType } from '../../../src';
 import { YobitRestV3 } from '../../../src/services/yobit';
 import { YobitConstants } from '../../../src/services/yobit/yobit-rest-v3/constants';
 import { YobitSignatureMaker } from '../../../src/services/yobit/yobit-rest-v3/yobit-signature-maker';
-import { balanceCases, createOrderCases, deleteOrderCases, orderBookCases, tradesCases } from './data';
+import { balanceCases, createOrderCases, deleteOrderCases, orderBookCases, orderInfoCases, tradesCases } from './data';
 
 describe('Yobit Exchange Service', () => {
     const defaultRootPublicApiUrl = YobitConstants.getRootPublicApiUrl(YobitConstants.rootServerUrl);
@@ -148,6 +148,35 @@ describe('Yobit Exchange Service', () => {
         expect(result).to.eql(createOrderCases.defaultSellLtcBtcWithPrice100Order.expect);
     });
 
+    it('should get order info', async () => {
+        nock(defaultRootPrivateApiUrl, {
+            // tslint:disable-next-line:max-line-length
+            reqheaders: getAuthRequestHeaders('AAA', 'dae7eb0f5a1adafd496f65a57d37240819d29108c032aa2564528ed0ed4c8d9008916cfba637df321f57a9a998bf2639c8eb40ff0e770e660741bb661bbf902e')
+        })
+            .post('/', {
+                method: YobitConstants.orderInfoMethod,
+                nonce: 1,
+                order_id: 100025362
+            })
+            .reply(200, JSON.stringify(orderInfoCases.orderInfo.data));
+
+        exchangeService.nonceFactory = () => 1;
+        const order: Identified<Order> = {
+            id: '100025362',
+            amount: 13.345,
+            orderType: OrderType.Sell,
+            pair: ['ltc', 'btc'],
+            price: 485
+        };
+
+        const result = await exchangeService.getOrderInfo(order, {
+            apiKey: 'AAA',
+            secret: 'BBB'
+        });
+
+        expect(result).to.eql(orderInfoCases.orderInfo.expect);
+    });
+
     it('should delete an order', async () => {
         nock(defaultRootPrivateApiUrl, {
             // tslint:disable-next-line:max-line-length
@@ -156,7 +185,7 @@ describe('Yobit Exchange Service', () => {
             .post('/', {
                 method: YobitConstants.deleteOrderMethod,
                 nonce: 1,
-                order_id: 100025362,
+                order_id: 100025362
             })
             .reply(200, JSON.stringify(deleteOrderCases.defaultWithId100025362.data));
 
