@@ -109,7 +109,7 @@ export class YobitRestV3 implements RestExchangeService, AuthenticatedRestExchan
             order_id: identifiedOrder.id
         };
 
-        const authHeaders = await this.getAuthHeaders(exchangeCredentials, params);
+        const authHeaders = this.getAuthHeaders(exchangeCredentials, params);
         const responseResult = await request.post('/', {
             baseUrl: YobitConstants.getRootPrivateApiUrl(this.rootServerUrl),
             headers: authHeaders,
