@@ -81,6 +81,24 @@ describe('The Yobit service', () => {
         }
     });
 
+    it('should get info about a non-existent order with an exception', async () => {
+        const order: Identified<Order> = {
+            id: '0',
+            pair: ['eth', 'btc'],
+            orderType: OrderType.Sell,
+            amount: 100,
+            price: 1
+        };
+        await wait(100);
+        try {
+            await wait(100);
+            await service.getOrderInfo(order, credentials);
+            expect.fail('The test should throw an exception');
+        } catch (error) {
+            expect(error).to.match(/invalid order id/i);
+        }
+    });
+
     it('should delete a non-existent order with an exception', async () => {
         const order: Identified<Order> = {
             id: '0',
