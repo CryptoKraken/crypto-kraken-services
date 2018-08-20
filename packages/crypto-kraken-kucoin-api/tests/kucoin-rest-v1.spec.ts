@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { CurrencyPair } from 'crypto-kraken-core';
 import * as nock from 'nock';
-import { KuCoinConstants, KuCoinRestV1 } from 'src';
+import { KuCoinConstants, KuCoinRestV1 } from '../src';
 import {
     buyOrderBooksCases, coinInfoCases,
     commonCases, listCoinsCases,

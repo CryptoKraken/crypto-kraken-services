@@ -1,4 +1,4 @@
-import { KuCoinListTradingSymbolsTick } from 'src';
+import { KuCoinListTradingSymbolsTick } from '../../src';
 
 export const listTradingSymbolsTickCases = {
     /*

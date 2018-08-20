@@ -1,4 +1,4 @@
-import { KuCoinCoinInfo } from 'src';
+import { KuCoinCoinInfo } from '../../src';
 
 export const coinInfoCases = {
     /*

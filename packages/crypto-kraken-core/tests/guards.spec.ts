@@ -2,11 +2,11 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import { is, isArray, isBoolean, isFunction, isNullOrArray, isNumber, isString, isSymbol } from 'src';
+import { is, isArray, isBoolean, isFunction, isNullOrArray, isNumber, isString, isSymbol } from '../src';
 import {
     FieldGuardsMap, isNullOrBoolean, isNullOrFunction,
     isNullOrNumber, isNullOrString, isNullOrSymbol
-} from 'src/guards';
+} from '../src/guards';
 import { TestType } from './test-types';
 chai.use(sinonChai);
 

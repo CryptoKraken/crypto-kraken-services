@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 import {
-    tradingViewBarsArraysCases, tradingViewBarsArraysErrorCases,
-    wrongTradingViewBarsArraysCases, wrongTradingViewBarsArraysErrorCases
-} from 'data';
-import {
     is,
     TradingViewBarsArrays, TradingViewBarsArraysError,
     tradingViewBarsArraysErrorGuardsMap, tradingViewBarsArraysGuardsMap
-} from 'src';
+} from '../src';
+import {
+    tradingViewBarsArraysCases, tradingViewBarsArraysErrorCases,
+    wrongTradingViewBarsArraysCases, wrongTradingViewBarsArraysErrorCases
+} from './data';
 
 describe('The types and guards of trading view', () => {
     describe('The guard of the TradingViewBarsArrays type', () => {

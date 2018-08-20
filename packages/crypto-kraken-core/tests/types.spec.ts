@@ -1,4 +1,4 @@
-import { FieldsSelector, FieldsSelectorResult } from 'src';
+import { FieldsSelector, FieldsSelectorResult } from '../src';
 import { TestType } from './test-types';
 
 /* These tests are created for type checking only. It shouldn't execute */

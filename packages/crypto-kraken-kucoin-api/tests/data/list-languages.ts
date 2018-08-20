@@ -1,4 +1,4 @@
-import { KuCoinListLanguages } from 'src';
+import { KuCoinListLanguages } from '../../src';
 
 export const listLanguagesCases = {
     /*

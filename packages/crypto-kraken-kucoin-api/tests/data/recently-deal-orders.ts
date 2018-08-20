@@ -1,4 +1,4 @@
-import { KuCoinRecentlyDealOrders } from 'src';
+import { KuCoinRecentlyDealOrders } from '../../src';
 
 export const recentlyDealOrdersCases = {
     /*

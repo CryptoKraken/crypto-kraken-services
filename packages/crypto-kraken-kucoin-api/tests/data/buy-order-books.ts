@@ -1,4 +1,4 @@
-import { KuCoinBuyOrderBooks } from 'src';
+import { KuCoinBuyOrderBooks } from '../../src';
 
 export const buyOrderBooksCases = {
     /*
