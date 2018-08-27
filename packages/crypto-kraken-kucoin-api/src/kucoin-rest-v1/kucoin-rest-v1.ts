@@ -75,7 +75,7 @@ interface RecentlyDealOrdersParameters {
 
 interface TradingViewKLineDataParameters {
     symbol: CurrencyPair;
-    resolution: 1 | 5 | 15 | 30 | 60 | 480 | '1' | '5' | '15' | '30' | '60' | '480' | 'D' | 'W';
+    resolution?: string;
     from: number;
     to: number;
 }
