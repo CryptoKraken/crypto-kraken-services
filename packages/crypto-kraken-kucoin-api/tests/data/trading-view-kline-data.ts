@@ -1,19 +1,19 @@
 import {
     tradingViewBarsArraysCases,
-    tradingViewBarsArraysErrorCases,
-    wrongTradingViewBarsArraysCases, wrongTradingViewBarsArraysErrorCases
+    tradingViewErrorCases,
+    wrongTradingViewBarsArraysCases, wrongTradingViewErrorCases
 } from 'crypto-kraken-core/tests/data';
 
 export const tradingViewKLineDataCases = {
     ...tradingViewBarsArraysCases, ...{
-        simpleError: tradingViewBarsArraysErrorCases.simple,
-        errorWithoutMessage: tradingViewBarsArraysErrorCases.withoutErrorMessage
+        simpleError: tradingViewErrorCases.simple,
+        errorWithoutMessage: tradingViewErrorCases.withoutErrorMessage
     }
 };
 
 export const wrongTradingViewKLineDataCases = {
     ...wrongTradingViewBarsArraysCases, ...{
-        errorWithWrongStatus: wrongTradingViewBarsArraysErrorCases.withWrongStatus,
-        errorWithUndefinedMessage: wrongTradingViewBarsArraysErrorCases.errorMessageUndefined
+        errorWithWrongStatus: wrongTradingViewErrorCases.withWrongStatus,
+        errorWithUndefinedMessage: wrongTradingViewErrorCases.errorMessageUndefined
     }
 };

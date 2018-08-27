@@ -26,6 +26,6 @@ export {
 export {
     TradingViewBarsArrays,
     tradingViewBarsArraysGuardsMap,
-    TradingViewBarsArraysError,
-    tradingViewBarsArraysErrorGuardsMap
+    TradingViewError,
+    tradingViewErrorGuardsMap
 } from './trading-view';

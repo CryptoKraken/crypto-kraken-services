@@ -1,6 +1,9 @@
 export {
+    TradingViewError,
+    tradingViewErrorGuardsMap,
+} from './error';
+
+export {
     BarsArrays as TradingViewBarsArrays,
-    tradingViewBarsArraysGuardsMap,
-    BarsArraysError as TradingViewBarsArraysError,
-    tradingViewBarsArraysErrorGuardsMap
+    tradingViewBarsArraysGuardsMap
 } from './bars-arrays';

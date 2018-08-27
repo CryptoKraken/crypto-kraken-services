@@ -38,20 +38,6 @@ export interface BarsArrays {
     v: number[];
 }
 
-/**
- * See the 'history' method of TradingView REST Api by this link: https://www.tradingview.com/rest-api-spec/
- */
-export interface BarsArraysError {
-    /**
-     * Status code.
-     */
-    s: 'error';
-    /**
-     * Error message.
-     */
-    errmsg?: string;
-}
-
 export const tradingViewBarsArraysGuardsMap: FieldGuardsMap<BarsArrays> = {
     c: {
         this: isArray,
@@ -79,9 +65,4 @@ export const tradingViewBarsArraysGuardsMap: FieldGuardsMap<BarsArrays> = {
         this: isArray,
         every: isNumber
     },
-};
-
-export const tradingViewBarsArraysErrorGuardsMap: FieldGuardsMap<BarsArraysError> = {
-    s: (value: any): value is BarsArraysError['s'] => value === 'error',
-    errmsg: (value: any): value is string | undefined => value === undefined || typeof value === 'string'
 };

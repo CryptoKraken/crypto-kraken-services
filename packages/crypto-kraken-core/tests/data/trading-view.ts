@@ -1,4 +1,28 @@
-import { TradingViewBarsArrays } from '../../src/index';
+import { TradingViewBarsArrays, TradingViewError } from '../../src/index';
+
+export const tradingViewErrorCases = {
+    simple: {
+        s: 'error',
+        errmsg: 'Some error'
+    } as TradingViewError,
+    withoutErrorMessage: {
+        s: 'error'
+    } as TradingViewError
+};
+
+export const wrongTradingViewErrorCases = {
+    otherObject: {
+        anyField: 'value'
+    } as any as TradingViewError,
+    withWrongStatus: {
+        s: 'ok',
+        errmsg: 'Some error'
+    } as any as TradingViewError,
+    errorMessageUndefined: {
+        s: 'error',
+        errmsg: null
+    } as any as TradingViewError
+};
 
 export const tradingViewBarsArraysCases = {
     simple: {
@@ -62,28 +86,4 @@ export const wrongTradingViewBarsArraysCases = {
         h: [0.03, null, 0.04],
         l: [0.01, null, 0.01]
     } as any as TradingViewBarsArrays
-};
-
-export const tradingViewBarsArraysErrorCases = {
-    simple: {
-        s: 'error',
-        errmsg: 'Some error'
-    },
-    withoutErrorMessage: {
-        s: 'error'
-    }
-};
-
-export const wrongTradingViewBarsArraysErrorCases = {
-    otherObject: {
-        anyField: 'value'
-    },
-    withWrongStatus: {
-        s: 'ok',
-        errmsg: 'Some error'
-    },
-    errorMessageUndefined: {
-        s: 'error',
-        errmsg: null
-    }
 };

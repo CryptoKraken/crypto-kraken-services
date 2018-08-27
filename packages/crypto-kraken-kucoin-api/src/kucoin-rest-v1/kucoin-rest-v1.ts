@@ -1,7 +1,7 @@
 import {
     CurrencyPair, FieldsSelector, FieldsSelectorResult, is,
-    TradingViewBarsArrays, TradingViewBarsArraysError,
-    tradingViewBarsArraysErrorGuardsMap, tradingViewBarsArraysGuardsMap
+    TradingViewBarsArrays, tradingViewBarsArraysGuardsMap,
+    TradingViewError, tradingViewErrorGuardsMap
 } from 'crypto-kraken-core';
 import * as request from 'request-promise-native';
 import { KuCoinConstants } from './kucoin-constants';
@@ -397,14 +397,14 @@ export class KuCoinRestV1 {
 
     async getTradingViewKLineData(
         parameters: TradingViewKLineDataParameters
-    ): Promise<TradingViewBarsArrays | TradingViewBarsArraysError | KuCoinErrorResponseResult>;
+    ): Promise<TradingViewBarsArrays | TradingViewError | KuCoinErrorResponseResult>;
     async getTradingViewKLineData<T extends FieldsSelector<TradingViewBarsArrays>>(
         parameters: TradingViewKLineDataParameters, checkFields?: T
-    ): Promise<FieldsSelectorResult<TradingViewBarsArrays, T> | TradingViewBarsArraysError | KuCoinErrorResponseResult>;
+    ): Promise<FieldsSelectorResult<TradingViewBarsArrays, T> | TradingViewError | KuCoinErrorResponseResult>;
     async getTradingViewKLineData<T>(
         parameters: TradingViewKLineDataParameters, checkFields?: T
     ): Promise<
-    TradingViewBarsArrays | TradingViewBarsArraysError |
+    TradingViewBarsArrays | TradingViewError |
     FieldsSelectorResult<TradingViewBarsArrays, T> | KuCoinErrorResponseResult
     > {
         const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineDataUri, {
@@ -419,7 +419,7 @@ export class KuCoinRestV1 {
 
         const responseResult = JSON.parse(rawResponseResult);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields) ||
-            is<TradingViewBarsArraysError>(responseResult, tradingViewBarsArraysErrorGuardsMap)
+            is<TradingViewError>(responseResult, tradingViewErrorGuardsMap)
         )
             return responseResult;
 

@@ -1,6 +1,6 @@
 export {
     tradingViewBarsArraysCases,
     wrongTradingViewBarsArraysCases,
-    tradingViewBarsArraysErrorCases,
-    wrongTradingViewBarsArraysErrorCases
+    tradingViewErrorCases,
+    wrongTradingViewErrorCases
 } from './trading-view';
