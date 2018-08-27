@@ -114,7 +114,7 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.listExchangeRateOfCoinsUri, requestOptions);
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -136,7 +136,7 @@ export class KuCoinRestV1 {
             baseUrl: this.serverUri
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -176,7 +176,7 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.tickUri, requestOptions);
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -203,7 +203,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -228,7 +228,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -255,7 +255,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -284,7 +284,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -306,7 +306,7 @@ export class KuCoinRestV1 {
             baseUrl: this.serverUri
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -335,7 +335,7 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.listTradingSymbolsTickUri, requestOptions);
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -364,7 +364,7 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.listTrendingsUri, requestOptions);
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -444,7 +444,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -464,7 +464,7 @@ export class KuCoinRestV1 {
             baseUrl: this.serverUri
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -473,7 +473,7 @@ export class KuCoinRestV1 {
         return responseResult;
     }
 
-    protected parseRawResponseResult<T>(rawResponseResult: string, checkFields: T) {
+    protected parseKuCoinResponseResult<T>(rawResponseResult: string, checkFields: T) {
         const obj = JSON.parse(rawResponseResult);
         if (is(obj, kuCoinResponseResultGuardsMap, checkFields))
             return obj;
