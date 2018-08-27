@@ -38,7 +38,9 @@ import {
     KuCoinTick,
     kuCoinTickGuardsMap,
     KuCoinTradingViewKLineConfig,
-    kuCoinTradingViewKLineConfigGuardsMap
+    kuCoinTradingViewKLineConfigGuardsMap,
+    KuCoinTradingViewSymbolTick,
+    kuCoinTradingViewSymbolTickGuardsMap
 } from './types';
 
 export interface KuCoinRestV1Options {
@@ -395,6 +397,36 @@ export class KuCoinRestV1 {
         return responseResult;
     }
 
+    async getTradingViewSymbolTick(
+        parameters: { symbol: CurrencyPair }
+    ): Promise<KuCoinTradingViewSymbolTick | TradingViewError | KuCoinErrorResponseResult>;
+    async getTradingViewSymbolTick<T extends FieldsSelector<KuCoinTradingViewSymbolTick>>(
+        parameters: { symbol: CurrencyPair }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinTradingViewSymbolTick, T> | TradingViewError | KuCoinErrorResponseResult>;
+    async getTradingViewSymbolTick<T>(
+        parameters: { symbol: CurrencyPair }, checkFields?: T
+    ): Promise<
+    KuCoinTradingViewSymbolTick | TradingViewError| KuCoinErrorResponseResult |
+    FieldsSelectorResult<KuCoinTradingViewSymbolTick, T>
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewSymbolTickUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                symbol: KuCoinUtils.getSymbol(parameters.symbol)
+            }
+        });
+
+        const responseResult = JSON.parse(rawResponseResult);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields) ||
+            is<TradingViewError>(responseResult, tradingViewErrorGuardsMap)
+        )
+            return responseResult;
+
+        if (!(is<KuCoinTradingViewSymbolTick, T>(responseResult, kuCoinTradingViewSymbolTickGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin tick of the Trading View.`);
+        return responseResult;
+    }
+
     async getTradingViewKLineData(
         parameters: TradingViewKLineDataParameters
     ): Promise<TradingViewBarsArrays | TradingViewError | KuCoinErrorResponseResult>;
@@ -404,8 +436,8 @@ export class KuCoinRestV1 {
     async getTradingViewKLineData<T>(
         parameters: TradingViewKLineDataParameters, checkFields?: T
     ): Promise<
-    TradingViewBarsArrays | TradingViewError |
-    FieldsSelectorResult<TradingViewBarsArrays, T> | KuCoinErrorResponseResult
+    TradingViewBarsArrays | TradingViewError | KuCoinErrorResponseResult |
+    FieldsSelectorResult<TradingViewBarsArrays, T>
     > {
         const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineDataUri, {
             baseUrl: this.serverUri,

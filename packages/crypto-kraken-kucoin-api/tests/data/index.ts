@@ -10,6 +10,7 @@ export * from './list-trading-markets';
 export * from './list-trading-symbols-tick';
 export * from './list-trendings';
 export * from './trading-view-kline-config';
+export * from './trading-view-symbol-tick';
 export * from './trading-view-kline-data';
 export * from './coin-info';
 export * from './list-coins';

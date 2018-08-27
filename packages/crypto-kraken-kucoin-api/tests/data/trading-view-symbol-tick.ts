@@ -67,7 +67,7 @@ export const tradingViewSymbolTickCases = {
         s: 'error',
         errmsg: 'unknown_symbol '
     } as TradingViewError,
-    unknownSymbolBtcAndEth: {
+    unknownBtcAndEthSymbol: {
         s: 'error',
         errmsg: 'unknown_symbol BTC-ETH'
     } as TradingViewError

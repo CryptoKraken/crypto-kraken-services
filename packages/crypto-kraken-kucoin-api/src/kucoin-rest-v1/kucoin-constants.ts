@@ -12,6 +12,7 @@ const constants = {
     listTradingSymbolsTickUri: '/v1/market/open/symbols',
     listTrendingsUri: '/v1/market/open/coins-trending',
     getTradingViewKLineConfigUri: '/v1/open/chart/config',
+    getTradingViewSymbolTickUri: '/v1/open/chart/symbols',
     getTradingViewKLineDataUri: '/v1/open/chart/history',
     getCoinInfoUri: '/v1/market/open/coin-info',
     listCoinsUri: '/v1/market/open/coins',

@@ -5,18 +5,38 @@ import { CurrencyPair } from 'crypto-kraken-core';
 import * as nock from 'nock';
 import { KuCoinConstants, KuCoinRestV1 } from '../src';
 import {
-    buyOrderBooksCases, coinInfoCases,
-    commonCases, listCoinsCases,
-    listExchangeRateOfCoinsCases, listLanguagesCases, listTradingMarketsCases,
-    listTradingSymbolsTickCases, listTrendingsCases, orderBooksCases,
-    recentlyDealOrdersCases, sellOrderBooksCases,
-    tickCases, tradingViewKLineConfigCases,
-    tradingViewKLineDataCases, wrongBuyOrderBooksCases,
-    wrongCoinInfoCases, wrongCommonCases,
-    wrongListCoinsCases, wrongListExchangeRateOfCoinsCases,
-    wrongListLanguagesCases, wrongListTradingMarketsCases,
-    wrongListTradingSymbolsTickCases, wrongListTrendingsCases, wrongOrderBooksCases, wrongRecentlyDealOrdersCases,
-    wrongSellOrderBooksCases, wrongTickCases, wrongTradingViewKLineConfigCases, wrongTradingViewKLineDataCases
+    buyOrderBooksCases,
+    coinInfoCases,
+    commonCases,
+    listCoinsCases,
+    listExchangeRateOfCoinsCases,
+    listLanguagesCases,
+    listTradingMarketsCases,
+    listTradingSymbolsTickCases,
+    listTrendingsCases,
+    orderBooksCases,
+    recentlyDealOrdersCases,
+    sellOrderBooksCases,
+    tickCases,
+    tradingViewKLineConfigCases,
+    tradingViewKLineDataCases,
+    tradingViewSymbolTickCases,
+    wrongBuyOrderBooksCases,
+    wrongCoinInfoCases,
+    wrongCommonCases,
+    wrongListCoinsCases,
+    wrongListExchangeRateOfCoinsCases,
+    wrongListLanguagesCases,
+    wrongListTradingMarketsCases,
+    wrongListTradingSymbolsTickCases,
+    wrongListTrendingsCases,
+    wrongOrderBooksCases,
+    wrongRecentlyDealOrdersCases,
+    wrongSellOrderBooksCases,
+    wrongTickCases,
+    wrongTradingViewKLineConfigCases,
+    wrongTradingViewKLineDataCases,
+    wrongTradingViewSymbolTickCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -492,6 +512,76 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.getTradingViewKLineConfig()).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get symbol tick (TradingView)', async () => {
+        const kcsBtcCurrencyPair: CurrencyPair = { 0: 'KCS', 1: 'BTC' };
+        const ethBtcCurrencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
+        const unknownCurrencyPair: CurrencyPair = { 0: 'BTC', 1: 'ETH' };
+
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewSymbolTickUri)
+            .query({
+                symbol: `${kcsBtcCurrencyPair[0]}-${kcsBtcCurrencyPair[1]}`,
+            })
+            .reply(200, tradingViewSymbolTickCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewSymbolTickUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`,
+            })
+            .reply(200, tradingViewSymbolTickCases.ethAndBtc);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewSymbolTickUri)
+            .query({
+                symbol: `${unknownCurrencyPair[0]}-${unknownCurrencyPair[1]}`,
+            })
+            .reply(200, tradingViewSymbolTickCases.unknownBtcAndEthSymbol);
+
+        const kcsBtcTradingViewTick = await kuCoin.getTradingViewSymbolTick({ symbol: kcsBtcCurrencyPair });
+        const ethBtcTradingViewTick = await kuCoin.getTradingViewSymbolTick({ symbol: ethBtcCurrencyPair });
+        const unknownTradingViewTick = await kuCoin.getTradingViewSymbolTick({ symbol: unknownCurrencyPair });
+
+        expect(kcsBtcTradingViewTick).to.eql(tradingViewSymbolTickCases.default);
+        expect(ethBtcTradingViewTick).to.eql(tradingViewSymbolTickCases.ethAndBtc);
+        expect(unknownTradingViewTick).to.eql(tradingViewSymbolTickCases.unknownBtcAndEthSymbol);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get symbol tick (TradingView)', async () => {
+        const kcsBtcCurrencyPair: CurrencyPair = { 0: 'KCS', 1: 'BTC' };
+        const ethBtcCurrencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
+        const unknownCurrencyPair: CurrencyPair = { 0: 'BTC', 1: 'ETH' };
+
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewSymbolTickUri)
+            .query({
+                symbol: `${ethBtcCurrencyPair[0]}-${ethBtcCurrencyPair[1]}`,
+            })
+            .reply(200, wrongTradingViewSymbolTickCases.withoutName);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewSymbolTickUri)
+            .query({
+                symbol: `${kcsBtcCurrencyPair[0]}-${kcsBtcCurrencyPair[1]}`,
+            })
+            .reply(200, wrongTradingViewSymbolTickCases.withWrongPriceScale);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewSymbolTickUri)
+            .query({
+                symbol: `${unknownCurrencyPair[0]}-${unknownCurrencyPair[1]}`,
+            })
+            .reply(200, wrongTradingViewSymbolTickCases.withWrongTradingViewError);
+
+        const expectedExceptionMessage = /isn't the KuCoin tick of the Trading View/;
+        await expect(kuCoin.getTradingViewSymbolTick({
+            symbol: ethBtcCurrencyPair
+        })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.getTradingViewSymbolTick({
+            symbol: kcsBtcCurrencyPair
+        })).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.getTradingViewSymbolTick({
+            symbol: unknownCurrencyPair
+        })).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should get kline data (TradingView)', async () => {
         const ethBtcCurrencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
         nock(KuCoinConstants.serverProductionUrl)
@@ -712,6 +802,9 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.listTrendings()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTrendings({ market: 'BTC' })).to.eql(commonCases.commonError);
         expect(await kuCoin.getTradingViewKLineConfig()).to.eql(commonCases.commonError);
+        expect(await kuCoin.getTradingViewSymbolTick({
+            symbol: { 0: 'ETH', 1: 'BTC' }
+        })).to.eql(commonCases.commonError);
         expect(await kuCoin.getTradingViewKLineData({
             symbol: { 0: 'ETH', 1: 'BTC' },
             from: 1422018000,
