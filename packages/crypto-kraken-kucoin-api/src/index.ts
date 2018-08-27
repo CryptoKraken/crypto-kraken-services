@@ -16,6 +16,7 @@ export {
     KuCoinListTradingMarkets,
     KuCoinListTradingSymbolsTick,
     KuCoinListTrendings,
+    KuCoinTradingViewKLineConfig,
     KuCoinCoinInfo,
     KuCoinListCoins,
     KuCoinConstants
