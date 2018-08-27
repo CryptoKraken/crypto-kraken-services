@@ -36,7 +36,9 @@ import {
     KuCoinSellOrderBooks,
     kuCoinSellOrderBooksGuardsMap,
     KuCoinTick,
-    kuCoinTickGuardsMap
+    kuCoinTickGuardsMap,
+    KuCoinTradingViewKLineConfig,
+    kuCoinTradingViewKLineConfigGuardsMap
 } from './types';
 
 export interface KuCoinRestV1Options {
@@ -368,6 +370,28 @@ export class KuCoinRestV1 {
 
         if (!(is<KuCoinListTrendings, T>(responseResult, kuCoinListTrendingsGuardsMap, checkFields)))
             throw new Error(`The result ${responseResult} isn't the KuCoin list of trending.`);
+        return responseResult;
+    }
+
+    async getTradingViewKLineConfig(): Promise<KuCoinTradingViewKLineConfig | KuCoinErrorResponseResult>;
+    async getTradingViewKLineConfig<T extends FieldsSelector<KuCoinTradingViewKLineConfig>>(
+        checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinTradingViewKLineConfig, T> | KuCoinErrorResponseResult>;
+    async getTradingViewKLineConfig<T>(
+        checkFields?: T
+    ): Promise<
+    KuCoinTradingViewKLineConfig | FieldsSelectorResult<KuCoinTradingViewKLineConfig, T> | KuCoinErrorResponseResult
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineConfigUri, {
+            baseUrl: this.serverUri
+        });
+
+        const responseResult = JSON.parse(rawResponseResult);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinTradingViewKLineConfig, T>(responseResult, kuCoinTradingViewKLineConfigGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin KLine config of the Trading View.`);
         return responseResult;
     }
 

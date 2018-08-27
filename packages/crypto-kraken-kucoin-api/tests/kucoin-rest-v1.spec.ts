@@ -10,13 +10,13 @@ import {
     listExchangeRateOfCoinsCases, listLanguagesCases, listTradingMarketsCases,
     listTradingSymbolsTickCases, listTrendingsCases, orderBooksCases,
     recentlyDealOrdersCases, sellOrderBooksCases,
-    tickCases, tradingViewKLineDataCases,
-    wrongBuyOrderBooksCases, wrongCoinInfoCases,
-    wrongCommonCases, wrongListCoinsCases,
-    wrongListExchangeRateOfCoinsCases, wrongListLanguagesCases,
-    wrongListTradingMarketsCases, wrongListTradingSymbolsTickCases,
-    wrongListTrendingsCases, wrongOrderBooksCases, wrongRecentlyDealOrdersCases, wrongSellOrderBooksCases,
-    wrongTickCases, wrongTradingViewKLineDataCases
+    tickCases, tradingViewKLineConfigCases,
+    tradingViewKLineDataCases, wrongBuyOrderBooksCases,
+    wrongCoinInfoCases, wrongCommonCases,
+    wrongListCoinsCases, wrongListExchangeRateOfCoinsCases,
+    wrongListLanguagesCases, wrongListTradingMarketsCases,
+    wrongListTradingSymbolsTickCases, wrongListTrendingsCases, wrongOrderBooksCases, wrongRecentlyDealOrdersCases,
+    wrongSellOrderBooksCases, wrongTickCases, wrongTradingViewKLineConfigCases, wrongTradingViewKLineDataCases
 } from './data';
 
 chai.use(chaiAsPromised);
@@ -464,6 +464,34 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.listTrendings({ market: 'AAA' })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should get kline config (TradingView)', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineConfigUri)
+            .reply(200, tradingViewKLineConfigCases.default);
+
+        const defaultConfig = await kuCoin.getTradingViewKLineConfig();
+
+        expect(defaultConfig).to.eql(tradingViewKLineConfigCases.default);
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should throw an exception when a response contained wrong data in the get kline config (TradingView)', async () => {
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineConfigUri)
+            .reply(200, wrongTradingViewKLineConfigCases.withoutSupportedResolutions);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineConfigUri)
+            .reply(200, wrongTradingViewKLineConfigCases.withWrongSupportedResolutions);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.getTradingViewKLineConfigUri)
+            .reply(200, wrongTradingViewKLineConfigCases.withWrongSupportedResolutionsFieldName);
+
+        const expectedExceptionMessage = /isn't the KuCoin KLine config of the Trading View/;
+        await expect(kuCoin.getTradingViewKLineConfig()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.getTradingViewKLineConfig()).to.be.rejectedWith(expectedExceptionMessage);
+        await expect(kuCoin.getTradingViewKLineConfig()).to.be.rejectedWith(expectedExceptionMessage);
+    });
+
     it('should get kline data (TradingView)', async () => {
         const ethBtcCurrencyPair: CurrencyPair = { 0: 'ETH', 1: 'BTC' };
         nock(KuCoinConstants.serverProductionUrl)
@@ -683,6 +711,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(await kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.eql(commonCases.commonError);
         expect(await kuCoin.listTrendings()).to.eql(commonCases.commonError);
         expect(await kuCoin.listTrendings({ market: 'BTC' })).to.eql(commonCases.commonError);
+        expect(await kuCoin.getTradingViewKLineConfig()).to.eql(commonCases.commonError);
         expect(await kuCoin.getTradingViewKLineData({
             symbol: { 0: 'ETH', 1: 'BTC' },
             from: 1422018000,
