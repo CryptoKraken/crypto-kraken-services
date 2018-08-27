@@ -29,7 +29,7 @@ export const wrongTradingViewKLineConfigCases = {
         supports_time: true,
         supports_search: true,
         supports_group_request: false
-         /* There isn't the supported_resolutions field */
+        /* There isn't the supported_resolutions field */
     } as KuCoinTradingViewKLineConfig,
     withWrongSupportedResolutionsFieldName: {
         'supports_marks': false,

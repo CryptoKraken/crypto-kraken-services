@@ -2,7 +2,7 @@ import {
     tradingViewBarsArraysCases,
     tradingViewErrorCases,
     wrongTradingViewBarsArraysCases, wrongTradingViewErrorCases
-} from 'crypto-kraken-core/tests/data';
+} from '../../../crypto-kraken-core/tests/data';
 
 export const tradingViewKLineDataCases = {
     ...tradingViewBarsArraysCases, ...{

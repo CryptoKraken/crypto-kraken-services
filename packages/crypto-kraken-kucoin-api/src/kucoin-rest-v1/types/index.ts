@@ -12,6 +12,7 @@ export { KuCoinListTradingMarkets, kuCoinListTradingMarketsGuardsMap } from './l
 export { KuCoinListTradingSymbolsTick, kuCoinListTradingSymbolsTickGuardsMap } from './list-trading-symbols-tick';
 export { KuCoinListTrendings, kuCoinListTrendingsGuardsMap } from './list-trendings';
 export { KuCoinTradingViewKLineConfig, kuCoinTradingViewKLineConfigGuardsMap } from './trading-view-kline-config';
+export { KuCoinTradingViewSymbolTick, kuCoinTradingViewSymbolTickGuardsMap } from './trading-view-symbol-tick';
 export { KuCoinCoinInfo, kuCoinCoinInfoGuardsMap } from './coin-info';
 export { KuCoinListCoins, kuCoinListCoinsGuardsMap } from './list-coins';
 export { KuCoinOrderType, isKuCoinOrderType } from './order-type';
