@@ -543,12 +543,12 @@ describe('The simple guards', () => {
     });
 
     it(`having the 'isNullOr' prefix should check null values or work like corresponding not-null guards`, () => {
-        expect(isNullOrArray(null)).to.true;
-        expect(isNullOrBoolean(null)).to.true;
-        expect(isNullOrFunction(null)).to.true;
-        expect(isNullOrNumber(null)).to.true;
-        expect(isNullOrString(null)).to.true;
-        expect(isNullOrSymbol(null)).to.true;
+        expect(isNullOrArray(null)).to.be.true;
+        expect(isNullOrBoolean(null)).to.be.true;
+        expect(isNullOrFunction(null)).to.be.true;
+        expect(isNullOrNumber(null)).to.be.true;
+        expect(isNullOrString(null)).to.be.true;
+        expect(isNullOrSymbol(null)).to.be.true;
 
         values.forEach(value => {
             expect(isNullOrArray(value)).to.eql(Array.isArray(value));
