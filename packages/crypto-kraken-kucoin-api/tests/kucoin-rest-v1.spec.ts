@@ -3,7 +3,12 @@ import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { CurrencyPair } from 'crypto-kraken-core';
 import * as nock from 'nock';
-import { KuCoinConstants, KuCoinRestV1 } from '../src';
+import {
+    isKuCoinErrorResponseResult,
+    KuCoinConstants,
+    KuCoinErrorResponseResult,
+    KuCoinRestV1
+ } from '../src';
 import {
     buyOrderBooksCases,
     coinInfoCases,
@@ -825,5 +830,27 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(kuCoin.typeChecking).to.be.false;
         for (const operationResult of commonKuCoinOperationResultPromises)
             await expect(operationResult).to.not.be.rejected;
+    });
+});
+
+describe('The guards of the the KuCoinRestV1 service', () => {
+    it('the \'isKuCoinErrorResponseResult\' guard should work correctly', () => {
+        const obj = { someField: 1 };
+        const errorResponseResult: KuCoinErrorResponseResult = {
+            code: 'ERROR',
+            msg: 'Some error',
+            success: false,
+            timestamp: 1535569548444
+        };
+        const wrongErrorResponseResult: KuCoinErrorResponseResult = {
+            code: 'ERROR',
+            msg: 'Some error',
+            success: true,
+            timestamp: 1535569548444
+        } as any;
+
+        expect(isKuCoinErrorResponseResult(obj)).to.be.false;
+        expect(isKuCoinErrorResponseResult(errorResponseResult)).to.be.true;
+        expect(isKuCoinErrorResponseResult(wrongErrorResponseResult)).to.be.false;
     });
 });

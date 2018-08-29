@@ -512,6 +512,8 @@ export class KuCoinRestV1 {
         });
 
         const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
+        // TODO: use the shortest variant of this expression:
+        // replace this call to a call of the `isKuCoinErrorResponseResult` method.
         if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
             return responseResult;
 

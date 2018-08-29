@@ -1,5 +1,9 @@
 export { KuCoinResponseResult, kuCoinResponseResultGuardsMap } from './response-result';
-export { KuCoinErrorResponseResult, kuCoinErrorResponseResultGuardsMap } from './error-response-result';
+export {
+    KuCoinErrorResponseResult,
+    kuCoinErrorResponseResultGuardsMap,
+    isKuCoinErrorResponseResult
+} from './error-response-result';
 export { KuCoinSuccessResponseResult, kuCoinSuccessResponseResultGuardsMap } from './success-response-result';
 export { KuCoinListExchangeRateOfCoins, kuCoinListExchangeRateOfCoinsGuardsMap } from './list-exchange-rate-of-coins';
 export { KuCoinListLanguages, kuCoinListLanguagesGuardsMap } from './list-languages';
