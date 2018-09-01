@@ -6,7 +6,7 @@ import {
     KuCoinRestV1
 } from '../../src';
 
-const getFailTestMessageOnErrorResponseResult = (operationName: string, error: KuCoinErrorResponseResult) =>
+const getFailTestMessageOnErrorResponseResult = (operationName: keyof KuCoinRestV1, error: KuCoinErrorResponseResult) =>
     `The ${operationName} operation returns the following error: ${error.msg}`;
 
 describe('The KuCoin REST service of the V1 version', () => {
@@ -23,22 +23,14 @@ describe('The KuCoin REST service of the V1 version', () => {
         const unknownCoinAndEthRates = await kuCoin.listExchangeRateOfCoins({ coins: ['BBB', 'ETH'] });
 
         const operationName = 'listExchangeRateOfCoins';
-        if (isKuCoinErrorResponseResult(defaultCoinRates)) {
-            expect.fail(getFailTestMessageOnErrorResponseResult(operationName, defaultCoinRates));
-            return;
-        }
-        if (isKuCoinErrorResponseResult(btcAndEthRates)) {
-            expect.fail(getFailTestMessageOnErrorResponseResult(operationName, btcAndEthRates));
-            return;
-        }
-        if (isKuCoinErrorResponseResult(unknownCoinRates)) {
-            expect.fail(getFailTestMessageOnErrorResponseResult(operationName, unknownCoinRates));
-            return;
-        }
-        if (isKuCoinErrorResponseResult(unknownCoinAndEthRates)) {
-            expect.fail(getFailTestMessageOnErrorResponseResult(operationName, unknownCoinAndEthRates));
-            return;
-        }
+        if (isKuCoinErrorResponseResult(defaultCoinRates))
+            return expect.fail(getFailTestMessageOnErrorResponseResult(operationName, defaultCoinRates));
+        if (isKuCoinErrorResponseResult(btcAndEthRates))
+            return expect.fail(getFailTestMessageOnErrorResponseResult(operationName, btcAndEthRates));
+        if (isKuCoinErrorResponseResult(unknownCoinRates))
+            return expect.fail(getFailTestMessageOnErrorResponseResult(operationName, unknownCoinRates));
+        if (isKuCoinErrorResponseResult(unknownCoinAndEthRates))
+            return expect.fail(getFailTestMessageOnErrorResponseResult(operationName, unknownCoinAndEthRates));
 
         const checkCorrespondingCurrenciesAndRates = (coins: string[], kuCoinResult: KuCoinListExchangeRateOfCoins) => {
             /**
@@ -73,5 +65,15 @@ describe('The KuCoin REST service of the V1 version', () => {
         // Rates should be empty when we pass an unknown coin
         expect(unknownCoinRates.data.rates).to.be.empty;
         checkCorrespondingCurrenciesAndRates(['ETH'], unknownCoinAndEthRates);
+    });
+
+    it('should get a list of languages correctly', async () => {
+        const listLanguages = await kuCoin.listLanguages();
+
+        if (isKuCoinErrorResponseResult(listLanguages))
+            return expect.fail(getFailTestMessageOnErrorResponseResult('listLanguages', listLanguages));
+
+        expect(listLanguages.data).to.not.be.empty;
+        expect(listLanguages.data).to.include.deep.members([['en_US', 'English', true]]);
     });
 });

@@ -182,7 +182,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
-    it('should get a languages list correctly', async () => {
+    it('should get a list of languages correctly', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.listLanguagesUri)
             .reply(200, listLanguagesCases.default);
