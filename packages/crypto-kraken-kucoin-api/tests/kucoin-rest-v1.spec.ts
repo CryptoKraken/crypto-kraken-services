@@ -8,7 +8,7 @@ import {
     KuCoinConstants,
     KuCoinErrorResponseResult,
     KuCoinRestV1
- } from '../src';
+} from '../src';
 import {
     buyOrderBooksCases,
     coinInfoCases,
@@ -73,6 +73,9 @@ describe('The KuCoin REST service of the V1 version', () => {
 
     beforeEach(() => {
         kuCoin = new KuCoinRestV1();
+    });
+
+    afterEach(() => {
         nock.cleanAll();
     });
 
@@ -136,23 +139,38 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should get a tick correctly', async () => {
-        const currencyPair: CurrencyPair = { 0: 'KCS', 1: 'BTC' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.tickUri)
             .query({
-                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+                symbol: `KCS-BTC`
             })
             .reply(200, tickCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .query({
+                symbol: `ARN-BTC`
+            })
+            .reply(200, tickCases.withZeroVolume);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .query({
+                symbol: `BTG-USDT`
+            })
+            .reply(200, tickCases.btgUsdt);
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.tickUri)
             .twice()
             .reply(200, tickCases.allCoins);
 
-        const tick = await kuCoin.tick({ symbol: currencyPair });
+        const kcsBtcTick = await kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } });
+        const arnBtcTick = await kuCoin.tick({ symbol: { 0: 'ARN', 1: 'BTC' } });
+        const btgUsdtTick = await kuCoin.tick({ symbol: { 0: 'BTG', 1: 'USDT' } });
         const allCoinsTick = await kuCoin.tick();
         const allCoinsTickWithEmptyParams = await kuCoin.tick({});
 
-        expect(tick).to.eql(tickCases.default);
+        expect(kcsBtcTick).to.eql(tickCases.default);
+        expect(arnBtcTick).to.eql(tickCases.withZeroVolume);
+        expect(btgUsdtTick).to.eql(tickCases.btgUsdt);
         expect(allCoinsTick)
             .to.eql(allCoinsTickWithEmptyParams)
             .to.eql(tickCases.allCoins);
@@ -778,28 +796,34 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should return an error object when a response contains an error', async () => {
-        nock(KuCoinConstants.serverProductionUrl)
-            .persist()
-            .get(() => true)
-            .query(true)
-            .reply(200, commonCases.commonError);
+        const responseCodes = [200, 404, 500];
 
-        const tradingViewOperations = [
-            kuCoin.getTradingViewKLineConfig(),
-            kuCoin.getTradingViewSymbolTick({
-                symbol: { 0: 'ETH', 1: 'BTC' }
-            }),
-            kuCoin.getTradingViewKLineData({
-                symbol: { 0: 'ETH', 1: 'BTC' },
-                from: 1422018000,
-                to: 1532029207,
-                resolution: 'W'
-            })
-        ];
-        const allKuCoinOperationResultPromises = getCommonKuCoinOperationResultPromises(kuCoin)
-            .concat(tradingViewOperations as any[]);
-        for (const operationResultPromise of allKuCoinOperationResultPromises)
-            expect(await operationResultPromise).to.eql(commonCases.commonError);
+        for (const responseCode of responseCodes) {
+            nock(KuCoinConstants.serverProductionUrl)
+                .persist()
+                .get(() => true)
+                .query(true)
+                .reply(responseCode, commonCases.commonError);
+
+            const tradingViewOperations = [
+                kuCoin.getTradingViewKLineConfig(),
+                kuCoin.getTradingViewSymbolTick({
+                    symbol: { 0: 'ETH', 1: 'BTC' }
+                }),
+                kuCoin.getTradingViewKLineData({
+                    symbol: { 0: 'ETH', 1: 'BTC' },
+                    from: 1422018000,
+                    to: 1532029207,
+                    resolution: 'W'
+                })
+            ];
+            const allKuCoinOperationResultPromises = getCommonKuCoinOperationResultPromises(kuCoin)
+                .concat(tradingViewOperations as any[]);
+            for (const operationResultPromise of allKuCoinOperationResultPromises)
+                expect(await operationResultPromise).to.eql(commonCases.commonError);
+
+            nock.cleanAll();
+        }
     });
 
     it('should throw an exception when a response is wrong', async () => {

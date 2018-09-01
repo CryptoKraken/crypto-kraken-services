@@ -76,4 +76,38 @@ describe('The KuCoin REST service of the V1 version', () => {
         expect(listLanguages.data).to.not.be.empty;
         expect(listLanguages.data).to.include.deep.members([['en_US', 'English', true]]);
     });
+
+    it('should get a tick correctly', async () => {
+        const symbol = undefined;
+        const ethBtcTick = await kuCoin.tick({ symbol: { 0: 'ETH', 1: 'BTC' } });
+        const btcEth = await kuCoin.tick({ symbol: { 0: 'BTC', 1: 'ETH' } });
+        const allCoinsTick1 = await kuCoin.tick();
+        const allCoinsTick2 = await kuCoin.tick({ symbol });
+
+        if (isKuCoinErrorResponseResult(ethBtcTick))
+            return expect.fail(getFailTestMessageOnErrorResponseResult('tick', ethBtcTick));
+        if (!isKuCoinErrorResponseResult(btcEth))
+            return expect.fail(`the type of the 'btcEth' should be the KuCoinErrorResponseResult`);
+        if (isKuCoinErrorResponseResult(allCoinsTick1))
+            return expect.fail(getFailTestMessageOnErrorResponseResult('tick', allCoinsTick1));
+        if (isKuCoinErrorResponseResult(allCoinsTick2))
+            return expect.fail(getFailTestMessageOnErrorResponseResult('tick', allCoinsTick2));
+        if (isKuCoinErrorResponseResult(allCoinsTick2))
+            return expect.fail(getFailTestMessageOnErrorResponseResult('tick', allCoinsTick2));
+        if (!Array.isArray(allCoinsTick2.data))
+            return expect.fail(`the type of the 'allCoinsTick2.data' should be the Array<CoinTick>`);
+
+        expect(ethBtcTick.data.coinTypePair).to.eql('BTC');
+        expect(ethBtcTick.data.coinType).to.eql('ETH');
+        expect(ethBtcTick.data.symbol).to.eql('ETH-BTC');
+        expect(allCoinsTick1.data).to.have.lengthOf(allCoinsTick2.data.length);
+
+        const ethBtcTickFromAll1 = allCoinsTick1.data.find(coinTick => coinTick.symbol === 'ETH-BTC');
+        const ethBtcTickFromAll2 = allCoinsTick2.data.find(coinTick => coinTick.symbol === 'ETH-BTC');
+        expect(ethBtcTickFromAll1).to.not.be.undefined;
+        expect(ethBtcTickFromAll2).to.not.be.undefined;
+        expect(ethBtcTickFromAll2!.symbol)
+            .to.be.eql(ethBtcTickFromAll1!.symbol)
+            .to.be.eql(ethBtcTick.data.symbol);
+    });
 });

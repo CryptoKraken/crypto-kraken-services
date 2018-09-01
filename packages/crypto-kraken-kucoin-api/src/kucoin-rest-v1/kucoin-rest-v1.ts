@@ -137,7 +137,7 @@ export class KuCoinRestV1 {
             requestOptions.qs = {
                 coins: parameters.coins.join(',')
             };
-        const rawResponseResult = await request.get(KuCoinConstants.listExchangeRateOfCoinsUri, requestOptions);
+        const rawResponseResult = await this.requestGet(KuCoinConstants.listExchangeRateOfCoinsUri, requestOptions);
 
         const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
         if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
@@ -157,7 +157,7 @@ export class KuCoinRestV1 {
     async listLanguages<T>(
         checkFields?: T
     ): Promise<KuCoinListLanguages | KuCoinTypeCheckedOperationResult<KuCoinListLanguages, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.listLanguagesUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.listLanguagesUri, {
             baseUrl: this.serverUri
         });
 
@@ -199,7 +199,7 @@ export class KuCoinRestV1 {
                 // The result of checking of parameters and symbol fields is saved in the isAllCoins constant above
                 symbol: KuCoinUtils.getSymbol(parameters!.symbol!)
             };
-        const rawResponseResult = await request.get(KuCoinConstants.tickUri, requestOptions);
+        const rawResponseResult = await this.requestGet(KuCoinConstants.tickUri, requestOptions);
 
         const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
         if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
@@ -218,7 +218,7 @@ export class KuCoinRestV1 {
     async orderBooks<T>(
         parameters: OrderBooksParameters, checkFields?: T
     ): Promise<KuCoinOrderBooks | KuCoinTypeCheckedOperationResult<KuCoinOrderBooks, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.orderBooksUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.orderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol),
@@ -244,7 +244,7 @@ export class KuCoinRestV1 {
     async buyOrderBooks<T>(
         parameters: BuyOrderBooksParameters, checkFields?: T
     ): Promise<KuCoinBuyOrderBooks | KuCoinTypeCheckedOperationResult<KuCoinBuyOrderBooks, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.buyOrderBooksUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.buyOrderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol),
@@ -271,7 +271,7 @@ export class KuCoinRestV1 {
     async sellOrderBooks<T>(
         parameters: SellOrderBooksParameters, checkFields?: T
     ): Promise<KuCoinSellOrderBooks | KuCoinTypeCheckedOperationResult<KuCoinSellOrderBooks, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.sellOrderBooksUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.sellOrderBooksUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol),
@@ -298,7 +298,7 @@ export class KuCoinRestV1 {
     async recentlyDealOrders<T>(
         parameters: RecentlyDealOrdersParameters, checkFields?: T
     ): Promise<KuCoinRecentlyDealOrders | KuCoinTypeCheckedOperationResult<KuCoinRecentlyDealOrders, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.recentlyDealOrdersUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.recentlyDealOrdersUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol),
@@ -323,7 +323,7 @@ export class KuCoinRestV1 {
     async listTradingMarkets<T>(
         checkFields?: T
     ): Promise<KuCoinListTradingMarkets | KuCoinTypeCheckedOperationResult<KuCoinListTradingMarkets, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.listTradingMarketsUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.listTradingMarketsUri, {
             baseUrl: this.serverUri
         });
 
@@ -352,7 +352,7 @@ export class KuCoinRestV1 {
             requestOptions.qs = {
                 market: parameters.market
             };
-        const rawResponseResult = await request.get(KuCoinConstants.listTradingSymbolsTickUri, requestOptions);
+        const rawResponseResult = await this.requestGet(KuCoinConstants.listTradingSymbolsTickUri, requestOptions);
 
         const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
         if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
@@ -379,7 +379,7 @@ export class KuCoinRestV1 {
             requestOptions.qs = {
                 market: parameters.market
             };
-        const rawResponseResult = await request.get(KuCoinConstants.listTrendingsUri, requestOptions);
+        const rawResponseResult = await this.requestGet(KuCoinConstants.listTrendingsUri, requestOptions);
 
         const responseResult = this.parseKuCoinResponseResult(rawResponseResult);
         if (is<KuCoinErrorResponseResult>(responseResult, kuCoinErrorResponseResultGuardsMap))
@@ -399,7 +399,7 @@ export class KuCoinRestV1 {
     ): Promise<
     KuCoinTradingViewKLineConfig | FieldsSelectorResult<KuCoinTradingViewKLineConfig, T> | KuCoinErrorResponseResult
     > {
-        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineConfigUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.getTradingViewKLineConfigUri, {
             baseUrl: this.serverUri
         });
 
@@ -421,10 +421,10 @@ export class KuCoinRestV1 {
     async getTradingViewSymbolTick<T>(
         parameters: { symbol: CurrencyPair }, checkFields?: T
     ): Promise<
-    KuCoinTradingViewSymbolTick | TradingViewError| KuCoinErrorResponseResult |
+    KuCoinTradingViewSymbolTick | TradingViewError | KuCoinErrorResponseResult |
     FieldsSelectorResult<KuCoinTradingViewSymbolTick, T>
     > {
-        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewSymbolTickUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.getTradingViewSymbolTickUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol)
@@ -454,7 +454,7 @@ export class KuCoinRestV1 {
     TradingViewBarsArrays | TradingViewError | KuCoinErrorResponseResult |
     FieldsSelectorResult<TradingViewBarsArrays, T>
     > {
-        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineDataUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.getTradingViewKLineDataUri, {
             baseUrl: this.serverUri,
             qs: {
                 symbol: KuCoinUtils.getSymbol(parameters.symbol),
@@ -484,7 +484,7 @@ export class KuCoinRestV1 {
     async getCoinInfo<T>(
         parameters: { coin: string }, checkFields?: T
     ): Promise<KuCoinCoinInfo | KuCoinTypeCheckedOperationResult<KuCoinCoinInfo, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.getCoinInfoUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.getCoinInfoUri, {
             baseUrl: this.serverUri,
             qs: {
                 coin: parameters.coin,
@@ -507,7 +507,7 @@ export class KuCoinRestV1 {
     async listCoins<T>(
         checkFields?: T
     ): Promise<KuCoinListCoins | KuCoinTypeCheckedOperationResult<KuCoinListCoins, T>> {
-        const rawResponseResult = await request.get(KuCoinConstants.listCoinsUri, {
+        const rawResponseResult = await this.requestGet(KuCoinConstants.listCoinsUri, {
             baseUrl: this.serverUri
         });
 
@@ -533,5 +533,23 @@ export class KuCoinRestV1 {
         if (is<KuCoinResponseResult>(obj, kuCoinResponseResultGuardsMap))
             return obj;
         throw new Error(`The result ${rawResponseResult} isn't a KuCoin response result.`);
+    }
+
+    /*
+    *   We've created this method temporarily to catch 404, 500, etc errors and
+    *   return the KuCoinErrorResponse instead of throwing Exceptions, because the `request` package doesn't allow
+    *   disable throwing exceptions when server returns response with error status codes
+    *   After migration to axios (or similar package) we delete this method
+    */
+    private async requestGet(
+        uri: string,
+        options?: request.RequestPromiseOptions,
+        callback?: (error: any, response: request.FullResponse, body: any) => void
+    ): Promise<any> {
+        try {
+            return await request.get(uri, options, callback);
+        } catch (error) {
+            return error.error;
+        }
     }
 }
