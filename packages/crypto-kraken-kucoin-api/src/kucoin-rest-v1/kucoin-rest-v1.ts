@@ -1,4 +1,8 @@
-import { CurrencyPair, FieldsSelector, FieldsSelectorResult, is } from 'crypto-kraken-core';
+import {
+    CurrencyPair, FieldsSelector, FieldsSelectorResult, is,
+    TradingViewBarsArrays, tradingViewBarsArraysGuardsMap,
+    TradingViewError, tradingViewErrorGuardsMap
+} from 'crypto-kraken-core';
 import * as request from 'request-promise-native';
 import { KuCoinConstants } from './kucoin-constants';
 import { KuCoinUtils } from './kucoin-utils';
@@ -7,20 +11,36 @@ import {
     kuCoinAllCoinsTickGuardsMap,
     KuCoinBuyOrderBooks,
     kuCoinBuyOrderBooksGuardsMap,
+    KuCoinCoinInfo,
+    kuCoinCoinInfoGuardsMap,
     KuCoinErrorResponseResult,
     kuCoinErrorResponseResultGuardsMap,
+    KuCoinListCoins,
+    kuCoinListCoinsGuardsMap,
     KuCoinListExchangeRateOfCoins,
     kuCoinListExchangeRateOfCoinsGuardsMap,
     KuCoinListLanguages,
     kuCoinListLanguagesGuardsMap,
+    KuCoinListTradingMarkets,
+    kuCoinListTradingMarketsGuardsMap,
+    KuCoinListTradingSymbolsTick,
+    kuCoinListTradingSymbolsTickGuardsMap,
+    KuCoinListTrendings,
+    kuCoinListTrendingsGuardsMap,
     KuCoinOrderBooks,
     kuCoinOrderBooksGuardsMap,
     KuCoinOrderType,
+    KuCoinRecentlyDealOrders,
+    kuCoinRecentlyDealOrdersGuardsMap,
     kuCoinResponseResultGuardsMap,
     KuCoinSellOrderBooks,
     kuCoinSellOrderBooksGuardsMap,
     KuCoinTick,
-    kuCoinTickGuardsMap
+    kuCoinTickGuardsMap,
+    KuCoinTradingViewKLineConfig,
+    kuCoinTradingViewKLineConfigGuardsMap,
+    KuCoinTradingViewSymbolTick,
+    kuCoinTradingViewSymbolTickGuardsMap
 } from './types';
 
 export interface KuCoinRestV1Options {
@@ -50,6 +70,19 @@ interface BuyOrderBooksParameters {
 }
 
 type SellOrderBooksParameters = BuyOrderBooksParameters;
+
+interface RecentlyDealOrdersParameters {
+    symbol: CurrencyPair;
+    limit?: number;
+    since?: number;
+}
+
+interface TradingViewKLineDataParameters {
+    symbol: CurrencyPair;
+    resolution?: string;
+    from: number;
+    to: number;
+}
 
 export class KuCoinRestV1 {
     readonly serverUri: string;
@@ -83,7 +116,7 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.listExchangeRateOfCoinsUri, requestOptions);
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -105,7 +138,7 @@ export class KuCoinRestV1 {
             baseUrl: this.serverUri
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -145,7 +178,7 @@ export class KuCoinRestV1 {
             };
         const rawResponseResult = await request.get(KuCoinConstants.tickUri, requestOptions);
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -172,7 +205,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -197,7 +230,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -224,7 +257,7 @@ export class KuCoinRestV1 {
             }
         });
 
-        const responseResult = this.parseRawResponseResult(rawResponseResult, checkFields);
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
         if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
             return responseResult;
 
@@ -233,7 +266,246 @@ export class KuCoinRestV1 {
         return responseResult;
     }
 
-    protected parseRawResponseResult<T>(rawResponseResult: string, checkFields: T) {
+    async recentlyDealOrders(
+        parameters: RecentlyDealOrdersParameters
+    ): Promise<KuCoinRecentlyDealOrders | KuCoinErrorResponseResult>;
+    async recentlyDealOrders<T extends FieldsSelector<KuCoinRecentlyDealOrders>>(
+        parameters: RecentlyDealOrdersParameters, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinRecentlyDealOrders, T> | KuCoinErrorResponseResult>;
+    async recentlyDealOrders<T>(
+        parameters: RecentlyDealOrdersParameters, checkFields?: T
+    ): Promise<
+    KuCoinRecentlyDealOrders | FieldsSelectorResult<KuCoinRecentlyDealOrders, T> | KuCoinErrorResponseResult
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.recentlyDealOrdersUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                symbol: KuCoinUtils.getSymbol(parameters.symbol),
+                limit: parameters.limit,
+                since: parameters.since
+            }
+        });
+
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinRecentlyDealOrders, T>(responseResult, kuCoinRecentlyDealOrdersGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of recently deal orders.`);
+        return responseResult;
+    }
+
+    async listTradingMarkets(): Promise<KuCoinListTradingMarkets | KuCoinErrorResponseResult>;
+    async listTradingMarkets<T extends FieldsSelector<KuCoinListTradingMarkets>>(
+        checkFields: T
+    ): Promise<FieldsSelectorResult<KuCoinListTradingMarkets, T> | KuCoinErrorResponseResult>;
+    async listTradingMarkets<T>(
+        checkFields?: T
+    ): Promise<
+    KuCoinListTradingMarkets | FieldsSelectorResult<KuCoinListTradingMarkets, T> | KuCoinErrorResponseResult
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.listTradingMarketsUri, {
+            baseUrl: this.serverUri
+        });
+
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListTradingMarkets, T>(responseResult, kuCoinListTradingMarketsGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of trading markets.`);
+        return responseResult;
+    }
+
+    async listTradingSymbolsTick(
+        parameters?: { market?: string }
+    ): Promise<KuCoinListTradingSymbolsTick | KuCoinErrorResponseResult>;
+    async listTradingSymbolsTick<T extends FieldsSelector<KuCoinListTradingSymbolsTick>>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListTradingSymbolsTick, T> | KuCoinErrorResponseResult>;
+    async listTradingSymbolsTick<T>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<
+    KuCoinListTradingSymbolsTick | FieldsSelectorResult<KuCoinListTradingSymbolsTick, T> | KuCoinErrorResponseResult
+    > {
+        const requestOptions: request.RequestPromiseOptions = {
+            baseUrl: this.serverUri
+        };
+        if (parameters && parameters.market)
+            requestOptions.qs = {
+                market: parameters.market
+            };
+        const rawResponseResult = await request.get(KuCoinConstants.listTradingSymbolsTickUri, requestOptions);
+
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListTradingSymbolsTick, T>(responseResult, kuCoinListTradingSymbolsTickGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of trading symbols tick.`);
+        return responseResult;
+    }
+
+    async listTrendings(
+        parameters?: { market?: string }
+    ): Promise<KuCoinListTrendings | KuCoinErrorResponseResult>;
+    async listTrendings<T extends FieldsSelector<KuCoinListTrendings>>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListTrendings, T> | KuCoinErrorResponseResult>;
+    async listTrendings<T>(
+        parameters?: { market?: string }, checkFields?: T
+    ): Promise<
+    KuCoinListTrendings | FieldsSelectorResult<KuCoinListTrendings, T> | KuCoinErrorResponseResult
+    > {
+        const requestOptions: request.RequestPromiseOptions = {
+            baseUrl: this.serverUri
+        };
+        if (parameters && parameters.market)
+            requestOptions.qs = {
+                market: parameters.market
+            };
+        const rawResponseResult = await request.get(KuCoinConstants.listTrendingsUri, requestOptions);
+
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListTrendings, T>(responseResult, kuCoinListTrendingsGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of trending.`);
+        return responseResult;
+    }
+
+    async getTradingViewKLineConfig(): Promise<KuCoinTradingViewKLineConfig | KuCoinErrorResponseResult>;
+    async getTradingViewKLineConfig<T extends FieldsSelector<KuCoinTradingViewKLineConfig>>(
+        checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinTradingViewKLineConfig, T> | KuCoinErrorResponseResult>;
+    async getTradingViewKLineConfig<T>(
+        checkFields?: T
+    ): Promise<
+    KuCoinTradingViewKLineConfig | FieldsSelectorResult<KuCoinTradingViewKLineConfig, T> | KuCoinErrorResponseResult
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineConfigUri, {
+            baseUrl: this.serverUri
+        });
+
+        const responseResult = JSON.parse(rawResponseResult);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinTradingViewKLineConfig, T>(responseResult, kuCoinTradingViewKLineConfigGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin KLine config of the Trading View.`);
+        return responseResult;
+    }
+
+    async getTradingViewSymbolTick(
+        parameters: { symbol: CurrencyPair }
+    ): Promise<KuCoinTradingViewSymbolTick | TradingViewError | KuCoinErrorResponseResult>;
+    async getTradingViewSymbolTick<T extends FieldsSelector<KuCoinTradingViewSymbolTick>>(
+        parameters: { symbol: CurrencyPair }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinTradingViewSymbolTick, T> | TradingViewError | KuCoinErrorResponseResult>;
+    async getTradingViewSymbolTick<T>(
+        parameters: { symbol: CurrencyPair }, checkFields?: T
+    ): Promise<
+    KuCoinTradingViewSymbolTick | TradingViewError| KuCoinErrorResponseResult |
+    FieldsSelectorResult<KuCoinTradingViewSymbolTick, T>
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewSymbolTickUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                symbol: KuCoinUtils.getSymbol(parameters.symbol)
+            }
+        });
+
+        const responseResult = JSON.parse(rawResponseResult);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields) ||
+            is<TradingViewError>(responseResult, tradingViewErrorGuardsMap)
+        )
+            return responseResult;
+
+        if (!(is<KuCoinTradingViewSymbolTick, T>(responseResult, kuCoinTradingViewSymbolTickGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin tick of the Trading View.`);
+        return responseResult;
+    }
+
+    async getTradingViewKLineData(
+        parameters: TradingViewKLineDataParameters
+    ): Promise<TradingViewBarsArrays | TradingViewError | KuCoinErrorResponseResult>;
+    async getTradingViewKLineData<T extends FieldsSelector<TradingViewBarsArrays>>(
+        parameters: TradingViewKLineDataParameters, checkFields?: T
+    ): Promise<FieldsSelectorResult<TradingViewBarsArrays, T> | TradingViewError | KuCoinErrorResponseResult>;
+    async getTradingViewKLineData<T>(
+        parameters: TradingViewKLineDataParameters, checkFields?: T
+    ): Promise<
+    TradingViewBarsArrays | TradingViewError | KuCoinErrorResponseResult |
+    FieldsSelectorResult<TradingViewBarsArrays, T>
+    > {
+        const rawResponseResult = await request.get(KuCoinConstants.getTradingViewKLineDataUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                symbol: KuCoinUtils.getSymbol(parameters.symbol),
+                resolution: parameters.resolution,
+                from: parameters.from,
+                to: parameters.to
+            }
+        });
+
+        const responseResult = JSON.parse(rawResponseResult);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields) ||
+            is<TradingViewError>(responseResult, tradingViewErrorGuardsMap)
+        )
+            return responseResult;
+
+        if (!(is<TradingViewBarsArrays, T>(responseResult, tradingViewBarsArraysGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin KLineData type of the Trading View.`);
+        return responseResult;
+    }
+
+    async getCoinInfo(
+        parameters: { coin: string }
+    ): Promise<KuCoinCoinInfo | KuCoinErrorResponseResult>;
+    async getCoinInfo<T extends FieldsSelector<KuCoinCoinInfo>>(
+        parameters: { coin: string }, checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinCoinInfo, T> | KuCoinErrorResponseResult>;
+    async getCoinInfo<T>(
+        parameters: { coin: string }, checkFields?: T
+    ): Promise<KuCoinCoinInfo | FieldsSelectorResult<KuCoinCoinInfo, T> | KuCoinErrorResponseResult> {
+        const rawResponseResult = await request.get(KuCoinConstants.getCoinInfoUri, {
+            baseUrl: this.serverUri,
+            qs: {
+                coin: parameters.coin,
+            }
+        });
+
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinCoinInfo, T>(responseResult, kuCoinCoinInfoGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin coin info type.`);
+        return responseResult;
+    }
+
+    async listCoins(): Promise<KuCoinListCoins | KuCoinErrorResponseResult>;
+    async listCoins<T extends FieldsSelector<KuCoinListCoins>>(
+        checkFields?: T
+    ): Promise<FieldsSelectorResult<KuCoinListCoins, T> | KuCoinErrorResponseResult>;
+    async listCoins<T>(
+        checkFields?: T
+    ): Promise<KuCoinListCoins | FieldsSelectorResult<KuCoinListCoins, T> | KuCoinErrorResponseResult> {
+        const rawResponseResult = await request.get(KuCoinConstants.listCoinsUri, {
+            baseUrl: this.serverUri
+        });
+
+        const responseResult = this.parseKuCoinResponseResult(rawResponseResult, checkFields);
+        if (is<KuCoinErrorResponseResult, T>(responseResult, kuCoinErrorResponseResultGuardsMap, checkFields))
+            return responseResult;
+
+        if (!(is<KuCoinListCoins, T>(responseResult, kuCoinListCoinsGuardsMap, checkFields)))
+            throw new Error(`The result ${responseResult} isn't the KuCoin list of coin infos.`);
+        return responseResult;
+    }
+
+    protected parseKuCoinResponseResult<T>(rawResponseResult: string, checkFields: T) {
         const obj = JSON.parse(rawResponseResult);
         if (is(obj, kuCoinResponseResultGuardsMap, checkFields))
             return obj;

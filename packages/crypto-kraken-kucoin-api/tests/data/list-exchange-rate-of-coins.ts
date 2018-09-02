@@ -1,4 +1,4 @@
-import { KuCoinListExchangeRateOfCoins } from 'src';
+import { KuCoinListExchangeRateOfCoins } from '../../src';
 
 export const listExchangeRateOfCoinsCases = {
     /*

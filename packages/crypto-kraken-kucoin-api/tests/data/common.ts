@@ -1,4 +1,4 @@
-import { KuCoinErrorResponseResult } from 'src';
+import { KuCoinErrorResponseResult } from '../../src';
 
 export const commonCases = {
     commonError: {

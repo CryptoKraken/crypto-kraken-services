@@ -2,6 +2,7 @@ export interface TestType {
     numberField: number;
     stringField: string;
     booleanField: boolean;
+    optionalNumberField?: number;
     objectField: {
         numberField: number;
         stringField: string;

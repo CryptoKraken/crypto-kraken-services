@@ -11,7 +11,8 @@
     ],
     "reporter": [
         "json",
-        "text"
+        "text",
+        "html"
     ],
     "require": [
         "../../environment/plugins/remove-empty-module-init-ts-node",
