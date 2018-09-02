@@ -13,5 +13,13 @@ export const wrongCommonCases = {
     wrongResponse: {
         field1: 10,
         field2: 'field2'
+    },
+    unknownSuccessResponseResult: {
+        success: true,
+        code: 'OK',
+        msg: 'some message',
+        timestamp: 1530718094413,
+        field1: 10,
+        field2: 'field2'
     }
 };

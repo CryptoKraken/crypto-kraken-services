@@ -4,7 +4,6 @@ import { KuCoinResponseResult } from './response-result';
 export interface KuCoinSuccessResponseResult extends KuCoinResponseResult {
     success: true;
     code: 'OK';
-    msg: string;
 }
 
 export const kuCoinSuccessResponseResultGuardsMap: FieldGuardsMap<KuCoinSuccessResponseResult> = {

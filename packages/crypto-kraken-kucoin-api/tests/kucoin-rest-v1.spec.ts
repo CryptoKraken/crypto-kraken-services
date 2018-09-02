@@ -3,7 +3,12 @@ import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { CurrencyPair } from 'crypto-kraken-core';
 import * as nock from 'nock';
-import { KuCoinConstants, KuCoinRestV1 } from '../src';
+import {
+    isKuCoinErrorResponseResult,
+    KuCoinConstants,
+    KuCoinErrorResponseResult,
+    KuCoinRestV1
+} from '../src';
 import {
     buyOrderBooksCases,
     coinInfoCases,
@@ -41,11 +46,36 @@ import {
 
 chai.use(chaiAsPromised);
 
+const getCommonKuCoinOperationResultPromises = (kuCoin: KuCoinRestV1) => {
+    const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
+    return [
+        kuCoin.listExchangeRateOfCoins(),
+        kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] }),
+        kuCoin.listLanguages(),
+        kuCoin.tick(),
+        kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } }),
+        kuCoin.orderBooks({ symbol: currencyPair }),
+        kuCoin.buyOrderBooks({ symbol: currencyPair }),
+        kuCoin.sellOrderBooks({ symbol: currencyPair }),
+        kuCoin.recentlyDealOrders({ symbol: { 0: 'ETH', 1: 'BTC' } }),
+        kuCoin.listTradingMarkets(),
+        kuCoin.listTradingSymbolsTick(),
+        kuCoin.listTradingSymbolsTick({ market: 'BTC' }),
+        kuCoin.listTrendings(),
+        kuCoin.listTrendings({ market: 'BTC' }),
+        kuCoin.getCoinInfo({ coin: 'BTC' }),
+        kuCoin.listCoins()
+    ];
+};
+
 describe('The KuCoin REST service of the V1 version', () => {
     let kuCoin: KuCoinRestV1;
 
     beforeEach(() => {
         kuCoin = new KuCoinRestV1();
+    });
+
+    afterEach(() => {
         nock.cleanAll();
     });
 
@@ -109,23 +139,38 @@ describe('The KuCoin REST service of the V1 version', () => {
     });
 
     it('should get a tick correctly', async () => {
-        const currencyPair: CurrencyPair = { 0: 'KCS', 1: 'BTC' };
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.tickUri)
             .query({
-                symbol: `${currencyPair[0]}-${currencyPair[1]}`
+                symbol: `KCS-BTC`
             })
             .reply(200, tickCases.default);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .query({
+                symbol: `ARN-BTC`
+            })
+            .reply(200, tickCases.withZeroVolume);
+        nock(KuCoinConstants.serverProductionUrl)
+            .get(KuCoinConstants.tickUri)
+            .query({
+                symbol: `BTG-USDT`
+            })
+            .reply(200, tickCases.btgUsdt);
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.tickUri)
             .twice()
             .reply(200, tickCases.allCoins);
 
-        const tick = await kuCoin.tick({ symbol: currencyPair });
+        const kcsBtcTick = await kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } });
+        const arnBtcTick = await kuCoin.tick({ symbol: { 0: 'ARN', 1: 'BTC' } });
+        const btgUsdtTick = await kuCoin.tick({ symbol: { 0: 'BTG', 1: 'USDT' } });
         const allCoinsTick = await kuCoin.tick();
         const allCoinsTickWithEmptyParams = await kuCoin.tick({});
 
-        expect(tick).to.eql(tickCases.default);
+        expect(kcsBtcTick).to.eql(tickCases.default);
+        expect(arnBtcTick).to.eql(tickCases.withZeroVolume);
+        expect(btgUsdtTick).to.eql(tickCases.btgUsdt);
         expect(allCoinsTick)
             .to.eql(allCoinsTickWithEmptyParams)
             .to.eql(tickCases.allCoins);
@@ -155,7 +200,7 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.tick({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
     });
 
-    it('should get a languages list correctly', async () => {
+    it('should get a list of languages correctly', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .get(KuCoinConstants.listLanguagesUri)
             .reply(200, listLanguagesCases.default);
@@ -750,6 +795,37 @@ describe('The KuCoin REST service of the V1 version', () => {
         await expect(kuCoin.listCoins()).to.be.rejectedWith(expectedExceptionMessage);
     });
 
+    it('should return an error object when a response contains an error', async () => {
+        const responseCodes = [200, 404, 500];
+
+        for (const responseCode of responseCodes) {
+            nock(KuCoinConstants.serverProductionUrl)
+                .persist()
+                .get(() => true)
+                .query(true)
+                .reply(responseCode, commonCases.commonError);
+
+            const tradingViewOperations = [
+                kuCoin.getTradingViewKLineConfig(),
+                kuCoin.getTradingViewSymbolTick({
+                    symbol: { 0: 'ETH', 1: 'BTC' }
+                }),
+                kuCoin.getTradingViewKLineData({
+                    symbol: { 0: 'ETH', 1: 'BTC' },
+                    from: 1422018000,
+                    to: 1532029207,
+                    resolution: 'W'
+                })
+            ];
+            const allKuCoinOperationResultPromises = getCommonKuCoinOperationResultPromises(kuCoin)
+                .concat(tradingViewOperations as any[]);
+            for (const operationResultPromise of allKuCoinOperationResultPromises)
+                expect(await operationResultPromise).to.eql(commonCases.commonError);
+
+            nock.cleanAll();
+        }
+    });
+
     it('should throw an exception when a response is wrong', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .persist()
@@ -757,61 +833,48 @@ describe('The KuCoin REST service of the V1 version', () => {
             .query(true)
             .reply(200, wrongCommonCases.wrongResponse);
 
-        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
         const expectedExceptionMessage = /isn't a KuCoin response result/;
-        await expect(kuCoin.listExchangeRateOfCoins()).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] }))
-            .to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listLanguages()).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.tick()).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.orderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.buyOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.sellOrderBooks({ symbol: currencyPair })).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.recentlyDealOrders({ symbol: { 0: 'ETH', 1: 'BTC' } }))
-            .to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listTradingMarkets()).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listTradingSymbolsTick()).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listTrendings()).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listTrendings({ market: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.getCoinInfo({ coin: 'BTC' })).to.be.rejectedWith(expectedExceptionMessage);
-        await expect(kuCoin.listCoins()).to.be.rejectedWith(expectedExceptionMessage);
+        const commonKuCoinOperationResultPromises = getCommonKuCoinOperationResultPromises(kuCoin);
+        expect(kuCoin.typeChecking).to.be.true;
+        for (const operationResult of commonKuCoinOperationResultPromises)
+            await expect(operationResult).to.be.rejectedWith(expectedExceptionMessage);
     });
 
-    it('should return an error object when a response contained an error', async () => {
+    // tslint:disable-next-line:max-line-length
+    it('should not throw an exception when a response is success result with wrong fields for the operation and the type checking is disabled', async () => {
         nock(KuCoinConstants.serverProductionUrl)
             .persist()
             .get(() => true)
             .query(true)
-            .reply(200, commonCases.commonError);
-        const currencyPair: CurrencyPair = { 0: 'AAA', 1: 'BBB' };
+            .reply(200, wrongCommonCases.unknownSuccessResponseResult);
 
-        expect(await kuCoin.tick()).to.eql(commonCases.commonError);
-        expect(await kuCoin.listExchangeRateOfCoins()).to.eql(commonCases.commonError);
-        expect(await kuCoin.listExchangeRateOfCoins({ coins: ['BTC', 'ETH'] })).to.eql(commonCases.commonError);
-        expect(await kuCoin.listLanguages()).to.eql(commonCases.commonError);
-        expect(await kuCoin.tick({ symbol: { 0: 'KCS', 1: 'BTC' } })).to.eql(commonCases.commonError);
-        expect(await kuCoin.orderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
-        expect(await kuCoin.buyOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
-        expect(await kuCoin.sellOrderBooks({ symbol: currencyPair })).to.eql(commonCases.commonError);
-        expect(await kuCoin.recentlyDealOrders({ symbol: { 0: 'ETH', 1: 'BTC' } })).to.eql(commonCases.commonError);
-        expect(await kuCoin.listTradingMarkets()).to.eql(commonCases.commonError);
-        expect(await kuCoin.listTradingSymbolsTick()).to.eql(commonCases.commonError);
-        expect(await kuCoin.listTradingSymbolsTick({ market: 'BTC' })).to.eql(commonCases.commonError);
-        expect(await kuCoin.listTrendings()).to.eql(commonCases.commonError);
-        expect(await kuCoin.listTrendings({ market: 'BTC' })).to.eql(commonCases.commonError);
-        expect(await kuCoin.getTradingViewKLineConfig()).to.eql(commonCases.commonError);
-        expect(await kuCoin.getTradingViewSymbolTick({
-            symbol: { 0: 'ETH', 1: 'BTC' }
-        })).to.eql(commonCases.commonError);
-        expect(await kuCoin.getTradingViewKLineData({
-            symbol: { 0: 'ETH', 1: 'BTC' },
-            from: 1422018000,
-            to: 1532029207,
-            resolution: 'W'
-        })).to.eql(commonCases.commonError);
-        expect(await kuCoin.getCoinInfo({ coin: 'BTC' })).to.eql(commonCases.commonError);
-        expect(await kuCoin.listCoins()).to.eql(commonCases.commonError);
+        kuCoin.typeChecking = false;
+
+        const commonKuCoinOperationResultPromises = getCommonKuCoinOperationResultPromises(kuCoin);
+        expect(kuCoin.typeChecking).to.be.false;
+        for (const operationResult of commonKuCoinOperationResultPromises)
+            await expect(operationResult).to.not.be.rejected;
+    });
+});
+
+describe('The guards of the the KuCoinRestV1 service', () => {
+    it('the \'isKuCoinErrorResponseResult\' guard should work correctly', () => {
+        const obj = { someField: 1 };
+        const errorResponseResult: KuCoinErrorResponseResult = {
+            code: 'ERROR',
+            msg: 'Some error',
+            success: false,
+            timestamp: 1535569548444
+        };
+        const wrongErrorResponseResult: KuCoinErrorResponseResult = {
+            code: 'ERROR',
+            msg: 'Some error',
+            success: true,
+            timestamp: 1535569548444
+        } as any;
+
+        expect(isKuCoinErrorResponseResult(obj)).to.be.false;
+        expect(isKuCoinErrorResponseResult(errorResponseResult)).to.be.true;
+        expect(isKuCoinErrorResponseResult(wrongErrorResponseResult)).to.be.false;
     });
 });

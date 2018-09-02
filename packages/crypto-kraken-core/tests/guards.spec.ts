@@ -4,8 +4,24 @@ import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import { is, isArray, isBoolean, isFunction, isNullOrArray, isNumber, isString, isSymbol } from '../src';
 import {
-    FieldGuardsMap, isNullOrBoolean, isNullOrFunction,
-    isNullOrNumber, isNullOrString, isNullOrSymbol
+    FieldGuardsMap,
+    isNullOrBoolean,
+    isNullOrFunction,
+    isNullOrNumber,
+    isNullOrString,
+    isNullOrSymbol,
+    isUndefinedOrArray,
+    isUndefinedOrBoolean,
+    isUndefinedOrFunction,
+    isUndefinedOrNullOrArray,
+    isUndefinedOrNullOrBoolean,
+    isUndefinedOrNullOrFunction,
+    isUndefinedOrNullOrNumber,
+    isUndefinedOrNullOrString,
+    isUndefinedOrNullOrSymbol,
+    isUndefinedOrNumber,
+    isUndefinedOrString,
+    isUndefinedOrSymbol
 } from '../src/guards';
 import { TestType } from './test-types';
 chai.use(sinonChai);
@@ -543,12 +559,12 @@ describe('The simple guards', () => {
     });
 
     it(`having the 'isNullOr' prefix should check null values or work like corresponding not-null guards`, () => {
-        expect(isNullOrArray(null)).to.true;
-        expect(isNullOrBoolean(null)).to.true;
-        expect(isNullOrFunction(null)).to.true;
-        expect(isNullOrNumber(null)).to.true;
-        expect(isNullOrString(null)).to.true;
-        expect(isNullOrSymbol(null)).to.true;
+        expect(isNullOrArray(null)).to.be.true;
+        expect(isNullOrBoolean(null)).to.be.true;
+        expect(isNullOrFunction(null)).to.be.true;
+        expect(isNullOrNumber(null)).to.be.true;
+        expect(isNullOrString(null)).to.be.true;
+        expect(isNullOrSymbol(null)).to.be.true;
 
         values.forEach(value => {
             expect(isNullOrArray(value)).to.eql(Array.isArray(value));
@@ -557,6 +573,46 @@ describe('The simple guards', () => {
             expect(isNullOrNumber(value)).to.eql(typeof value === 'number');
             expect(isNullOrString(value)).to.eql(typeof value === 'string');
             expect(isNullOrSymbol(value)).to.eql(typeof value === 'symbol');
+        });
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it(`having the 'isUndefinedOr' prefix should check undefined values or work like corresponding no-undefined guards`, () => {
+        expect(isUndefinedOrArray(undefined)).to.be.true;
+        expect(isUndefinedOrBoolean(undefined)).to.be.true;
+        expect(isUndefinedOrFunction(undefined)).to.be.true;
+        expect(isUndefinedOrNumber(undefined)).to.be.true;
+        expect(isUndefinedOrString(undefined)).to.be.true;
+        expect(isUndefinedOrSymbol(undefined)).to.be.true;
+
+        values.forEach(value => {
+            expect(isUndefinedOrArray(value)).to.eql(Array.isArray(value));
+            expect(isUndefinedOrBoolean(value)).to.eql(typeof value === 'boolean');
+            expect(isUndefinedOrFunction(value)).to.eql(typeof value === 'function');
+            expect(isUndefinedOrNumber(value)).to.eql(typeof value === 'number');
+            expect(isUndefinedOrString(value)).to.eql(typeof value === 'string');
+            expect(isUndefinedOrSymbol(value)).to.eql(typeof value === 'symbol');
+        });
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it(`having the 'isUndefinedOrNullOrNull' prefix should check undefined and null values or work like corresponding simple guards`, () => {
+        [undefined, null].forEach(value => {
+            expect(isUndefinedOrNullOrArray(value)).to.be.true;
+            expect(isUndefinedOrNullOrBoolean(value)).to.be.true;
+            expect(isUndefinedOrNullOrFunction(value)).to.be.true;
+            expect(isUndefinedOrNullOrNumber(value)).to.be.true;
+            expect(isUndefinedOrNullOrString(value)).to.be.true;
+            expect(isUndefinedOrNullOrSymbol(value)).to.be.true;
+        });
+
+        values.forEach(value => {
+            expect(isUndefinedOrNullOrArray(value)).to.eql(Array.isArray(value));
+            expect(isUndefinedOrNullOrBoolean(value)).to.eql(typeof value === 'boolean');
+            expect(isUndefinedOrNullOrFunction(value)).to.eql(typeof value === 'function');
+            expect(isUndefinedOrNullOrNumber(value)).to.eql(typeof value === 'number');
+            expect(isUndefinedOrNullOrString(value)).to.eql(typeof value === 'string');
+            expect(isUndefinedOrNullOrSymbol(value)).to.eql(typeof value === 'symbol');
         });
     });
 });

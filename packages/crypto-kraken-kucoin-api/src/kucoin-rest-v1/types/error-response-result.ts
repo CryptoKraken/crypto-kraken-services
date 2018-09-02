@@ -1,9 +1,8 @@
-import { FieldGuardsMap, isNumber, isString } from 'crypto-kraken-core';
+import { FieldGuardsMap, is, isNumber, isString } from 'crypto-kraken-core';
 import { KuCoinResponseResult } from './response-result';
 
 export interface KuCoinErrorResponseResult extends KuCoinResponseResult {
     success: false;
-    code: string;
     msg: string;
 }
 
@@ -12,4 +11,8 @@ export const kuCoinErrorResponseResultGuardsMap: FieldGuardsMap<KuCoinErrorRespo
     code: isString,
     msg: isString,
     timestamp: isNumber
+};
+
+export const isKuCoinErrorResponseResult = (data: any): data is KuCoinErrorResponseResult => {
+    return is<KuCoinErrorResponseResult>(data, kuCoinErrorResponseResultGuardsMap);
 };

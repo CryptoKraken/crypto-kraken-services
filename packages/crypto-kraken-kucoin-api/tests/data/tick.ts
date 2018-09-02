@@ -29,6 +29,53 @@ export const tickCases = {
             changeRate: -0.2642
         }
     } as KuCoinTick,
+    withZeroVolume: {
+        success: true,
+        code: 'OK',
+        msg: 'Operation succeeded.',
+        timestamp: 1535815518353,
+        data: {
+            coinType: 'ARN',
+            trading: true,
+            symbol: 'ARN-BTC',
+            st: true,
+            lastDealPrice: 0.000046,
+            buy: 0.00004105,
+            sell: 0.00005098,
+            change: 0,
+            coinTypePair: 'BTC',
+            sort: 100,
+            feeRate: 0.001,
+            volValue: 0,
+            datetime: 1535805834000,
+            vol: 0,
+            changeRate: 0
+        }
+    } as KuCoinTick,
+    btgUsdt: {
+        success: true,
+        code: 'OK',
+        msg: 'Operation succeeded.',
+        timestamp: 1535807431695,
+        data: {
+            coinType: 'BTG',
+            trading: true,
+            symbol: 'BTG-USDT',
+            lastDealPrice: null,
+            buy: 15.834911,
+            sell: 300.999977,
+            change: null,
+            coinTypePair: 'USDT',
+            sort: 100,
+            feeRate: 0.001,
+            volValue: 0,
+            high: null,
+            datetime: 1535807430000,
+            vol: 0,
+            low: null,
+            changeRate: null
+        }
+    } as KuCoinTick,
     allCoins: {
         success: true,
         code: 'OK',

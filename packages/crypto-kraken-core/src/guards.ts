@@ -157,3 +157,99 @@ export const isNullOrString = (value: any): value is string | null => {
 export const isNullOrSymbol = (value: any): value is 'symbol' => {
     return value === null || typeof value === 'symbol';
 };
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrArray = (value: any): value is any[] => {
+    return value === undefined || Array.isArray(value);
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrBoolean = (value: any): value is boolean => {
+    return value === undefined || typeof value === 'boolean';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrFunction = (value: any): value is 'function' => {
+    return value === undefined || typeof value === 'function';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrNumber = (value: any): value is number | undefined => {
+    return value === undefined || typeof value === 'number';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrString = (value: any): value is string | undefined => {
+    return value === undefined || typeof value === 'string';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrSymbol = (value: any): value is 'symbol' => {
+    return value === undefined || typeof value === 'symbol';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrNullOrArray = (value: any): value is any[] => {
+    return value === undefined || value === null || Array.isArray(value);
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrNullOrBoolean = (value: any): value is boolean => {
+    return value === undefined || value === null || typeof value === 'boolean';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrNullOrFunction = (value: any): value is 'function' => {
+    return value === undefined || value === null || typeof value === 'function';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrNullOrNumber = (value: any): value is number | undefined => {
+    return value === undefined || value === null || typeof value === 'number';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrNullOrString = (value: any): value is string | undefined => {
+    return value === undefined || value === null || typeof value === 'string';
+};
+/**
+ * This guard is needed for to avoid excessive using of memory.
+ * It should be used in guards map for simple type of fields.
+ * You shouldn't use them inside other guards, you should use native guards instead of.
+ */
+export const isUndefinedOrNullOrSymbol = (value: any): value is 'symbol' => {
+    return value === undefined || value === null || typeof value === 'symbol';
+};

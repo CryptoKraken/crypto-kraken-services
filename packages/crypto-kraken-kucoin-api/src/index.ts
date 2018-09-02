@@ -1,4 +1,5 @@
 export {
+    isKuCoinErrorResponseResult,
     KuCoinRestV1,
     KuCoinRestV1Options,
     KuCoinOrderType,
