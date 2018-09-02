@@ -9,6 +9,7 @@ const constants = {
     getTradesUri: (pair: CurrencyPair) => `/trades/${YobitUtils.getPairSymbol(pair)}`,
     balanceMethod: 'getInfo',
     createOrderMethod: 'Trade',
+    orderInfoMethod: 'OrderInfo',
     deleteOrderMethod: 'CancelOrder'
 };
 

@@ -1,5 +1,5 @@
 import { isArray, isNumber } from 'util';
-import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderType } from '../../../core';
+import { CurrencyBalance, CurrencyPair, Order, OrderBook, OrderInfo, OrderType } from '../../../core';
 import { Identified } from '../../../utils/identifier';
 import { YobitUtils } from './yobit-utils';
 
@@ -36,7 +36,15 @@ interface YobitResponseResultWithOrderId extends YobitSuccessResponseResult {
         order_id: number;
     };
 }
-
+interface YobitOrderInfo extends YobitSuccessResponseResult {
+    return: {
+        [key: string]: {
+            start_amount: number,
+            amount: number,
+            timestamp_created: number,
+        }
+    };
+}
 const Guards = {
     YobitErrorResponseResult: (data: any): data is YobitErrorResponseResult => {
         return data && data.success === 0 && data.error;
@@ -70,6 +78,12 @@ const Guards = {
 
     isYobitResponseResultWithOrderId: (data: YobitSuccessResponseResult): data is YobitResponseResultWithOrderId => {
         return data && data.return && typeof data.return.order_id === 'number';
+    },
+
+    isYobitOrderInfo: (data: YobitSuccessResponseResult): data is YobitOrderInfo => {
+        const order = data.return[Object.keys(data.return)[0]];
+        return order && typeof order.start_amount === 'number' && typeof order.amount === 'number'
+            && typeof order.timestamp_created === 'number';
     }
 };
 
@@ -119,6 +133,21 @@ export class YobitResponseParser {
         return { ...order, id: dataObject.return.order_id.toString() };
     }
 
+    parseOrderInfo(data: string, order: Identified<Order>): OrderInfo {
+        const result = this.getYobitSuccessResponseResult(data);
+        if (!Guards.isYobitOrderInfo(result))
+            throw new Error('Data object does not correspond to the order info type');
+
+        const orderId = Object.keys(result.return)[0];
+        const orderInfo = result.return[orderId];
+        return {
+            createdDate: new Date(orderInfo.timestamp_created),
+            remainingAmount: orderInfo.amount,
+            executedAmount: orderInfo.start_amount - orderInfo.amount,
+            order
+        };
+    }
+
     parseDeleteOrder(data: string, orderId: string): void {
         const dataObject = this.getYobitResponseResultWithOrderId(data);
         if (dataObject.return.order_id.toString() !== orderId)
@@ -126,7 +155,7 @@ export class YobitResponseParser {
     }
 
     parseBalance(data: string, currency: string): CurrencyBalance {
-        const dataObject = this.getYobitResponseResult(JSON.parse(data));
+        const dataObject = this.getYobitSuccessResponseResult(data);
         let allAmount = 0;
         let freeAmount = 0;
 
@@ -156,7 +185,8 @@ export class YobitResponseParser {
         }));
     }
 
-    private getYobitResponseResult(dataObject: any): YobitSuccessResponseResult {
+    private getYobitSuccessResponseResult(data: string): YobitSuccessResponseResult {
+        const dataObject = JSON.parse(data);
         if (!dataObject)
             throw new Error('Data object is empty.');
         if (Guards.YobitErrorResponseResult(dataObject))
@@ -166,8 +196,8 @@ export class YobitResponseParser {
         return dataObject;
     }
 
-    private getYobitResponseResultWithOrderId(dataObject: any): YobitResponseResultWithOrderId {
-        const result = this.getYobitResponseResult(JSON.parse(dataObject));
+    private getYobitResponseResultWithOrderId(data: string): YobitResponseResultWithOrderId {
+        const result = this.getYobitSuccessResponseResult(data);
         if (!Guards.isYobitResponseResultWithOrderId(result))
             throw new Error('Data object does not contain the \'order_id\' property');
         return result;

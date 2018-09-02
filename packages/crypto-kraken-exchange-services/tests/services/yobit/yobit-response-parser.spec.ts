@@ -7,10 +7,12 @@ import {
     createOrderCases,
     deleteOrderCases,
     orderBookCases,
+    orderInfoCases,
     tradesCases,
     wrongBalanceCases,
     wrongCreateOrderCases,
     wrongDeleteOrderCases,
+    wrongOrderInfoCases,
     yobitGeneralError
 } from './data';
 
@@ -104,6 +106,27 @@ describe('Yobit Response Parser', () => {
             .to.throw(/.*return.*/);
         expect(() => parser.parseCreateOrder(JSON.stringify(wrongCreateOrderCases.dataWithoutOrderIdField), order))
             .to.throw(/.*order_id.*/);
+    });
+
+    it('should parse order info result', () => {
+        const order: Identified<Order> = {
+            id: '100025362',
+            amount: 13.345,
+            orderType: OrderType.Sell,
+            pair: ['ltc', 'btc'],
+            price: 485
+        };
+
+        const result = parser.parseOrderInfo(JSON.stringify(orderInfoCases.orderInfo.data), order);
+        expect(result).to.eql(orderInfoCases.orderInfo.expect);
+        expect(() => parser.parseOrderInfo(JSON.stringify(yobitGeneralError), order))
+            .to.throw(/Yobit error text/);
+        expect(() => parser.parseOrderInfo(JSON.stringify(''), order))
+            .to.throw(/Data object is empty/);
+        expect(() => parser.parseOrderInfo(JSON.stringify(wrongOrderInfoCases.dataWithoutReturnField), order))
+            .to.throw(/.*return.*/);
+        expect(() => parser.parseOrderInfo(JSON.stringify(wrongOrderInfoCases.dataWithoutAmountField), order))
+            .to.throw(/.*order info.*/);
     });
 
     it('should parse delete order result', () => {
