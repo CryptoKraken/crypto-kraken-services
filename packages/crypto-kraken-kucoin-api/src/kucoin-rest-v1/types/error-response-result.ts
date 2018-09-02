@@ -3,7 +3,6 @@ import { KuCoinResponseResult } from './response-result';
 
 export interface KuCoinErrorResponseResult extends KuCoinResponseResult {
     success: false;
-    code: string;
     msg: string;
 }
 
